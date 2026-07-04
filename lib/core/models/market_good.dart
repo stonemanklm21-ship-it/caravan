@@ -3,28 +3,37 @@ import 'good.dart';
 class MarketGood {
   final Good good;
 
-  double supply;
-  double demand;
-
-  /// Quantity produced per day.
-  double productionPerDay;
-
-  /// Quantity consumed per day.
-  double consumptionPerDay;
+  /// Quantity currently available
+  /// in the city market.
+  double quantity;
 
   MarketGood({
     required this.good,
-    required this.supply,
-    required this.demand,
-    required this.productionPerDay,
-    required this.consumptionPerDay,
+    required this.quantity,
   });
 
-  double get scarcity {
-    if (supply <= 0) {
-      return double.infinity;
-    }
+  Map<String, dynamic> toJson() {
+    return {
+      'good': good.id,
+      'quantity': quantity,
+    };
+  }
 
-    return demand / supply;
+  factory MarketGood.fromJson({
+    required Map<String, dynamic>
+        json,
+    required Good Function(
+      String id,
+    )
+    goodForId,
+  }) {
+    return MarketGood(
+      good: goodForId(
+        json['good'] as String,
+      ),
+      quantity:
+          (json['quantity'] as num)
+              .toDouble(),
+    );
   }
 }

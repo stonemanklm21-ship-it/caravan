@@ -81,9 +81,9 @@ class Caravan {
     );
   }
 
-  double quantityOf(String goodName) {
+  double quantityOf(String goodId) {
     final item = inventory.where(
-      (item) => item.good.name == goodName,
+      (item) => item.good.id == goodId,
     );
 
     if (item.isEmpty) {
@@ -91,5 +91,49 @@ class Caravan {
     }
 
     return item.first.quantity;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'gold': gold,
+      'inventory':
+          inventory
+              .map((item) => item.toJson())
+              .toList(),
+      'components':
+          components
+              .map((component) =>
+                  component.toJson())
+              .toList(),
+    };
+  }
+
+  factory Caravan.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    return Caravan(
+      gold:
+          (json['gold'] as num)
+              .toDouble(),
+      inventory:
+          (json['inventory'] as List)
+              .map(
+                (item) =>
+                    CargoItem.fromJson(
+                  item,
+                ),
+              )
+              .toList(),
+      components:
+          (json['components'] as List)
+              .map(
+                (component) =>
+                    CaravanComponentStack
+                        .fromJson(
+                  component,
+                ),
+              )
+              .toList(),
+    );
   }
 }

@@ -9,11 +9,11 @@ class TradingService {
     required MarketGood market,
     required int quantity,
   }) {
-    final price = PricingService.calculatePrice(
+    final cost =
+        PricingService.transactionCost(
       market: market,
+      quantity: quantity,
     );
-
-    final cost = price * quantity;
 
     if (caravan.gold < cost) {
       return false;
@@ -22,14 +22,13 @@ class TradingService {
     final addedWeight =
         market.good.weight * quantity;
 
-    if (
-      caravan.cargoWeightKg + addedWeight >
-      caravan.cargoCapacityKg
-    ) {
+    if (caravan.cargoWeightKg +
+            addedWeight >
+        caravan.cargoCapacityKg) {
       return false;
     }
 
-    if (market.supply < quantity) {
+    if (market.quantity < quantity) {
       return false;
     }
 
@@ -37,22 +36,26 @@ class TradingService {
 
     final existingIndex =
         caravan.inventory.indexWhere(
-      (item) => item.good.name == market.good.name,
+      (item) =>
+          item.good.id ==
+          market.good.id,
     );
 
     if (existingIndex >= 0) {
-      caravan.inventory[existingIndex].quantity +=
-          quantity.toDouble();
+      caravan
+          .inventory[existingIndex]
+          .quantity += quantity;
     } else {
       caravan.inventory.add(
         CargoItem(
           good: market.good,
-          quantity: quantity.toDouble(),
+          quantity:
+              quantity.toDouble(),
         ),
       );
     }
 
-    market.supply -= quantity;
+    market.quantity -= quantity;
 
     return true;
   }
@@ -64,32 +67,41 @@ class TradingService {
   }) {
     final existingIndex =
         caravan.inventory.indexWhere(
-      (item) => item.good.name == market.good.name,
+      (item) =>
+          item.good.id ==
+          market.good.id,
     );
 
     if (existingIndex < 0) {
       return false;
     }
 
-    final item = caravan.inventory[existingIndex];
+    final item =
+        caravan.inventory[
+            existingIndex];
 
     if (item.quantity < quantity) {
       return false;
     }
 
-    final price = PricingService.calculatePrice(
+    final revenue =
+        PricingService
+            .transactionRevenue(
       market: market,
+      quantity: quantity,
     );
 
-    item.quantity -= quantity.toDouble();
+    item.quantity -= quantity;
 
-    caravan.gold += price * quantity;
+    caravan.gold += revenue;
 
     if (item.quantity <= 0.0001) {
-      caravan.inventory.removeAt(existingIndex);
+      caravan.inventory.removeAt(
+        existingIndex,
+      );
     }
 
-    market.supply += quantity;
+    market.quantity += quantity;
 
     return true;
   }

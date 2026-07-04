@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../models/game_state.dart';
+import '../models/player_state.dart';
 
-class JourneyRoutePainter extends CustomPainter {
-  final GameState gameState;
+class JourneyRoutePainter
+    extends CustomPainter {
+  final PlayerState playerState;
 
   JourneyRoutePainter({
-    required this.gameState,
+    required this.playerState,
   });
 
   @override
@@ -14,7 +15,8 @@ class JourneyRoutePainter extends CustomPainter {
     Canvas canvas,
     Size size,
   ) {
-    final journey = gameState.activeJourney;
+    final journey =
+        playerState.activeJourney;
 
     if (journey == null) {
       return;
@@ -30,8 +32,8 @@ class JourneyRoutePainter extends CustomPainter {
         journey.originY,
       ),
       Offset(
-        journey.destination.x,
-        journey.destination.y,
+        journey.destinationX,
+        journey.destinationY,
       ),
       routePaint,
     );
@@ -39,7 +41,8 @@ class JourneyRoutePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(
-    covariant JourneyRoutePainter oldDelegate,
+    covariant JourneyRoutePainter
+        oldDelegate,
   ) {
     return true;
   }

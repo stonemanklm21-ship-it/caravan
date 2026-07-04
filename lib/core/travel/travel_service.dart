@@ -1,29 +1,58 @@
 import '../models/city.dart';
-import '../models/game_state.dart';
+import '../models/player_state.dart';
 import 'journey_service.dart';
+import '../world/location_service.dart';
+import '../models/world.dart';
 
 class TravelService {
   static void startTravel({
-    required GameState gameState,
+    required PlayerState playerState,
     required City destination,
   }) {
     JourneyService.startJourney(
-      gameState: gameState,
+      playerState: playerState,
       destination: destination,
     );
   }
 
-  static void arrive({
-    required GameState gameState,
-    required City destination,
+  static void startTravelToCoordinates({
+    required PlayerState playerState,
+    required double destinationX,
+    required double destinationY,
   }) {
-    gameState.worldX = destination.x;
-    gameState.worldY = destination.y;
+    JourneyService.startJourneyToCoordinates(
+      playerState: playerState,
+      destinationX: destinationX,
+      destinationY: destinationY,
+    );
+  }
 
-    gameState.currentCity = destination;
+  static void arrive({
+    required PlayerState playerState,
+    required World world,
+  }) {
+    final journey =
+        playerState.activeJourney;
+
+    if (journey == null) {
+      return;
+    }
+
+    playerState.worldX =
+        journey.destinationX;
+
+    playerState.worldY =
+        journey.destinationY;
+
+    playerState.currentCity =
+        LocationService.cityAtPosition(
+      world: world,
+      x: playerState.worldX,
+      y: playerState.worldY,
+    );
 
     JourneyService.clearJourney(
-      gameState,
+      playerState,
     );
   }
 }

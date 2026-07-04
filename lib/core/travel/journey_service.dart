@@ -2,20 +2,27 @@ import 'dart:math';
 
 import '../travel/active_journey.dart';
 import '../models/city.dart';
-import '../models/game_state.dart';
+import '../models/player_state.dart';
 
 class JourneyService {
-  static const double mapUnitsPerDay = 500;
+  static const double mapUnitsPerDay =
+      500;
 
   static ActiveJourney startJourney({
-    required GameState gameState,
+    required PlayerState playerState,
     required City destination,
   }) {
-    final originX = currentX(gameState);
-    final originY = currentY(gameState);
+    final originX =
+        currentX(playerState);
 
-    final dx = destination.x - originX;
-    final dy = destination.y - originY;
+    final originY =
+        currentY(playerState);
+
+    final dx =
+        destination.x - originX;
+
+    final dy =
+        destination.y - originY;
 
     final distance = sqrt(
       (dx * dx) + (dy * dy),
@@ -23,27 +30,82 @@ class JourneyService {
 
     final travelDays =
         distance /
-        (mapUnitsPerDay * gameState.caravan.speed);
+        (mapUnitsPerDay *
+            playerState.caravan.speed);
 
-    final travelHours = travelDays * 24;
+    final travelHours =
+        travelDays * 24;
 
     final journey = ActiveJourney(
       originX: originX,
       originY: originY,
-      destination: destination,
+      destinationX:
+          destination.x,
+      destinationY:
+          destination.y,
+      destinationCity:
+          destination,
       totalHours: travelHours,
     );
 
-    gameState.activeJourney = journey;
+    playerState.activeJourney =
+        journey;
+
+    return journey;
+  }
+
+  static ActiveJourney
+      startJourneyToCoordinates({
+    required PlayerState playerState,
+    required double destinationX,
+    required double destinationY,
+  }) {
+    final originX =
+        currentX(playerState);
+
+    final originY =
+        currentY(playerState);
+
+    final dx =
+        destinationX - originX;
+
+    final dy =
+        destinationY - originY;
+
+    final distance = sqrt(
+      (dx * dx) + (dy * dy),
+    );
+
+    final travelDays =
+        distance /
+        (mapUnitsPerDay *
+            playerState.caravan.speed);
+
+    final travelHours =
+        travelDays * 24;
+
+    final journey = ActiveJourney(
+      originX: originX,
+      originY: originY,
+      destinationX:
+          destinationX,
+      destinationY:
+          destinationY,
+      totalHours: travelHours,
+    );
+
+    playerState.activeJourney =
+        journey;
 
     return journey;
   }
 
   static void advanceJourney({
-    required GameState gameState,
+    required PlayerState playerState,
     required double hours,
   }) {
-    final journey = gameState.activeJourney;
+    final journey =
+        playerState.activeJourney;
 
     if (journey == null) {
       return;
@@ -51,51 +113,57 @@ class JourneyService {
 
     journey.elapsedHours += hours;
 
-    if (journey.elapsedHours > journey.totalHours) {
-      journey.elapsedHours = journey.totalHours;
+    if (journey.elapsedHours >
+        journey.totalHours) {
+      journey.elapsedHours =
+          journey.totalHours;
     }
   }
 
   static double currentX(
-    GameState gameState,
+    PlayerState playerState,
   ) {
-    final journey = gameState.activeJourney;
+    final journey =
+        playerState.activeJourney;
 
     if (journey == null) {
-      return gameState.worldX;
+      return playerState.worldX;
     }
 
     return journey.originX +
-        ((journey.destination.x -
+        ((journey.destinationX -
                 journey.originX) *
             journey.progress);
   }
 
   static double currentY(
-    GameState gameState,
+    PlayerState playerState,
   ) {
-    final journey = gameState.activeJourney;
+    final journey =
+        playerState.activeJourney;
 
     if (journey == null) {
-      return gameState.worldY;
+      return playerState.worldY;
     }
 
     return journey.originY +
-        ((journey.destination.y -
+        ((journey.destinationY -
                 journey.originY) *
             journey.progress);
   }
 
   static bool hasActiveJourney(
-    GameState gameState,
+    PlayerState playerState,
   ) {
-    return gameState.activeJourney != null;
+    return playerState.activeJourney !=
+        null;
   }
 
   static bool isComplete(
-    GameState gameState,
+    PlayerState playerState,
   ) {
-    final journey = gameState.activeJourney;
+    final journey =
+        playerState.activeJourney;
 
     if (journey == null) {
       return false;
@@ -105,20 +173,23 @@ class JourneyService {
   }
 
   static void completeJourney(
-    GameState gameState,
+    PlayerState playerState,
   ) {
-    final journey = gameState.activeJourney;
+    final journey =
+        playerState.activeJourney;
 
     if (journey == null) {
       return;
     }
 
-    journey.elapsedHours = journey.totalHours;
+    journey.elapsedHours =
+        journey.totalHours;
   }
 
   static void clearJourney(
-    GameState gameState,
+    PlayerState playerState,
   ) {
-    gameState.activeJourney = null;
+    playerState.activeJourney =
+        null;
   }
 }

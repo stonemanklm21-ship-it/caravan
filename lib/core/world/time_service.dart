@@ -1,13 +1,15 @@
 import '../economy/economy_service.dart';
-import '../models/game_state.dart';
+import '../models/player_state.dart';
 import '../models/world.dart';
+import '../npc/npc_caravan_service.dart';
 import '../travel/consumption_service.dart';
+import '../travel/discovery_service.dart';
 import '../travel/journey_service.dart';
 import '../travel/travel_service.dart';
 
 class TimeService {
   static void advanceTime({
-    required GameState gameState,
+    required PlayerState playerState,
     required World world,
     required double hours,
   }) {
@@ -16,29 +18,37 @@ class TimeService {
       hours: hours,
     );
 
+    NpcCaravanService.advanceAll(
+      world: world,
+      hours: hours,
+    );
+
     ConsumptionService.consume(
-      caravan: gameState.caravan,
+      caravan: playerState.caravan,
       days: hours / 24,
     );
 
     JourneyService.advanceJourney(
-      gameState: gameState,
+      playerState: playerState,
       hours: hours,
     );
 
     final activeJourney =
-        gameState.activeJourney;
+        playerState.activeJourney;
 
-    if (
-      activeJourney != null &&
-      activeJourney.completed
-    ) {
+    if (activeJourney != null &&
+        activeJourney.completed) {
       TravelService.arrive(
-        gameState: gameState,
-        destination: activeJourney.destination,
+        world: world,
+        playerState: playerState,
       );
     }
 
-    gameState.worldTimeHours += hours;
+    playerState.worldTimeHours += hours;
+
+    DiscoveryService.discoverNearbyCities(
+      playerState: playerState,
+      world: world,
+    );
   }
 }

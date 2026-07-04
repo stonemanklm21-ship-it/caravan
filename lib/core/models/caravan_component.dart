@@ -6,6 +6,7 @@ enum CaravanComponentType {
 }
 
 class CaravanComponent {
+  final String id;
   final String name;
 
   final CaravanComponentType type;
@@ -32,6 +33,7 @@ class CaravanComponent {
   final double fuelPerDay;
 
   const CaravanComponent({
+    required this.id,
     required this.name,
     required this.type,
     required this.cargoCapacityKg,

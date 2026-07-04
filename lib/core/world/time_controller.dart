@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
-import '../models/game_state.dart';
+import '../models/player_state.dart';
 import '../models/world.dart';
 import 'simulation_service.dart';
 import 'time_speed.dart';
@@ -18,7 +18,7 @@ class TimeController {
 
   void setSpeed({
     required TimeSpeed speed,
-    required GameState gameState,
+    required PlayerState playerState,
     required World world,
     required VoidCallback onTick,
   }) {
@@ -59,7 +59,7 @@ class TimeController {
           i++
         ) {
           SimulationService.tick(
-            gameState: gameState,
+            playerState: playerState,
             world: world,
           );
         }

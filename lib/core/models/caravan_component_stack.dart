@@ -1,3 +1,4 @@
+import '/data/caravan_components_data.dart';
 import 'caravan_component.dart';
 
 class CaravanComponentStack {
@@ -20,5 +21,29 @@ class CaravanComponentStack {
 
   double get totalPurchasePrice {
     return component.purchasePrice * quantity;
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'component': component.id,
+      'quantity': quantity,
+    };
+  }
+
+  factory CaravanComponentStack.fromJson(
+    Map<String, dynamic> json,
+  ) {
+    final componentId =
+        json['component'] as String;
+
+    final component =
+        componentForId(
+      componentId,
+    );
+
+    return CaravanComponentStack(
+      component: component,
+      quantity: json['quantity'] as int,
+    );
   }
 }

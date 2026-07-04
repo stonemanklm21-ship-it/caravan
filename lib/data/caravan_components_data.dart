@@ -1,6 +1,7 @@
 import '../core/models/caravan_component.dart';
 
 const player = CaravanComponent(
+  id: 'player',
   name: 'Player',
   type: CaravanComponentType.person,
   cargoCapacityKg: 10,
@@ -12,7 +13,21 @@ const player = CaravanComponent(
   fuelPerDay: 0,
 );
 
+const person = CaravanComponent(
+  id: 'person',
+  name: 'Person',
+  type: CaravanComponentType.person,
+  cargoCapacityKg: 10,
+  travelSpeed: 1.0,
+  purchasePrice: 20,
+  caloriesPerDay: 2500,
+  waterPerDay: 3,
+  foragePerDay: 0,
+  fuelPerDay: 0,
+);
+
 const donkey = CaravanComponent(
+  id: 'donkey',
   name: 'Donkey',
   type: CaravanComponentType.packAnimal,
   cargoCapacityKg: 50,
@@ -25,6 +40,7 @@ const donkey = CaravanComponent(
 );
 
 const horse = CaravanComponent(
+  id: 'horse',
   name: 'Horse',
   type: CaravanComponentType.packAnimal,
   cargoCapacityKg: 40,
@@ -37,6 +53,7 @@ const horse = CaravanComponent(
 );
 
 const cart = CaravanComponent(
+  id: 'cart',
   name: 'Cart',
   type: CaravanComponentType.vehicle,
   cargoCapacityKg: 100,
@@ -50,7 +67,19 @@ const cart = CaravanComponent(
 
 const components = [
   player,
+  person,
   donkey,
   horse,
   cart,
 ];
+
+final componentsById = {
+  for (final component in components)
+    component.id: component,
+};
+
+CaravanComponent componentForId(
+  String id,
+) {
+  return componentsById[id]!;
+}

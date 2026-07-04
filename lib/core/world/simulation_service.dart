@@ -1,4 +1,4 @@
-import '../models/game_state.dart';
+import '../models/player_state.dart';
 import '../models/world.dart';
 import 'time_service.dart';
 
@@ -6,11 +6,11 @@ class SimulationService {
   static const double tickHours = 1;
 
   static void tick({
-    required GameState gameState,
+    required PlayerState playerState,
     required World world,
   }) {
     TimeService.advanceTime(
-      gameState: gameState,
+      playerState: playerState,
       world: world,
       hours: tickHours,
     );

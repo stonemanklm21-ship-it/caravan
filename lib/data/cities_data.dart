@@ -1,97 +1,168 @@
 import '../core/models/city.dart';
 import '../core/models/city_specialisation.dart';
+import '../core/models/industry.dart';
 import '../core/models/market_good.dart';
+
 import 'goods_data.dart';
+import 'industry_data.dart';
 
 final farmingVillage = City(
+  id: 'farming_village',
   name: 'Farming Village',
   specialisation: CitySpecialisation.farming,
   x: 100,
   y: 100,
-  marketGoods: [
-    MarketGood(
-      good: grain,
-      supply: 120,
-      demand: 40,
-      productionPerDay: 20,
-      consumptionPerDay: 5,
+  population: 1000,
+  industries: [
+    Industry(
+      type: farm,
+      size: 4,
+      inputDaysTarget: 2,
+      inventory: [],
     ),
-    MarketGood(
-      good: water,
-      supply: 200,
-      demand: 50,
-      productionPerDay: 30,
-      consumptionPerDay: 10,
+    Industry(
+      type: well,
+      size: 2,
+      inputDaysTarget: 0,
+      inventory: [],
     ),
-    MarketGood(
-      good: forage,
-      supply: 150,
-      demand: 40,
-      productionPerDay: 15,
-      consumptionPerDay: 5,
-    ),
-    MarketGood(
-      good: wood,
-      supply: 60,
-      demand: 80,
-      productionPerDay: 8,
-      consumptionPerDay: 3,
-    ),
-    MarketGood(
-      good: ironOre,
-      supply: 20,
-      demand: 100,
-      productionPerDay: 1,
-      consumptionPerDay: 2,
+    Industry(
+      type: gatheringCamp,
+      size: 1,
+      inputDaysTarget: 5,
+      inventory: [],
     ),
   ],
+  marketGoods: [
+    MarketGood(good: grain, quantity: 120),
+    MarketGood(good: bread, quantity: 10),
+    MarketGood(good: water, quantity: 200),
+    MarketGood(good: forage, quantity: 150),
+    MarketGood(good: wood, quantity: 60),
+    MarketGood(good: ironOre, quantity: 20),
+    MarketGood(good: tools, quantity: 3),
+    MarketGood(good: chair, quantity: 1),
+  ],
+  shopGoods: [],
 );
 
 final miningTown = City(
+  id: 'mining_town',
   name: 'Mining Town',
   specialisation: CitySpecialisation.mining,
-  x: 400,
+  x: 320,
   y: 250,
-  marketGoods: [
-    MarketGood(
-      good: grain,
-      supply: 40,
-      demand: 120,
-      productionPerDay: 2,
-      consumptionPerDay: 10,
+  population: 2000,
+  industries: [
+    Industry(
+      type: mine,
+      size: 2,
+      inputDaysTarget: 14,
+      inventory: [],
     ),
-    MarketGood(
-      good: water,
-      supply: 80,
-      demand: 150,
-      productionPerDay: 8,
-      consumptionPerDay: 12,
+    Industry(
+      type: bakery,
+      size: 4,
+      inputDaysTarget: 3,
+      inventory: [],
     ),
-    MarketGood(
-      good: forage,
-      supply: 60,
-      demand: 120,
-      productionPerDay: 3,
-      consumptionPerDay: 8,
+    Industry(
+      type: well,
+      size: 1,
+      inputDaysTarget: 0,
+      inventory: [],
     ),
-    MarketGood(
-      good: wood,
-      supply: 50,
-      demand: 80,
-      productionPerDay: 2,
-      consumptionPerDay: 4,
+    Industry(
+      type: gatheringCamp,
+      size: 1,
+      inputDaysTarget: 5,
+      inventory: [],
     ),
-    MarketGood(
-      good: ironOre,
-      supply: 150,
-      demand: 40,
-      productionPerDay: 20,
-      consumptionPerDay: 5,
+    Industry(
+      type: toolmaker,
+      size: 1,
+      inputDaysTarget: 5,
+      inventory: [],
+    ),
+    Industry(
+      type: well,
+      size: 3,
+      inputDaysTarget: 0,
+      inventory: [],
+    ),
+    Industry(
+      type: chairmaker,
+      size: 2,
+      inputDaysTarget: 3,
+      inventory: [],
     ),
   ],
+  marketGoods: [
+    MarketGood(good: grain, quantity: 40),
+    MarketGood(good: bread, quantity: 30),
+    MarketGood(good: water, quantity: 80),
+    MarketGood(good: forage, quantity: 60),
+    MarketGood(good: wood, quantity: 50),
+    MarketGood(good: ironOre, quantity: 150),
+    MarketGood(good: tools, quantity: 10),
+    MarketGood(good: chair, quantity: 1),
+  ],
+  shopGoods: [],
+);
+
+final forestCamp = City(
+  id: 'forest_camp',
+  name: 'Forest Camp',
+  specialisation: CitySpecialisation.forestry,
+  x: 220,
+  y: 50,
+  population: 600,
+  industries: [
+    Industry(
+      type: loggingCamp,
+      size: 4,
+      inputDaysTarget: 7,
+      inventory: [],
+    ),
+    Industry(
+      type: gatheringCamp,
+      size: 2,
+      inputDaysTarget: 5,
+      inventory: [],
+    ),
+    Industry(
+      type: well,
+      size: 1,
+      inputDaysTarget: 0,
+      inventory: [],
+    ),
+  ],
+  marketGoods: [
+    MarketGood(good: grain, quantity: 30),
+    MarketGood(good: bread, quantity: 5),
+    MarketGood(good: water, quantity: 100),
+    MarketGood(good: forage, quantity: 180),
+    MarketGood(good: wood, quantity: 180),
+    MarketGood(good: ironOre, quantity: 10),
+    MarketGood(good: tools, quantity: 3),
+    MarketGood(good: chair, quantity: 1),
+  ],
+  shopGoods: [],
 );
 
 final cities = [
   farmingVillage,
   miningTown,
+  forestCamp,
 ];
+
+final citiesById = {
+  for (final city in cities)
+    city.id: city,
+};
+
+City cityForId(
+  String id,
+) {
+  return citiesById[id]!;
+}

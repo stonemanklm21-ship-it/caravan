@@ -1,3 +1,4 @@
+import '../../data/goods_data.dart';
 import '../models/caravan.dart';
 
 class ConsumptionService {
@@ -13,24 +14,27 @@ class ConsumptionService {
 
     _consumeGood(
       caravan: caravan,
-      goodName: 'Water',
+      goodId: water.id,
       quantityRequired:
           caravan.waterRequirementPerDay * days,
     );
 
     _consumeGood(
       caravan: caravan,
-      goodName: 'Forage',
+      goodId: forage.id,
       quantityRequired:
           caravan.forageRequirementPerDay * days,
     );
 
+    // Re-enable when/if a fuel good exists.
+    /*
     _consumeGood(
       caravan: caravan,
-      goodName: 'Fuel',
+      goodId: fuel.id,
       quantityRequired:
           caravan.fuelRequirementPerDay * days,
     );
+    */
   }
 
   static void _consumeCalories({
@@ -72,12 +76,12 @@ class ConsumptionService {
 
   static void _consumeGood({
     required Caravan caravan,
-    required String goodName,
+    required String goodId,
     required double quantityRequired,
   }) {
     final itemIndex =
         caravan.inventory.indexWhere(
-      (item) => item.good.name == goodName,
+      (item) => item.good.id == goodId,
     );
 
     if (itemIndex < 0) {
