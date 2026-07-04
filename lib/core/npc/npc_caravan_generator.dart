@@ -1,11 +1,10 @@
 import 'dart:math';
 
+import '../../data/character_data.dart';
 import '../economy/market_ledger.dart';
 import '../models/caravan.dart';
-import '../models/caravan_component_stack.dart';
 import '../models/city.dart';
 import '../models/npc_caravan.dart';
-import '../../data/caravan_components_data.dart';
 
 class NpcCaravanGenerator {
   static final Random _random =
@@ -34,6 +33,7 @@ class NpcCaravanGenerator {
             worldY: city.y,
             currentCity: city,
             caravan: Caravan(
+              leader: defaultNpc,
               gold:
                   (200 +
                           _random.nextInt(
@@ -41,12 +41,8 @@ class NpcCaravanGenerator {
                           ))
                       .toDouble(),
               inventory: [],
-              components: [
-                CaravanComponentStack(
-                  component: person,
-                  quantity: 3,
-                ),
-              ],
+              animals: [],
+              vehicles: [],
             ),
             ledger: MarketLedger(
               observations: [],

@@ -1,7 +1,12 @@
+import '../../data/animal_data.dart';
+import '../../data/vehicle_data.dart';
+
 import '../economy/market_ledger.dart';
 import '../travel/active_journey.dart';
+import 'animal.dart';
 import 'caravan.dart';
 import 'city.dart';
+import 'vehicle.dart';
 import 'world.dart';
 
 class NpcCaravan {
@@ -61,8 +66,22 @@ class NpcCaravan {
               .toDouble(),
       currentCity: currentCity,
       caravan: Caravan.fromJson(
-        json['caravan']
+        json: json['caravan']
             as Map<String, dynamic>,
+        animalFromJson:
+            (animalJson) =>
+                Animal.fromJson(
+          json: animalJson,
+          animalTypeForId:
+              animalTypeForId,
+        ),
+        vehicleFromJson:
+            (vehicleJson) =>
+                Vehicle.fromJson(
+          json: vehicleJson,
+          vehicleTypeForId:
+              vehicleTypeForId,
+        ),
       ),
       ledger:
           MarketLedger.fromJson(
