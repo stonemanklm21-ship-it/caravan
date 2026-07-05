@@ -8,10 +8,16 @@ class TravelService {
   static void startTravel({
     required PlayerState playerState,
     required City destination,
+    double? originX,
+    double? originY,
   }) {
+    playerState.currentCity = null;
+
     JourneyService.startJourney(
       playerState: playerState,
       destination: destination,
+      originX: originX,
+      originY: originY,
     );
   }
 
@@ -19,11 +25,17 @@ class TravelService {
     required PlayerState playerState,
     required double destinationX,
     required double destinationY,
+    double? originX,
+    double? originY,
   }) {
+    playerState.currentCity = null;
+
     JourneyService.startJourneyToCoordinates(
       playerState: playerState,
       destinationX: destinationX,
       destinationY: destinationY,
+      originX: originX,
+      originY: originY,
     );
   }
 

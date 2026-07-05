@@ -7,7 +7,7 @@ class VehicleService {
     required double hours,
   }) {
     vehicle.condition -=
-        (hours / 24) * 0.1;
+        (hours / 24) * 5;
 
     if (vehicle.condition < 0) {
       vehicle.condition = 0;

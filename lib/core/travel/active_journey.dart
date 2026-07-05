@@ -2,8 +2,8 @@ import '../models/city.dart';
 import '../models/world.dart';
 
 class ActiveJourney {
-  final double originX;
-  final double originY;
+  double originX;
+  double originY;
 
   final double destinationX;
   final double destinationY;
@@ -64,7 +64,8 @@ class ActiveJourney {
     City? destinationCity;
 
     if (cityId != null) {
-      destinationCity = world.cities.firstWhere(
+      destinationCity =
+          world.cities.firstWhere(
         (city) =>
             city.id == cityId,
       );

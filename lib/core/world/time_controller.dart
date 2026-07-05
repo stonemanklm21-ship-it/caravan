@@ -10,11 +10,42 @@ import 'time_speed.dart';
 class TimeController {
   Timer? _timer;
 
+  DateTime? _lastTickTime;
+
+  double _pausedTickFraction = 0.0;
+
+  static const Duration tickDuration =
+      Duration(seconds: 1);
+
   TimeSpeed currentSpeed =
       TimeSpeed.paused;
 
   bool get isRunning =>
       currentSpeed != TimeSpeed.paused;
+
+  /// 0.0 -> 1.0 progress through current tick
+  double get tickFraction {
+    if (currentSpeed ==
+        TimeSpeed.paused) {
+      return _pausedTickFraction;
+    }
+
+    if (_lastTickTime == null) {
+      return _pausedTickFraction;
+    }
+
+    final elapsed =
+        DateTime.now()
+            .difference(
+      _lastTickTime!,
+    );
+
+    return (_pausedTickFraction +
+            (elapsed.inMilliseconds /
+                tickDuration
+                    .inMilliseconds))
+        .clamp(0.0, 1.0);
+  }
 
   void setSpeed({
     required TimeSpeed speed,
@@ -22,6 +53,9 @@ class TimeController {
     required World world,
     required VoidCallback onTick,
   }) {
+    final resumeFraction =
+        _pausedTickFraction;
+
     stop();
 
     currentSpeed = speed;
@@ -29,6 +63,9 @@ class TimeController {
     if (speed == TimeSpeed.paused) {
       return;
     }
+
+    _pausedTickFraction =
+        resumeFraction;
 
     int ticksPerSecond;
 
@@ -50,9 +87,15 @@ class TimeController {
         break;
     }
 
+    _lastTickTime = DateTime.now();
+
     _timer = Timer.periodic(
-      const Duration(seconds: 1),
+      tickDuration,
       (_) {
+        _pausedTickFraction = 0.0;
+
+        _lastTickTime = DateTime.now();
+
         for (
           int i = 0;
           i < ticksPerSecond;
@@ -70,8 +113,12 @@ class TimeController {
   }
 
   void stop() {
+    _pausedTickFraction =
+        tickFraction;
+
     _timer?.cancel();
     _timer = null;
+
     currentSpeed = TimeSpeed.paused;
   }
 

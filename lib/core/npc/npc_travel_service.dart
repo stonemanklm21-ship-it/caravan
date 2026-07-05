@@ -10,9 +10,20 @@ class NpcTravelService {
   static void startJourney({
     required NpcCaravan npc,
     required City destination,
+    double? originX,
+    double? originY,
   }) {
-    final dx = destination.x - npc.worldX;
-    final dy = destination.y - npc.worldY;
+    final startX =
+        originX ?? npc.worldX;
+
+    final startY =
+        originY ?? npc.worldY;
+
+    final dx =
+        destination.x - startX;
+
+    final dy =
+        destination.y - startY;
 
     final distance = sqrt(
       (dx * dx) + (dy * dy),
@@ -27,8 +38,8 @@ class NpcTravelService {
         travelDays * 24;
 
     npc.activeJourney = ActiveJourney(
-      originX: npc.worldX,
-      originY: npc.worldY,
+      originX: startX,
+      originY: startY,
       destinationX: destination.x,
       destinationY: destination.y,
       destinationCity: destination,
@@ -106,5 +117,49 @@ class NpcTravelService {
         ((journey.destinationY -
                 journey.originY) *
             journey.progress);
+  }
+
+  static double currentXSmooth(
+    NpcCaravan npc,
+    double tickFraction,
+  ) {
+    final journey = npc.activeJourney;
+
+    if (journey == null) {
+      return npc.worldX;
+    }
+
+    final progress =
+        ((journey.elapsedHours +
+                    tickFraction) /
+                journey.totalHours)
+            .clamp(0.0, 1.0);
+
+    return journey.originX +
+        ((journey.destinationX -
+                journey.originX) *
+            progress);
+  }
+
+  static double currentYSmooth(
+    NpcCaravan npc,
+    double tickFraction,
+  ) {
+    final journey = npc.activeJourney;
+
+    if (journey == null) {
+      return npc.worldY;
+    }
+
+    final progress =
+        ((journey.elapsedHours +
+                    tickFraction) /
+                journey.totalHours)
+            .clamp(0.0, 1.0);
+
+    return journey.originY +
+        ((journey.destinationY -
+                journey.originY) *
+            progress);
   }
 }

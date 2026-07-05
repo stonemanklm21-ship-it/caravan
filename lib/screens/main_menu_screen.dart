@@ -16,6 +16,7 @@ import 'market_screen.dart';
 import 'recruitment_screen.dart';
 import 'vehicle_market_screen.dart';
 import 'vet_screen.dart';
+import 'world_map_screen.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({
@@ -147,7 +148,7 @@ class _MainMenuScreenState
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            const MapScreen(),
+                            const WorldMapScreen(),
                       ),
                     ).then(
                       (_) => setState(() {}),

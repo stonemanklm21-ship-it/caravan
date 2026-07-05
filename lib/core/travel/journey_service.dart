@@ -12,6 +12,8 @@ class JourneyService {
   static ActiveJourney startJourney({
     required PlayerState playerState,
     required City destination,
+    double? originX,
+    double? originY,
   }) {
     if (!CaravanService.canTravel(
       playerState.caravan,
@@ -21,17 +23,19 @@ class JourneyService {
       );
     }
 
-    final originX =
+    final startX =
+        originX ??
         currentX(playerState);
 
-    final originY =
+    final startY =
+        originY ??
         currentY(playerState);
 
     final dx =
-        destination.x - originX;
+        destination.x - startX;
 
     final dy =
-        destination.y - originY;
+        destination.y - startY;
 
     final distance = sqrt(
       (dx * dx) + (dy * dy),
@@ -46,8 +50,8 @@ class JourneyService {
         travelDays * 24;
 
     final journey = ActiveJourney(
-      originX: originX,
-      originY: originY,
+      originX: startX,
+      originY: startY,
       destinationX:
           destination.x,
       destinationY:
@@ -68,6 +72,8 @@ class JourneyService {
     required PlayerState playerState,
     required double destinationX,
     required double destinationY,
+    double? originX,
+    double? originY,
   }) {
     if (!CaravanService.canTravel(
       playerState.caravan,
@@ -77,17 +83,19 @@ class JourneyService {
       );
     }
 
-    final originX =
+    final startX =
+        originX ??
         currentX(playerState);
 
-    final originY =
+    final startY =
+        originY ??
         currentY(playerState);
 
     final dx =
-        destinationX - originX;
+        destinationX - startX;
 
     final dy =
-        destinationY - originY;
+        destinationY - startY;
 
     final distance = sqrt(
       (dx * dx) + (dy * dy),
@@ -102,8 +110,8 @@ class JourneyService {
         travelDays * 24;
 
     final journey = ActiveJourney(
-      originX: originX,
-      originY: originY,
+      originX: startX,
+      originY: startY,
       destinationX:
           destinationX,
       destinationY:
@@ -167,6 +175,52 @@ class JourneyService {
         ((journey.destinationY -
                 journey.originY) *
             journey.progress);
+  }
+
+  static double currentXSmooth(
+    PlayerState playerState,
+    double tickFraction,
+  ) {
+    final journey =
+        playerState.activeJourney;
+
+    if (journey == null) {
+      return playerState.worldX;
+    }
+
+    final progress =
+        ((journey.elapsedHours +
+                    tickFraction) /
+                journey.totalHours)
+            .clamp(0.0, 1.0);
+
+    return journey.originX +
+        ((journey.destinationX -
+                journey.originX) *
+            progress);
+  }
+
+  static double currentYSmooth(
+    PlayerState playerState,
+    double tickFraction,
+  ) {
+    final journey =
+        playerState.activeJourney;
+
+    if (journey == null) {
+      return playerState.worldY;
+    }
+
+    final progress =
+        ((journey.elapsedHours +
+                    tickFraction) /
+                journey.totalHours)
+            .clamp(0.0, 1.0);
+
+    return journey.originY +
+        ((journey.destinationY -
+                journey.originY) *
+            progress);
   }
 
   static bool hasActiveJourney(

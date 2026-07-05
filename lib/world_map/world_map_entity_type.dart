@@ -1,0 +1,4 @@
+enum WorldMapEntityType {
+  city,
+  npcCaravan,
+}
