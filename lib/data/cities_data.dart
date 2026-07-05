@@ -1,5 +1,6 @@
+import '../core/economy/animal_market_service.dart';
+import '../core/economy/vehicle_market_service.dart';
 import '../core/models/city.dart';
-import '../core/models/city_specialisation.dart';
 import '../core/models/industry.dart';
 import '../core/models/market_good.dart';
 
@@ -9,7 +10,6 @@ import 'industry_data.dart';
 final farmingVillage = City(
   id: 'farming_village',
   name: 'Farming Village',
-  specialisation: CitySpecialisation.farming,
   x: 100,
   y: 100,
   population: 1000,
@@ -44,12 +44,16 @@ final farmingVillage = City(
     MarketGood(good: chair, quantity: 1),
   ],
   shopGoods: [],
+  animalMarketTier: AnimalMarketTier.major,
+  vehicleMarketTier: VehicleMarketTier.major,
+  hasVet: true,
+  hasCartwright: true,
+  hasDoctor: true,
 );
 
 final miningTown = City(
   id: 'mining_town',
   name: 'Mining Town',
-  specialisation: CitySpecialisation.mining,
   x: 320,
   y: 250,
   population: 2000,
@@ -108,12 +112,16 @@ final miningTown = City(
     MarketGood(good: chair, quantity: 1),
   ],
   shopGoods: [],
+  animalMarketTier: AnimalMarketTier.major,
+  vehicleMarketTier: VehicleMarketTier.major,
+  hasVet: true,
+  hasCartwright: true,
+  hasDoctor: true,
 );
 
 final forestCamp = City(
   id: 'forest_camp',
   name: 'Forest Camp',
-  specialisation: CitySpecialisation.forestry,
   x: 220,
   y: 50,
   population: 600,
@@ -148,6 +156,11 @@ final forestCamp = City(
     MarketGood(good: chair, quantity: 1),
   ],
   shopGoods: [],
+  animalMarketTier: AnimalMarketTier.major,
+  vehicleMarketTier: VehicleMarketTier.major,
+  hasVet: true,
+  hasCartwright: true,
+  hasDoctor: true,
 );
 
 final cities = [

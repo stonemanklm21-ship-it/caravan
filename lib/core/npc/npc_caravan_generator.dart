@@ -34,6 +34,7 @@ class NpcCaravanGenerator {
             currentCity: city,
             caravan: Caravan(
               leader: defaultNpc,
+              companions: [],
               gold:
                   (200 +
                           _random.nextInt(

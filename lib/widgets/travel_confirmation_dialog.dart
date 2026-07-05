@@ -2,8 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../core/caravan/caravan_service.dart';
+import '../../core/caravan/vehicle_service.dart';
 import '../../core/models/city.dart';
-import '../core/models/player_state.dart';
+import '../../core/models/player_state.dart';
 import '../../core/travel/journey_service.dart';
 import '../../data/goods_data.dart';
 
@@ -124,6 +126,18 @@ class TravelConfirmationDialog
         hasCalorieShortage ||
         hasFuelShortage;
 
+    final canTravel =
+        CaravanService.canTravel(
+      playerState.caravan,
+    );
+
+    final usableVehicles =
+        playerState.caravan.vehicles
+            .where(
+              VehicleService.canPull,
+            )
+            .length;
+
     return AlertDialog(
       title: Text(
         destination?.name ??
@@ -136,6 +150,58 @@ class TravelConfirmationDialog
           crossAxisAlignment:
               CrossAxisAlignment.start,
           children: [
+            Container(
+              width: double.infinity,
+              padding:
+                  const EdgeInsets.all(
+                8,
+              ),
+              decoration:
+                  BoxDecoration(
+                color: canTravel
+                    ? Colors
+                        .green
+                        .shade100
+                    : Colors
+                        .red
+                        .shade100,
+                border: Border.all(
+                  color: canTravel
+                      ? Colors.green
+                      : Colors.red,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment
+                        .start,
+                children: [
+                  Text(
+                    canTravel
+                        ? '✅ Caravan Ready'
+                        : '❌ Caravan Not Ready',
+                    style:
+                        const TextStyle(
+                      fontWeight:
+                          FontWeight
+                              .bold,
+                    ),
+                  ),
+                  Text(
+                    'Usable Vehicles: '
+                    '$usableVehicles / '
+                    '${playerState.caravan.vehicles.length}',
+                  ),
+                  if (!canTravel)
+                    const Text(
+                      'Assign a sufficiently strong animal to a vehicle before travelling.',
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
             if (destination == null)
               Text(
                 'Coordinates: '
@@ -274,12 +340,14 @@ class TravelConfirmationDialog
               const Text('Cancel'),
         ),
         ElevatedButton(
-          onPressed: () {
-            Navigator.pop(
-              context,
-              true,
-            );
-          },
+          onPressed: canTravel
+              ? () {
+                  Navigator.pop(
+                    context,
+                    true,
+                  );
+                }
+              : null,
           child: Text(
             hasShortage
                 ? 'Travel Anyway'

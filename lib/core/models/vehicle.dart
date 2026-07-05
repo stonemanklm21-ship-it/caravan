@@ -1,3 +1,4 @@
+import 'animal.dart';
 import 'vehicle_type.dart';
 
 class Vehicle {
@@ -5,9 +6,12 @@ class Vehicle {
 
   double condition;
 
+  Animal? draftAnimal;
+
   Vehicle({
     required this.type,
     required this.condition,
+    this.draftAnimal,
   });
 
   bool get operational =>
@@ -17,6 +21,8 @@ class Vehicle {
     return {
       'type': type.id,
       'condition': condition,
+      'draftAnimal':
+          draftAnimal?.toJson(),
     };
   }
 
@@ -26,6 +32,10 @@ class Vehicle {
       String id,
     )
     vehicleTypeForId,
+    required Animal Function(
+      Map<String, dynamic> json,
+    )
+    animalFromJson,
   }) {
     return Vehicle(
       type: vehicleTypeForId(
@@ -34,6 +44,13 @@ class Vehicle {
       condition:
           (json['condition'] as num)
               .toDouble(),
+      draftAnimal:
+          json['draftAnimal'] == null
+              ? null
+              : animalFromJson(
+                  json['draftAnimal']
+                      as Map<String, dynamic>,
+                ),
     );
   }
 }

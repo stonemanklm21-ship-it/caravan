@@ -14,11 +14,14 @@ class Animal {
 
   double ageYears;
 
+  double adultWeightKg;
+
   Animal({
     required this.type,
     required this.gender,
     required this.hp,
     required this.ageYears,
+    required this.adultWeightKg,
   });
 
   bool get alive => hp > 0;
@@ -29,6 +32,7 @@ class Animal {
       'gender': gender.name,
       'hp': hp,
       'ageYears': ageYears,
+      'adultWeightKg': adultWeightKg,
     };
   }
 
@@ -54,6 +58,9 @@ class Animal {
               .toDouble(),
       ageYears:
           (json['ageYears'] as num)
+              .toDouble(),
+      adultWeightKg:
+          (json['adultWeightKg'] as num)
               .toDouble(),
     );
   }

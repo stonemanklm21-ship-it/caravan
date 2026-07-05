@@ -1,7 +1,7 @@
 import '../../data/goods_data.dart';
 import '../../data/industry_data.dart';
+
 import 'city.dart';
-import 'city_specialisation.dart';
 import 'industry.dart';
 import 'market_good.dart';
 import 'npc_caravan.dart';
@@ -39,8 +39,6 @@ class World {
               (cityJson) => City.fromJson(
                 json: cityJson
                     as Map<String, dynamic>,
-                citySpecialisationForName:
-                    citySpecialisationForName,
                 industryFromJson:
                     (industryJson) =>
                         Industry.fromJson(

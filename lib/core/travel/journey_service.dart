@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../caravan/caravan_service.dart';
 import '../travel/active_journey.dart';
 import '../models/city.dart';
 import '../models/player_state.dart';
@@ -12,6 +13,14 @@ class JourneyService {
     required PlayerState playerState,
     required City destination,
   }) {
+    if (!CaravanService.canTravel(
+      playerState.caravan,
+    )) {
+      throw StateError(
+        'Caravan has no usable draft animal and vehicle.',
+      );
+    }
+
     final originX =
         currentX(playerState);
 
@@ -60,6 +69,14 @@ class JourneyService {
     required double destinationX,
     required double destinationY,
   }) {
+    if (!CaravanService.canTravel(
+      playerState.caravan,
+    )) {
+      throw StateError(
+        'Caravan has no usable draft animal and vehicle.',
+      );
+    }
+
     final originX =
         currentX(playerState);
 

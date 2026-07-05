@@ -1,3 +1,5 @@
+import '../caravan/animal_service.dart';
+import '../caravan/vehicle_service.dart';
 import '../economy/economy_service.dart';
 import '../models/player_state.dart';
 import '../models/world.dart';
@@ -22,6 +24,29 @@ class TimeService {
       world: world,
       hours: hours,
     );
+
+    AnimalService.advanceTimeForAll(
+      animals: playerState.caravan.animals,
+      hours: hours,
+    );
+
+    VehicleService.advanceTimeForAll(
+      vehicles: playerState.caravan.vehicles,
+      hours: hours,
+    );
+
+    for (final npc
+        in world.npcCaravans) {
+      AnimalService.advanceTimeForAll(
+        animals: npc.caravan.animals,
+        hours: hours,
+      );
+
+      VehicleService.advanceTimeForAll(
+        vehicles: npc.caravan.vehicles,
+        hours: hours,
+      );
+    }
 
     ConsumptionService.consume(
       caravan: playerState.caravan,

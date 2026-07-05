@@ -58,25 +58,25 @@ class _DebugScreenState
       }
 
       switch (good.id) {
-        case 'Bread':
+        case 'bread':
           total +=
               city.population *
               0.01;
           break;
 
-        case 'Water':
+        case 'water':
           total +=
               city.population *
               0.01;
           break;
 
-        case 'Wood':
+        case 'wood':
           total +=
               city.population *
               0.002;
           break;
 
-        case 'Tools':
+        case 'tools':
           total +=
               city.population *
               0.001;

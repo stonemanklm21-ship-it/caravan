@@ -4,11 +4,18 @@ import '../data/game_data.dart';
 import '../core/save/save_service.dart';
 import '../core/world/time_service.dart';
 
+import 'animal_market_screen.dart';
+import 'caravan_screen.dart';
+import 'cartwright_screen.dart';
 import 'debug_screen.dart';
+import 'doctor_screen.dart';
 import 'industries_screen.dart';
 import 'ledger_screen.dart';
 import 'map_screen.dart';
 import 'market_screen.dart';
+import 'recruitment_screen.dart';
+import 'vehicle_market_screen.dart';
+import 'vet_screen.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({
@@ -24,6 +31,9 @@ class _MainMenuScreenState
     extends State<MainMenuScreen> {
   @override
   Widget build(BuildContext context) {
+    final city =
+        game.player.currentCity;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -39,7 +49,7 @@ class _MainMenuScreenState
           children: [
             Text(
               'Current Location: '
-              '${game.player.currentCity?.name ?? 'Wilderness'}',
+              '${city?.name ?? 'Wilderness'}',
               style: const TextStyle(
                 fontSize: 20,
                 fontWeight:
@@ -147,6 +157,161 @@ class _MainMenuScreenState
                     'Map',
                   ),
                 ),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            CaravanScreen(
+                          caravan:
+                              game.player.caravan,
+                        ),
+                      ),
+                    ).then(
+                      (_) => setState(() {}),
+                    );
+                  },
+                  child: const Text(
+                    'Caravan',
+                  ),
+                ),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            RecruitmentScreen(
+                          playerState:
+                              game.player,
+                        ),
+                      ),
+                    ).then(
+                      (_) => setState(() {}),
+                    );
+                  },
+                  child: const Text(
+                    'Recruitment',
+                  ),
+                ),
+
+                if (city?.animalMarketTier !=
+                    null)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              AnimalMarketScreen(
+                            playerState:
+                                game.player,
+                            tier: city!
+                                .animalMarketTier!,
+                          ),
+                        ),
+                      ).then(
+                        (_) =>
+                            setState(() {}),
+                      );
+                    },
+                    child: const Text(
+                      'Animal Market',
+                    ),
+                  ),
+
+                if (city?.vehicleMarketTier !=
+                    null)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              VehicleMarketScreen(
+                            playerState:
+                                game.player,
+                            tier: city!
+                                .vehicleMarketTier!,
+                          ),
+                        ),
+                      ).then(
+                        (_) =>
+                            setState(() {}),
+                      );
+                    },
+                    child: const Text(
+                      'Vehicle Dealer',
+                    ),
+                  ),
+
+                if (city?.hasVet ?? false)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              VetScreen(
+                            playerState:
+                                game.player,
+                          ),
+                        ),
+                      ).then(
+                        (_) =>
+                            setState(() {}),
+                      );
+                    },
+                    child: const Text(
+                      'Vet',
+                    ),
+                  ),
+
+                if (city?.hasCartwright ??
+                    false)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              CartwrightScreen(
+                            playerState:
+                                game.player,
+                          ),
+                        ),
+                      ).then(
+                        (_) =>
+                            setState(() {}),
+                      );
+                    },
+                    child: const Text(
+                      'Cartwright',
+                    ),
+                  ),
+
+                if (city?.hasDoctor ??
+                    false)
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              const DoctorScreen(),
+                        ),
+                      ).then(
+                        (_) =>
+                            setState(() {}),
+                      );
+                    },
+                    child: const Text(
+                      'Doctor',
+                    ),
+                  ),
 
                 ElevatedButton(
                   onPressed: () {

@@ -20,6 +20,7 @@ final game = Game(
     ledger: MarketLedger(),
     caravan: Caravan(
       leader: defaultPlayer,
+      companions: [],
       gold: 100,
       inventory: [],
       animals: [],

@@ -1,3 +1,5 @@
+import '../caravan/caravan_service.dart';
+
 import 'animal.dart';
 import 'cargo_item.dart';
 import 'character.dart';
@@ -5,6 +7,8 @@ import 'vehicle.dart';
 
 class Caravan {
   Character leader;
+
+  List<Character> companions;
 
   double gold;
 
@@ -16,15 +20,17 @@ class Caravan {
 
   Caravan({
     required this.leader,
+    required this.companions,
     required this.gold,
     required this.inventory,
     required this.animals,
     required this.vehicles,
   });
 
-  double get cargoCapacityKg {
-    return leader.cargoCapacityKg;
-  }
+  double get cargoCapacityKg =>
+      CaravanService.cargoCapacityKg(
+        this,
+      );
 
   double get cargoWeightKg {
     return inventory.fold<double>(
@@ -46,15 +52,37 @@ class Caravan {
   }
 
   double get calorieRequirementPerDay {
-    return leader.caloriesPerDay;
+    double total =
+        leader.caloriesPerDay;
+
+    for (final companion
+        in companions) {
+      total +=
+          companion.caloriesPerDay;
+    }
+
+    return total;
+  }
+
+  double get wagesPerDay {
+    return companions.fold<double>(
+      0,
+      (total, companion) =>
+          total +
+          companion.wagePerDay,
+    );
   }
 
   double get waterRequirementPerDay {
-    return leader.waterPerDay;
+    return CaravanService.waterPerDay(
+      this,
+    );
   }
 
   double get forageRequirementPerDay {
-    return 0;
+    return CaravanService.foragePerDay(
+      this,
+    );
   }
 
   double get fuelRequirementPerDay {
@@ -78,28 +106,30 @@ class Caravan {
   Map<String, dynamic> toJson() {
     return {
       'leader': leader.toJson(),
+      'companions': companions
+          .map(
+            (character) =>
+                character.toJson(),
+          )
+          .toList(),
       'gold': gold,
-      'inventory':
-          inventory
-              .map(
-                (item) =>
-                    item.toJson(),
-              )
-              .toList(),
-      'animals':
-          animals
-              .map(
-                (animal) =>
-                    animal.toJson(),
-              )
-              .toList(),
-      'vehicles':
-          vehicles
-              .map(
-                (vehicle) =>
-                    vehicle.toJson(),
-              )
-              .toList(),
+      'inventory': inventory
+          .map(
+            (item) => item.toJson(),
+          )
+          .toList(),
+      'animals': animals
+          .map(
+            (animal) =>
+                animal.toJson(),
+          )
+          .toList(),
+      'vehicles': vehicles
+          .map(
+            (vehicle) =>
+                vehicle.toJson(),
+          )
+          .toList(),
     };
   }
 
@@ -120,6 +150,19 @@ class Caravan {
         json['leader']
             as Map<String, dynamic>,
       ),
+      companions:
+          (json['companions']
+                      as List?)
+                  ?.map(
+                    (character) =>
+                        Character.fromJson(
+                      character
+                          as Map<String,
+                              dynamic>,
+                    ),
+                  )
+                  .toList() ??
+              [],
       gold:
           (json['gold'] as num)
               .toDouble(),
@@ -138,7 +181,8 @@ class Caravan {
                 (animal) =>
                     animalFromJson(
                   animal
-                      as Map<String, dynamic>,
+                      as Map<String,
+                          dynamic>,
                 ),
               )
               .toList(),
@@ -148,7 +192,8 @@ class Caravan {
                 (vehicle) =>
                     vehicleFromJson(
                   vehicle
-                      as Map<String, dynamic>,
+                      as Map<String,
+                          dynamic>,
                 ),
               )
               .toList(),

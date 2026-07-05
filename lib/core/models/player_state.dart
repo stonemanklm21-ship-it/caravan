@@ -116,6 +116,13 @@ class PlayerState {
           json: vehicleJson,
           vehicleTypeForId:
               vehicleTypeForId,
+          animalFromJson:
+              (animalJson) =>
+                  Animal.fromJson(
+            json: animalJson,
+            animalTypeForId:
+                animalTypeForId,
+          ),
         ),
       ),
       ledger:
