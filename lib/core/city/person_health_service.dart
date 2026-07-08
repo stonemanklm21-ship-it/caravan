@@ -6,7 +6,7 @@ class CharacterHealthService {
   ) {
     return (character.maxHp -
             character.hp) *
-        100;
+        10;
   }
 
   static bool canHeal(

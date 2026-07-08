@@ -1,12 +1,21 @@
+import 'dart:math';
+
+import '../../data/goods_data.dart';
+import '../city/animal_health_service.dart';
+import '../city/person_health_service.dart';
+import '../city/vehicle_repair_service.dart';
 import '../economy/market_observation.dart';
 import '../economy/pricing_service.dart';
 import '../economy/trading_service.dart';
+import '../models/city.dart';
 import '../models/npc_caravan.dart';
 import '../models/world.dart';
 import 'npc_trading_service.dart';
 import 'npc_travel_service.dart';
 
 class NpcCaravanService {
+  static final Random _random = Random();
+
   static void observeCurrentCity({
     required NpcCaravan npc,
   }) {
@@ -38,11 +47,218 @@ class NpcCaravanService {
     }
   }
 
+  static void repairVehicles({
+    required NpcCaravan npc,
+  }) {
+    final city = npc.currentCity;
+
+    if (city == null || !city.hasCartwright) {
+      return;
+    }
+
+    for (final vehicle in npc.caravan.vehicles) {
+      final cost =
+          VehicleRepairService.repairCost(
+        vehicle,
+      );
+
+      if (npc.caravan.gold >= cost) {
+        npc.caravan.gold -= cost;
+
+        VehicleRepairService.repair(
+          vehicle,
+        );
+      }
+    }
+  }
+
+  static void visitDoctor({
+    required NpcCaravan npc,
+  }) {
+    final city = npc.currentCity;
+
+    if (city == null || !city.hasDoctor) {
+      return;
+    }
+
+    final characters = [
+      npc.caravan.leader,
+      ...npc.caravan.companions,
+    ];
+
+    for (final character in characters) {
+      final cost =
+          CharacterHealthService.healCost(
+        character,
+      );
+
+      if (!CharacterHealthService.canHeal(
+            character,
+          ) ||
+          npc.caravan.gold < cost) {
+        continue;
+      }
+
+      npc.caravan.gold -= cost;
+
+      CharacterHealthService.heal(
+        character,
+      );
+    }
+  }
+
+  static void visitVet({
+    required NpcCaravan npc,
+  }) {
+    final city = npc.currentCity;
+
+    if (city == null || !city.hasVet) {
+      return;
+    }
+
+    for (final animal in npc.caravan.animals) {
+      final cost =
+          AnimalHealthService.healCost(
+        animal,
+      );
+
+      if (!AnimalHealthService.canHeal(
+            animal,
+          ) ||
+          npc.caravan.gold < cost) {
+        continue;
+      }
+
+      npc.caravan.gold -= cost;
+
+      AnimalHealthService.heal(
+        animal,
+      );
+    }
+  }
+
+  static void resupplyForJourney({
+    required NpcCaravan npc,
+    required City city,
+    required double travelDays,
+  }) {
+    final targetDays =
+        travelDays + 2;
+
+    _buyWater(
+      npc: npc,
+      city: city,
+      targetQuantity:
+          npc.caravan.waterRequirementPerDay *
+          targetDays,
+    );
+
+    _buyForage(
+      npc: npc,
+      city: city,
+      targetQuantity:
+          npc.caravan.forageRequirementPerDay *
+          targetDays,
+    );
+
+    final targetCalories =
+        npc.caravan.calorieRequirementPerDay *
+        targetDays;
+
+    final currentCalories =
+        npc.caravan.inventory.fold<double>(
+      0,
+      (total, item) =>
+          total +
+          item.quantity *
+              item.good.caloriesPerUnit,
+    );
+
+    if (currentCalories < targetCalories) {
+      final caloriesNeeded =
+          targetCalories -
+          currentCalories;
+
+      final breadNeeded =
+          (caloriesNeeded /
+                  bread.caloriesPerUnit)
+              .ceil();
+
+      TradingService.buy(
+        city: city,
+        caravan: npc.caravan,
+        market: city.marketForGood(
+          bread,
+        ),
+        quantity: breadNeeded,
+      );
+    }
+  }
+
+  static void _buyWater({
+    required NpcCaravan npc,
+    required City city,
+    required double targetQuantity,
+  }) {
+    final current =
+        npc.caravan.quantityOf(
+      water.id,
+    );
+
+    final needed =
+        (targetQuantity - current)
+            .ceil();
+
+    if (needed <= 0) {
+      return;
+    }
+
+    TradingService.buy(
+      city: city,
+      caravan: npc.caravan,
+      market: city.marketForGood(
+        water,
+      ),
+      quantity: needed,
+    );
+  }
+
+  static void _buyForage({
+    required NpcCaravan npc,
+    required City city,
+    required double targetQuantity,
+  }) {
+    final current =
+        npc.caravan.quantityOf(
+      forage.id,
+    );
+
+    final needed =
+        (targetQuantity - current)
+            .ceil();
+
+    if (needed <= 0) {
+      return;
+    }
+
+    TradingService.buy(
+      city: city,
+      caravan: npc.caravan,
+      market: city.marketForGood(
+        forage,
+      ),
+      quantity: needed,
+    );
+  }
+
   static void clearMission(
     NpcCaravan npc,
   ) {
     npc.activeMission = null;
     npc.state = CaravanState.idle;
+
+    npc.idleHoursRemaining =
+        12.0;
   }
 
   static void sellCargo({
@@ -61,8 +277,12 @@ class NpcCaravanService {
     }
 
     final inventoryItem =
-        npc.caravan.inventory.cast<dynamic?>().firstWhere(
-      (item) => item?.good.id == mission.good.id,
+        npc.caravan.inventory
+            .cast<dynamic>()
+            .firstWhere(
+      (item) =>
+          item?.good.id ==
+          mission.good.id,
       orElse: () => null,
     );
 
@@ -70,7 +290,8 @@ class NpcCaravanService {
       return;
     }
 
-    final market = city.marketForGood(
+    final market =
+        city.marketForGood(
       mission.good,
     );
 
@@ -78,7 +299,8 @@ class NpcCaravanService {
       city: city,
       caravan: npc.caravan,
       market: market,
-      quantity: inventoryItem.quantity.floor(),
+      quantity:
+          inventoryItem.quantity.floor(),
     );
 
     npc.lastDecision =
@@ -102,11 +324,16 @@ class NpcCaravanService {
       world: world,
       origin: city,
       npc: npc,
+      availableGold:
+          npc.caravan.gold,
+      availableCargoKg:
+          npc.caravan.availableCapacityKg,
     );
 
     if (mission == null) {
       final destination =
-          NpcTradingService.randomRelocation(
+          NpcTradingService
+              .randomRelocation(
         world: world,
         origin: city,
       );
@@ -126,6 +353,31 @@ class NpcCaravanService {
     }
 
     npc.activeMission = mission;
+
+    final dx =
+        mission.destination.x -
+        city.x;
+
+    final dy =
+        mission.destination.y -
+        city.y;
+
+    final distance =
+        sqrt(
+          (dx * dx) +
+              (dy * dy),
+        );
+
+    final travelDays =
+        distance /
+        (500 *
+            npc.caravan.speed);
+
+    resupplyForJourney(
+      npc: npc,
+      city: city,
+      travelDays: travelDays,
+    );
 
     final market =
         city.marketForGood(
@@ -158,7 +410,8 @@ class NpcCaravanService {
 
     NpcTravelService.startJourney(
       npc: npc,
-      destination: mission.destination,
+      destination:
+          mission.destination,
     );
   }
 
@@ -169,10 +422,19 @@ class NpcCaravanService {
   }) {
     switch (npc.state) {
       case CaravanState.idle:
+        npc.idleHoursRemaining -=
+            hours;
+
+        if (npc.idleHoursRemaining >
+            0) {
+          break;
+        }
+
         startMission(
           npc: npc,
           world: world,
         );
+
         break;
 
       case CaravanState.travelling:
@@ -182,8 +444,21 @@ class NpcCaravanService {
         );
 
         if (npc.activeJourney != null &&
-            npc.activeJourney!.completed) {
+            npc.activeJourney!
+                .completed) {
           NpcTravelService.arrive(
+            npc: npc,
+          );
+
+          repairVehicles(
+            npc: npc,
+          );
+
+          visitDoctor(
+            npc: npc,
+          );
+
+          visitVet(
             npc: npc,
           );
 
@@ -218,7 +493,8 @@ class NpcCaravanService {
     required World world,
     required double hours,
   }) {
-    for (final npc in world.npcCaravans) {
+    for (final npc
+        in world.npcCaravans) {
       advanceTime(
         npc: npc,
         world: world,

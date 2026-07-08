@@ -5,10 +5,10 @@ final farm = IndustryType(
   id: 'farm',
   name: 'Farm',
   inputsPerSize: {
-    water: 10,
+    water: 100,
   },
   outputsPerSize: {
-    grain: 20,
+    grain: 200,
   },
   operatingCostPerSizePerDay: 5,
   workersPerSize: 5,
@@ -20,7 +20,7 @@ final well = IndustryType(
   name: 'Well',
   inputsPerSize: {},
   outputsPerSize: {
-    water: 30,
+    water: 100,
   },
   operatingCostPerSizePerDay: 2,
   workersPerSize: 2,
@@ -46,7 +46,7 @@ final loggingCamp = IndustryType(
     forage: 5,
   },
   outputsPerSize: {
-    wood: 10,
+    wood: 50,
   },
   operatingCostPerSizePerDay: 4,
   workersPerSize: 6,
@@ -72,11 +72,11 @@ final bakery = IndustryType(
   id: 'bakery',
   name: 'Bakery',
   inputsPerSize: {
-    grain: 20,
-    water: 20,
+    grain: 200,
+    water: 200,
   },
   outputsPerSize: {
-    bread: 20,
+    bread: 200,
   },
   operatingCostPerSizePerDay: 6,
   workersPerSize: 4,
@@ -91,7 +91,7 @@ final toolmaker = IndustryType(
     wood: 5,
   },
   outputsPerSize: {
-    tools: 5,
+    tools: 10,
   },
   operatingCostPerSizePerDay: 8,
   workersPerSize: 5,
@@ -105,7 +105,7 @@ final chairmaker = IndustryType(
     wood: 10,
   },
   outputsPerSize: {
-    chair: 5,
+    chair: 10,
   },
   operatingCostPerSizePerDay: 10,
   workersPerSize: 6,

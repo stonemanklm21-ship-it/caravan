@@ -1,5 +1,5 @@
-import '../../data/goods_data.dart';
 import '../models/world.dart';
+import 'demand_service.dart';
 
 class PopulationService {
   static void advanceTime({
@@ -9,74 +9,19 @@ class PopulationService {
     final days = hours / 24;
 
     for (final city in world.cities) {
-      final breadMarket =
-          city.marketForGood(
-        bread,
-      );
+      for (final market in city.marketGoods) {
+        final demandPerDay =
+            DemandService.populationDemandPerDay(
+          city: city,
+          good: market.good,
+        );
 
-      final waterMarket =
-          city.marketForGood(
-        water,
-      );
+        market.quantity -=
+            demandPerDay * days;
 
-      final toolsMarket =
-          city.marketForGood(
-        tools,
-      );
-
-      final woodMarket =
-          city.marketForGood(
-        wood,
-      );
-
-      final chairMarket =
-          city.marketForGood(
-        chair,
-      );
-
-      breadMarket.quantity -=
-          city.population *
-          0.01 *
-          days;
-
-      waterMarket.quantity -=
-          city.population *
-          0.01 *
-          days;
-
-      toolsMarket.quantity -=
-          city.population *
-          0.002 *
-          days;
-
-      woodMarket.quantity -=
-          city.population *
-          0.002 *
-          days;
-
-      chairMarket.quantity -=
-          city.population *
-          0.002 *
-          days;
-
-      if (breadMarket.quantity < 0) {
-        breadMarket.quantity = 0;
-      }
-
-      if (waterMarket.quantity < 0) {
-        waterMarket.quantity = 0;
-      }
-
-      if (toolsMarket.quantity < 0) {
-        toolsMarket.quantity = 0;
-      }
-
-      if (woodMarket.quantity < 0) {
-        woodMarket.quantity = 0;
-      }
-
-      if (chairMarket.quantity < 0) {
-        chairMarket.quantity = 0;
+        if (market.quantity < 0) {
+          market.quantity = 0;
+        }
       }
     }
   }

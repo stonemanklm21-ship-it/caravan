@@ -8,15 +8,8 @@ import '../models/trade_mission.dart';
 import '../models/world.dart';
 
 class NpcTradingService {
-  /// Maximum proportion of a market's stock
-  /// a caravan may buy in one transaction.
-  static const double maxMarketShare = 0.10;
-
-  /// Maximum proportion of available gold
-  /// a caravan may commit to a trade.
-  static const double maxGoldShare = 0.25;
-
-  /// Reject tiny trades.
+  static const double maxMarketShare = 0.95;
+  static const double maxGoldShare = 0.75;
   static const double minimumProfit = 5.0;
 
   static int maxAffordableQuantity({
@@ -53,6 +46,8 @@ class NpcTradingService {
     required World world,
     required City origin,
     required NpcCaravan npc,
+    required double availableGold,
+    required double availableCargoKg,
   }) {
     TradeMission? bestMission;
 
@@ -66,12 +61,8 @@ class NpcTradingService {
         continue;
       }
 
-      final remainingCargoKg =
-          npc.caravan.cargoCapacityKg -
-              npc.caravan.cargoWeightKg;
-
       final cargoLimit =
-          (remainingCargoKg /
+          (availableCargoKg /
                   market.good.weight)
               .floor();
 
@@ -91,7 +82,7 @@ class NpcTradingService {
         city: origin,
         market: market,
         gold:
-            npc.caravan.gold *
+            availableGold *
             maxGoldShare,
         maxQuantity: min(
           marketLimit,

@@ -8,7 +8,7 @@ class DemandService {
     required Good good,
   }) {
     if (good == bread) {
-      return city.population * 0.01;
+      return city.population * 0.1;
     }
 
     if (good == water) {
@@ -16,15 +16,15 @@ class DemandService {
     }
 
     if (good == tools) {
-      return city.population * 0.001;
+      return city.population * 0.01;
     }
 
     if (good == wood) {
-      return city.population * 0.002;
+      return city.population * 0.02;
     }
 
     if (good == chair) {
-      return city.population * 0.001;
+      return city.population * 0.01;
     }
 
     return 0;

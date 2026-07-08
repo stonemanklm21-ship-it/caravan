@@ -3,8 +3,8 @@ import '../core/models/good.dart';
 const grain = Good(
   id: 'grain',
   name: 'Grain',
-  priceFloor: 3,
-  priceCeiling: 15,
+  priceFloor: 0.2,
+  priceCeiling: 5,
   weight: 0.2,
   caloriesPerUnit: 0,
 );
@@ -12,9 +12,9 @@ const grain = Good(
 const bread = Good(
   id: 'bread',
   name: 'Bread',
-  priceFloor: 30,
-  priceCeiling: 100,
-  weight: 0.2,
+  priceFloor: 10,
+  priceCeiling: 20,
+  weight: 0.5,
   caloriesPerUnit: 1200,
 );
 
@@ -55,7 +55,7 @@ const tools = Good(
   id: 'tools',
   name: 'Tools',
   weight: 1,
-  priceFloor: 120,
+  priceFloor: 20,
   priceCeiling: 250,
 );
 
@@ -63,7 +63,7 @@ const chair = Good(
   id: 'chair',
   name: 'Chair',
   weight: 1.5,
-  priceFloor: 180,
+  priceFloor: 50,
   priceCeiling: 500,
 );
 

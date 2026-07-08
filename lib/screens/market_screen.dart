@@ -89,55 +89,131 @@ class _MarketScreenState
                                       'Available: ${market.quantity.toStringAsFixed(1)}',
                                     ),
                                   ),
-                                  ElevatedButton(
-                                    onPressed:
-                                        () {
-                                      setState(
-                                        () {
-                                          TradingService
-                                              .buy(
+
+                                  Column(
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed:
+                                            () {
+                                          setState(
+                                            () {
+                                              TradingService
+                                                  .buy(
                                                 city: city,
-                                            caravan:
-                                                game.player.caravan,
-                                            market:
-                                                market,
-                                            quantity:
-                                                1,
+                                                caravan:
+                                                    game.player.caravan,
+                                                market:
+                                                    market,
+                                                quantity:
+                                                    1,
+                                              );
+                                            },
                                           );
                                         },
-                                      );
-                                    },
-                                    child:
-                                        const Text(
-                                      'Buy',
-                                    ),
+                                        child:
+                                            const Text(
+                                          'Buy',
+                                        ),
+                                      ),
+
+                                      ElevatedButton(
+                                        onPressed:
+                                            () {
+                                          setState(
+                                            () {
+                                              while (TradingService
+                                                  .buy(
+                                                city: city,
+                                                caravan:
+                                                    game.player.caravan,
+                                                market:
+                                                    market,
+                                                quantity:
+                                                    1,
+                                              )) {}
+                                            },
+                                          );
+                                        },
+                                        child:
+                                            const Text(
+                                          'Buy Max',
+                                        ),
+                                      ),
+                                    ],
                                   ),
+
                                   const SizedBox(
-                                    width:
-                                        8,
+                                    width: 8,
                                   ),
-                                  ElevatedButton(
-                                    onPressed:
-                                        () {
-                                      setState(
-                                        () {
-                                          TradingService
-                                              .sell(
+
+                                  Column(
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed:
+                                            () {
+                                          setState(
+                                            () {
+                                              TradingService
+                                                  .sell(
                                                 city: city,
-                                            caravan:
-                                                game.player.caravan,
-                                            market:
-                                                market,
-                                            quantity:
-                                                1,
+                                                caravan:
+                                                    game.player.caravan,
+                                                market:
+                                                    market,
+                                                quantity:
+                                                    1,
+                                              );
+                                            },
                                           );
                                         },
-                                      );
-                                    },
-                                    child:
-                                        const Text(
-                                      'Sell',
-                                    ),
+                                        child:
+                                            const Text(
+                                          'Sell',
+                                        ),
+                                      ),
+
+                                      ElevatedButton(
+                                        onPressed:
+                                            () {
+                                          setState(
+                                            () {
+                                              final item =
+                                                  game.player
+                                                      .caravan
+                                                      .inventory
+                                                      .cast<dynamic>()
+                                                      .firstWhere(
+                                                (item) =>
+                                                    item?.good.id ==
+                                                    good.id,
+                                                orElse:
+                                                    () =>
+                                                        null,
+                                              );
+
+                                              if (item !=
+                                                  null) {
+                                                TradingService
+                                                    .sell(
+                                                  city:
+                                                      city,
+                                                  caravan:
+                                                      game.player.caravan,
+                                                  market:
+                                                      market,
+                                                  quantity:
+                                                      item.quantity.floor(),
+                                                );
+                                              }
+                                            },
+                                          );
+                                        },
+                                        child:
+                                            const Text(
+                                          'Sell All',
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

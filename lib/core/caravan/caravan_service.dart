@@ -27,11 +27,29 @@ class CaravanService {
           companion
               .cargoCapacityKg,
     );
+final animalCapacity =
+    caravan.animals.fold<double>(
+  0,
+  (total, animal) {
+    if (animalAssigned(
+      caravan,
+      animal,
+    )) {
+      return total;
+    }
+
+    return total +
+        AnimalService.cargoCapacityKg(
+          animal,
+        );
+  },
+);
 
     return caravan
             .leader
             .cargoCapacityKg +
         companionCapacity +
+        animalCapacity +
         vehicleCapacity;
   }
 

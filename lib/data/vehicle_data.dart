@@ -5,8 +5,8 @@ const smallCart = VehicleType(
   name: 'Small Cart',
   maxCondition: 100,
   capacityMultiplier: 2,
-  maxCargoKg: 100,
-  requiredPullingCapacityKg: 10,
+  maxCargoKg: 150,
+  requiredPullingCapacityKg: 20,
   basePrice: 5000,
 );
 
@@ -15,8 +15,8 @@ const cart = VehicleType(
   name: 'Cart',
   maxCondition: 100,
   capacityMultiplier: 3,
-  maxCargoKg: 150,
-  requiredPullingCapacityKg: 20,
+  maxCargoKg: 500,
+  requiredPullingCapacityKg: 60,
   basePrice: 10000,
 );
 
@@ -25,8 +25,8 @@ const largeCart = VehicleType(
   name: 'Large Cart',
   maxCondition: 100,
   capacityMultiplier: 4,
-  maxCargoKg: 300,
-  requiredPullingCapacityKg: 50,
+  maxCargoKg: 800,
+  requiredPullingCapacityKg: 150,
   basePrice: 20000,
 );
 

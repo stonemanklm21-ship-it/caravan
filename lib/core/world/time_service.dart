@@ -15,14 +15,13 @@ class TimeService {
     required World world,
     required double hours,
   }) {
-    EconomyService.advanceTime(
-      world: world,
-      hours: hours,
-    );
+    EconomyService.advanceTime(world: world, hours: hours);
 
-    NpcCaravanService.advanceAll(
-      world: world,
-      hours: hours,
+    NpcCaravanService.advanceAll(world: world, hours: hours);
+
+    ConsumptionService.consume(
+      caravan: playerState.caravan,
+      days: hours / 24,
     );
 
     AnimalService.advanceTimeForAll(
@@ -30,41 +29,42 @@ class TimeService {
       hours: hours,
     );
 
-    VehicleService.advanceTimeForAll(
-      caravan: playerState.caravan,
-      vehicles: playerState.caravan.vehicles,
-      hours: hours,
-    );
+    if (playerState.activeJourney != null) {
+      VehicleService.advanceTimeForAll(
+        caravan: playerState.caravan,
+        vehicles: playerState.caravan.vehicles,
+        hours: hours,
+      );
+    }
 
-    for (final npc
-        in world.npcCaravans) {
+    for (final npc in world.npcCaravans) {
+      ConsumptionService.consume(
+        caravan: npc.caravan,
+        days: hours / 24,
+      );
+
       AnimalService.advanceTimeForAll(
         animals: npc.caravan.animals,
         hours: hours,
       );
 
-      VehicleService.advanceTimeForAll(
-        caravan: npc.caravan,
-        vehicles: npc.caravan.vehicles,
-        hours: hours,
-      );
+      if (npc.activeJourney != null) {
+        VehicleService.advanceTimeForAll(
+          caravan: npc.caravan,
+          vehicles: npc.caravan.vehicles,
+          hours: hours,
+        );
+      }
     }
-
-    ConsumptionService.consume(
-      caravan: playerState.caravan,
-      days: hours / 24,
-    );
 
     JourneyService.advanceJourney(
       playerState: playerState,
       hours: hours,
     );
 
-    final activeJourney =
-        playerState.activeJourney;
+    final activeJourney = playerState.activeJourney;
 
-    if (activeJourney != null &&
-        activeJourney.completed) {
+    if (activeJourney != null && activeJourney.completed) {
       TravelService.arrive(
         world: world,
         playerState: playerState,

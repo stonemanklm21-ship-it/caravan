@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/world/time_controller.dart';
 import '../core/world/time_speed.dart';
 import '../data/game_data.dart';
+import '../core/caravan/animal_service.dart';
 
 class NpcCaravansScreen extends StatefulWidget {
   const NpcCaravansScreen({super.key});
@@ -143,26 +144,11 @@ class _NpcCaravansScreenState
                         Text(
                           'Status: ${npc.activeJourney == null ? 'Idle' : 'Travelling'}',
                         ),
-                        
-Text(
-  'Observations: '
-  '${npc.ledger.observations.length}',
-),
 
 Text('Last Decision: ${npc.lastDecision}'),
                         Text(
                           'Location: ${npc.currentCity?.name ?? 'En Route'}',
                         ),
-
-                        if (npc.activeJourney != null)
-                          Text(
-                            'Destination: ${npc.activeJourney!.destinationCity?.name ?? 'Unknown'}',
-                          ),
-
-                        if (npc.activeJourney != null)
-                          Text(
-                            'Progress: ${npc.activeJourney!.elapsedHours.toStringAsFixed(1)} / ${npc.activeJourney!.totalHours.toStringAsFixed(1)} h',
-                          ),
 
                         const Divider(),
 
@@ -175,15 +161,7 @@ Text('Last Decision: ${npc.lastDecision}'),
                         ),
 
                         Text(
-                          'Gold: ${caravan.gold.toStringAsFixed(0)}',
-                        ),
-
-                        Text(
-                          'Cargo: ${caravan.cargoWeightKg.toStringAsFixed(1)} / ${caravan.cargoCapacityKg.toStringAsFixed(1)} kg',
-                        ),
-
-                        Text(
-                          'Inventory Items: ${caravan.inventory.length}',
+                          'Gold: ${caravan.gold.toStringAsFixed(0)}, Cargo: ${caravan.cargoWeightKg.toStringAsFixed(1)} / ${caravan.cargoCapacityKg.toStringAsFixed(1)} kg',
                         ),
 
                         const SizedBox(height: 6),
@@ -210,58 +188,9 @@ Text('Last Decision: ${npc.lastDecision}'),
                         ),
 
                         Text(
-                          'Food: ${foodDays.toStringAsFixed(1)} days',
+                          'Food: ${foodDays.toStringAsFixed(1)} days, Water: ${waterDays.toStringAsFixed(1)} days, Forage: ${forageDays.toStringAsFixed(1)} days',
                         ),
 
-                        Text(
-                          'Water: ${waterDays.toStringAsFixed(1)} days',
-                        ),
-
-                        Text(
-                          'Forage: ${forageDays.toStringAsFixed(1)} days',
-                        ),
-
-                        const Divider(),
-
-                        const Text(
-                          'Caravan',
-                          style: TextStyle(
-                            fontWeight:
-                                FontWeight.bold,
-                          ),
-                        ),
-
-                        Text(
-                          'Companions: ${caravan.companions.length}',
-                        ),
-
-                        Text(
-                          'Animals: ${caravan.animals.length}',
-                        ),
-
-                        Text(
-                          'Vehicles: ${caravan.vehicles.length}',
-                        ),
-
-                        Text(
-                          'Doctor: ${caravan.doctorSkill}',
-                        ),
-
-                        Text(
-                          'Vet: ${caravan.vetSkill}',
-                        ),
-
-                        Text(
-                          'Mechanic: ${caravan.mechanicSkill}',
-                        ),
-
-                        Text(
-                          'Scout: ${caravan.scoutSkill}',
-                        ),
-
-                        Text(
-                          'Combat: ${caravan.combatSkill}',
-                        ),
                       ],
                     ),
                   ),

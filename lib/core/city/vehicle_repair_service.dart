@@ -6,7 +6,7 @@ class VehicleRepairService {
   ) {
     return (vehicle.type.maxCondition -
             vehicle.condition) *
-        75;
+        10;
   }
 
   static bool canRepair(

@@ -38,7 +38,7 @@ final farmingVillage = City(
   ],
   marketGoods: [
     MarketGood(good: grain, quantity: 120),
-    MarketGood(good: bread, quantity: 25),
+    MarketGood(good: bread, quantity: 250),
     MarketGood(good: water, quantity: 200),
     MarketGood(good: forage, quantity: 150),
     MarketGood(good: wood, quantity: 60),
@@ -63,7 +63,7 @@ final miningTown = City(
   industries: [
     Industry(
       type: mine,
-      size: 2,
+      size: 4,
       inputDaysTarget: 14,
       cash: 25000,
       inventory: [],
@@ -91,7 +91,7 @@ final miningTown = City(
     ),
     Industry(
       type: toolmaker,
-      size: 2,
+      size: 4,
       inputDaysTarget: 5,
       cash: 25000,
       inventory: [],
@@ -105,7 +105,7 @@ final miningTown = City(
     ),
     Industry(
       type: chairmaker,
-      size: 2,
+      size: 4,
       inputDaysTarget: 3,
       cash: 25000,
       inventory: [],
@@ -113,7 +113,7 @@ final miningTown = City(
   ],
   marketGoods: [
     MarketGood(good: grain, quantity: 40),
-    MarketGood(good: bread, quantity: 30),
+    MarketGood(good: bread, quantity: 300),
     MarketGood(good: water, quantity: 80),
     MarketGood(good: forage, quantity: 60),
     MarketGood(good: wood, quantity: 50),
@@ -160,7 +160,7 @@ final forestCamp = City(
   ],
   marketGoods: [
     MarketGood(good: grain, quantity: 30),
-    MarketGood(good: bread, quantity: 25),
+    MarketGood(good: bread, quantity: 250),
     MarketGood(good: water, quantity: 100),
     MarketGood(good: forage, quantity: 180),
     MarketGood(good: wood, quantity: 180),

@@ -6,7 +6,7 @@ class AnimalHealthService {
   ) {
     return (animal.type.maxHp -
             animal.hp) *
-        100;
+        10;
   }
 
   static bool canHeal(

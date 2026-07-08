@@ -23,6 +23,8 @@ class NpcCaravan {
 
   City? currentCity;
 
+  double idleHoursRemaining;
+
   Caravan caravan;
 
   ActiveJourney? activeJourney;
@@ -41,6 +43,7 @@ class NpcCaravan {
     required this.currentCity,
     required this.caravan,
     required this.ledger,
+    this.idleHoursRemaining = 0,
     this.activeJourney,
     this.lastDecision = 'None',
     this.activeMission,
