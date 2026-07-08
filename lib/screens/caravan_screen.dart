@@ -14,20 +14,12 @@ import '../../core/world/calendar_service.dart';
 class CaravanScreen extends StatefulWidget {
   final Caravan caravan;
 
-  const CaravanScreen({
-    super.key,
-    required this.caravan,
-  });
+  const CaravanScreen({super.key, required this.caravan,});
 
-  @override
-  State<CaravanScreen> createState() =>
-      _CaravanScreenState();
-}
+  @override State<CaravanScreen> createState() => _CaravanScreenState();}
 
-class _CaravanScreenState
-    extends State<CaravanScreen> {
-  Caravan get caravan =>
-      widget.caravan;
+class _CaravanScreenState extends State<CaravanScreen> {
+  Caravan get caravan => widget.caravan;
 
   void _addDonkey() {
     setState(() {
@@ -98,10 +90,41 @@ class _CaravanScreenState
                     'Cargo Weight: '
                     '${caravan.cargoWeightKg.toStringAsFixed(1)} kg',
                   ),
-                  Text(
-                    'Available Capacity: '
-                    '${caravan.availableCapacityKg.toStringAsFixed(1)} kg',
-                  ),
+                Text(
+  'Available Capacity: '
+  '${caravan.availableCapacityKg.toStringAsFixed(1)} kg',
+),
+Text(
+  'Speed: '
+  '${caravan.speed.toStringAsFixed(1)} km/h',
+),
+const SizedBox(
+  height: 8,
+),
+const Text(
+  'Skills',
+  style: TextStyle(
+    fontWeight: FontWeight.bold,
+  ),
+),
+Text(
+  '🩺 Doctor: ${caravan.doctorSkill}',
+),
+Text(
+  '🐴 Vet: ${caravan.vetSkill}',
+),
+Text(
+  '🔧 Mechanic: ${caravan.mechanicSkill}',
+),
+Text(
+  '👁️ Scout: ${caravan.scoutSkill}',
+),
+Text(
+  '⚔️ Combat: ${caravan.combatSkill}',
+),
+const SizedBox(
+  height: 8,
+),
 Text(
   'Water / Day: '
   '${caravan.waterRequirementPerDay.toStringAsFixed(1)}',

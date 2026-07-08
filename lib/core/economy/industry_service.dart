@@ -1,7 +1,10 @@
 import '../models/world.dart';
 import 'labour_service.dart';
+import 'pricing_service.dart';
 
 class IndustryService {
+  static const double wagePerWorkerPerDay = 1;
+
   static void advanceTime({
     required World world,
     required double hours,
@@ -10,145 +13,112 @@ class IndustryService {
 
     for (final city in world.cities) {
       final labourEfficiency =
-          LabourService.cityEfficiency(
-        city: city,
-      );
+          LabourService.cityEfficiency(city: city);
 
       for (final industry in city.industries) {
+        double revenue = 0;
+        double expenses = 0;
+
         // Buy inputs up to target stock.
-        for (final input
-            in industry.type.inputsPerSize.entries) {
-          final market =
-              city.marketForGood(
-            input.key,
-          );
+        for (final input in industry.type.inputsPerSize.entries) {
+          final market = city.marketForGood(input.key);
 
-          final targetStock =
-              input.value *
-              industry.size *
-              industry.inputDaysTarget;
+          final targetStock = input.value * industry.size * industry.inputDaysTarget;
 
-          final currentStock =
-              industry.quantityOf(
-            input.key,
-          );
+          final currentStock = industry.quantityOf(input.key);
 
-          final shortfall =
-              targetStock -
-              currentStock;
+          final shortfall = targetStock - currentStock;
 
-          if (shortfall <= 0) {
-            continue;
+          if (shortfall <= 0) {continue;}
+
+          final purchased = shortfall > market.quantity ? market.quantity : shortfall;
+
+          if (purchased > 0) {
+            final cost = PricingService.transactionCost(city: city, market: market, quantity: purchased.floor(),);
+
+            expenses += cost;
+            industry.cash -= cost;
           }
 
-          final purchased =
-              shortfall >
-                      market.quantity
-                  ? market.quantity
-                  : shortfall;
+          market.quantity -= purchased;
 
-          market.quantity -=
-              purchased;
+          industry.addInventory( good: input.key, quantity: purchased,);}
 
-          industry.addInventory(
-            good: input.key,
-            quantity: purchased,
-          );
-        }
-
-        double efficiency =
-            labourEfficiency;
+        double efficiency = labourEfficiency;
 
         // Check stored inputs.
-        for (final input
-            in industry.type.inputsPerSize.entries) {
-          final required =
-              input.value *
-              industry.size *
-              days;
+        for (final input in industry.type.inputsPerSize.entries) {
+          final required = input.value * industry.size * days;
 
           if (required <= 0) {
             continue;
           }
 
-          final stored =
-              industry.quantityOf(
-            input.key,
-          );
+          final stored = industry.quantityOf(input.key);
 
-          final availability =
-              stored / required;
+          final availability = stored / required;
 
-          if (availability <
-              efficiency) {
-            efficiency =
-                availability;
-          }
-        }
+          if (availability < efficiency) {efficiency = availability;}}
 
-        efficiency =
-            efficiency.clamp(
-          0.0,
-          1.0,
-        );
+        efficiency = efficiency.clamp(0.0, 1.0);
 
         // Consume inputs.
-        for (final input
-            in industry.type.inputsPerSize.entries) {
+        for (final input in industry.type.inputsPerSize.entries) {
           industry.removeInventory(
             good: input.key,
-            quantity:
-                input.value *
-                    industry.size *
-                    days *
-                    efficiency,
-          );
-        }
+            quantity: input.value * industry.size * days * efficiency,);}
 
         // Produce outputs.
-        for (final output
-            in industry
-                .type
-                .outputsPerSize
-                .entries) {
-          industry.addInventory(
-            good: output.key,
-            quantity:
-                output.value *
-                    industry.size *
-                    days *
-                    efficiency,
-          );
-        }
+        for (final output in industry.type.outputsPerSize.entries) {
+          industry.addInventory(good: output.key, quantity: output.value * industry.size * days * efficiency,);}
 
         // Sell all outputs to market.
-        for (final output
-            in industry
-                .type
-                .outputsPerSize
-                .keys) {
-          final quantity =
-              industry.quantityOf(
-            output,
+        for (final output in industry.type.outputsPerSize.keys) {
+          final quantity = industry.quantityOf(output);
+
+          if (quantity <= 0) {continue;}
+
+          final market = city.marketForGood(output);
+
+          final saleRevenue =
+              PricingService.transactionRevenue(
+            city: city,
+            market: market,
+            quantity: quantity.floor(),
           );
 
-          if (quantity <= 0) {
-            continue;
-          }
+          revenue += saleRevenue;
+          industry.cash += saleRevenue;
 
-          final market =
-              city.marketForGood(
-            output,
-          );
+          market.quantity += quantity;
 
-          market.quantity +=
-              quantity;
+          industry.removeInventory(good: output, quantity: quantity,);}
 
-          industry.removeInventory(
-            good: output,
-            quantity: quantity,
-          );
-        }
+        // Operating costs.
+        final operatingCost =
+            industry.type.operatingCostPerSizePerDay *
+            industry.size *
+            days;
+
+        expenses += operatingCost;
+        industry.cash -= operatingCost;
+
+        // Labour costs.
+        final labourCost =
+            industry.type.workersPerSize *
+            industry.size *
+            wagePerWorkerPerDay *
+            days;
+
+        expenses += labourCost;
+        industry.cash -= labourCost;
+
+        industry.lastRevenue = revenue;
+        industry.lastExpenses = expenses;
+        industry.lastProfit = revenue - expenses;
+
+        industry.lifetimeRevenue += revenue;
+        industry.lifetimeExpenses += expenses;
       }
     }
   }

@@ -13,6 +13,7 @@ import 'industries_screen.dart';
 import 'ledger_screen.dart';
 import 'map_screen.dart';
 import 'market_screen.dart';
+import 'npc_caravans_screen.dart';
 import 'recruitment_screen.dart';
 import 'vehicle_market_screen.dart';
 import 'vet_screen.dart';
@@ -328,6 +329,23 @@ class _MainMenuScreenState
                   },
                   child: const Text(
                     'Debug',
+                  ),
+                ),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            const NpcCaravansScreen(),
+                      ),
+                    ).then(
+                      (_) => setState(() {}),
+                    );
+                  },
+                  child: const Text(
+                    'NPC Caravans',
                   ),
                 ),
               ],

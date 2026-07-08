@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../data/game_data.dart';
+import '../core/economy/industry_ownership_service.dart';
 
-class IndustriesScreen extends StatelessWidget {
+class IndustriesScreen extends StatefulWidget {
   const IndustriesScreen({
     super.key,
   });
 
+  @override
+  State<IndustriesScreen> createState() =>
+      _IndustriesScreenState();
+}
+
+class _IndustriesScreenState
+    extends State<IndustriesScreen> {
   @override
   Widget build(BuildContext context) {
     final city =
@@ -30,6 +38,12 @@ class IndustriesScreen extends StatelessWidget {
               children:
                   city.industries.map(
                 (industry) {
+                  final purchasePrice =
+                      IndustryOwnershipService
+                          .purchasePrice(
+                    industry,
+                  );
+
                   return Card(
                     child: Padding(
                       padding:
@@ -57,6 +71,32 @@ class IndustriesScreen extends StatelessWidget {
                           ),
 
                           Text(
+                            'Owned: ${industry.playerOwned ? 'Yes' : 'No'}',
+                          ),
+
+                          Text(
+                            'Cash: ${industry.cash.toStringAsFixed(0)}',
+                          ),
+
+                          Text(
+                            'Profit: ${industry.lastProfit.toStringAsFixed(1)}',
+                            style: TextStyle(
+                              color:
+                                  industry.lastProfit >=
+                                          0
+                                      ? Colors.green
+                                      : Colors.red,
+                              fontWeight:
+                                  FontWeight
+                                      .bold,
+                            ),
+                          ),
+
+                          Text(
+                            'Lifetime Profit: ${industry.lifetimeProfit.toStringAsFixed(0)}',
+                          ),
+
+                          Text(
                             'Size: ${industry.size}',
                           ),
 
@@ -76,12 +116,63 @@ class IndustriesScreen extends StatelessWidget {
                             height: 12,
                           ),
 
+                          if (!industry
+                              .playerOwned)
+                            ElevatedButton(
+                              onPressed: () {
+                                final success =
+                                    IndustryOwnershipService
+                                        .buyIndustry(
+                                  caravan: game
+                                      .player
+                                      .caravan,
+                                  industry:
+                                      industry,
+                                );
+
+                                if (success) {
+                                  setState(() {});
+                                }
+                              },
+                              child: Text(
+                                'Buy (${purchasePrice.toStringAsFixed(0)}g)',
+                              ),
+                            ),
+
+                          if (industry
+                              .playerOwned)
+                            ElevatedButton(
+                              onPressed: () {
+                                final success =
+                                    IndustryOwnershipService
+                                        .collectCash(
+                                  caravan: game
+                                      .player
+                                      .caravan,
+                                  industry:
+                                      industry,
+                                );
+
+                                if (success) {
+                                  setState(() {});
+                                }
+                              },
+                              child: const Text(
+                                'Collect Cash',
+                              ),
+                            ),
+
+                          const SizedBox(
+                            height: 12,
+                          ),
+
                           const Text(
                             'Inventory',
                             style:
                                 TextStyle(
                               fontWeight:
-                                  FontWeight.bold,
+                                  FontWeight
+                                      .bold,
                             ),
                           ),
 

@@ -1,5 +1,6 @@
 import '../../data/goods_data.dart';
 import '../models/caravan.dart';
+import '../caravan/skill_service.dart';
 
 class ConsumptionService {
   static void consume({
@@ -177,6 +178,13 @@ class ConsumptionService {
               waterRequired);
     }
 
+    damage *= SkillService.asymptoticValue(
+      skill:
+          caravan.doctorSkill.toDouble(),
+      start: 1.0,
+      end: 1.0 / 3.0,
+    );
+
     caravan.leader.hp =
         (caravan.leader.hp - damage)
             .clamp(
@@ -220,6 +228,13 @@ class ConsumptionService {
           (waterShortfall /
               waterRequired);
     }
+
+    damage *= SkillService.asymptoticValue(
+      skill:
+          caravan.vetSkill.toDouble(),
+      start: 1.0,
+      end: 1.0 / 3.0,
+    );
 
     for (final animal
         in caravan.animals) {

@@ -1,13 +1,25 @@
+import '../models/caravan.dart';
 import '../models/vehicle.dart';
 import 'animal_service.dart';
+import 'skill_service.dart';
 
 class VehicleService {
   static void advanceTime({
+    required Caravan caravan,
     required Vehicle vehicle,
     required double hours,
   }) {
+    final dailyConditionLoss =
+        SkillService.asymptoticValue(
+      skill:
+          caravan.mechanicSkill.toDouble(),
+      start: 5.0,
+      end: 1.0,
+    );
+
     vehicle.condition -=
-        (hours / 24) * 5;
+        (hours / 24) *
+        dailyConditionLoss;
 
     if (vehicle.condition < 0) {
       vehicle.condition = 0;
@@ -15,11 +27,13 @@ class VehicleService {
   }
 
   static void advanceTimeForAll({
+    required Caravan caravan,
     required List<Vehicle> vehicles,
     required double hours,
   }) {
     for (final vehicle in vehicles) {
       advanceTime(
+        caravan: caravan,
         vehicle: vehicle,
         hours: hours,
       );

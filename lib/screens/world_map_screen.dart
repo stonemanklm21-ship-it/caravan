@@ -161,10 +161,10 @@ class _WorldMapScreenState
     });
   }
 
-  void _handleTap({
+  Future<void> _handleTap({
     required TapUpDetails details,
     required Size viewportSize,
-  }) {
+  }) async {
     final worldPosition =
         camera.screenToWorld(
       screenX:
@@ -201,7 +201,7 @@ class _WorldMapScreenState
     if (newSelection.isLocation &&
         game.player.currentCity ==
             null) {
-      WorldMapTravelService
+      await WorldMapTravelService
           .travelToCoordinates(
         context: context,
         playerState: game.player,
@@ -251,8 +251,8 @@ class _WorldMapScreenState
           return GestureDetector(
             behavior:
                 HitTestBehavior.opaque,
-            onTapUp: (details) {
-              _handleTap(
+            onTapUp: (details) async {
+              await _handleTap(
                 details: details,
                 viewportSize:
                     viewportSize,

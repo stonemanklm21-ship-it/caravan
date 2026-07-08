@@ -11,6 +11,28 @@ class Industry {
   /// industry tries to keep in stock.
   double inputDaysTarget;
 
+  /// Whether the player owns this industry.
+  bool playerOwned;
+
+  /// Cash reserves owned by the industry.
+  double cash;
+
+  /// Accounting for the most recent update.
+  double lastRevenue;
+
+  double lastExpenses;
+
+  double lastProfit;
+
+  /// Lifetime accounting.
+  double lifetimeRevenue;
+
+  double lifetimeExpenses;
+
+  double get lifetimeProfit =>
+      lifetimeRevenue -
+      lifetimeExpenses;
+
   final List<IndustryInventoryItem>
       inventory;
 
@@ -18,6 +40,13 @@ class Industry {
     required this.type,
     required this.size,
     required this.inputDaysTarget,
+    this.playerOwned = false,
+    required this.cash,
+    this.lastRevenue = 0,
+    this.lastExpenses = 0,
+    this.lastProfit = 0,
+    this.lifetimeRevenue = 0,
+    this.lifetimeExpenses = 0,
     required this.inventory,
   });
 
@@ -103,6 +132,16 @@ class Industry {
       'size': size,
       'inputDaysTarget':
           inputDaysTarget,
+      'playerOwned':
+          playerOwned,
+      'cash': cash,
+      'lastRevenue': lastRevenue,
+      'lastExpenses': lastExpenses,
+      'lastProfit': lastProfit,
+      'lifetimeRevenue':
+          lifetimeRevenue,
+      'lifetimeExpenses':
+          lifetimeExpenses,
       'inventory': inventory
           .map(
             (item) => item.toJson(),
@@ -134,6 +173,39 @@ class Industry {
           (json['inputDaysTarget']
                   as num)
               .toDouble(),
+      playerOwned:
+          json['playerOwned']
+                  as bool? ??
+              false,
+      cash:
+          (json['cash'] as num?)
+                  ?.toDouble() ??
+              1000,
+      lastRevenue:
+          (json['lastRevenue']
+                      as num?)
+                  ?.toDouble() ??
+              0,
+      lastExpenses:
+          (json['lastExpenses']
+                      as num?)
+                  ?.toDouble() ??
+              0,
+      lastProfit:
+          (json['lastProfit']
+                      as num?)
+                  ?.toDouble() ??
+              0,
+      lifetimeRevenue:
+          (json['lifetimeRevenue']
+                      as num?)
+                  ?.toDouble() ??
+              0,
+      lifetimeExpenses:
+          (json['lifetimeExpenses']
+                      as num?)
+                  ?.toDouble() ??
+              0,
       inventory:
           (json['inventory']
                   as List)

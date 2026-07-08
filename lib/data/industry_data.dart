@@ -30,15 +30,13 @@ final well = IndustryType(
 final gatheringCamp = IndustryType(
   id: 'gathering_camp',
   name: 'Gathering Camp',
-  inputsPerSize: {
-    water: 5,
-  },
+  inputsPerSize: {},
   outputsPerSize: {
     forage: 20,
   },
   operatingCostPerSizePerDay: 3,
   workersPerSize: 4,
-  storagePerSize: 100,
+  storagePerSize: 300,
 );
 
 final loggingCamp = IndustryType(
@@ -78,7 +76,7 @@ final bakery = IndustryType(
     water: 20,
   },
   outputsPerSize: {
-    bread: 10,
+    bread: 20,
   },
   operatingCostPerSizePerDay: 6,
   workersPerSize: 4,
@@ -93,7 +91,7 @@ final toolmaker = IndustryType(
     wood: 5,
   },
   outputsPerSize: {
-    tools: 3,
+    tools: 5,
   },
   operatingCostPerSizePerDay: 8,
   workersPerSize: 5,
@@ -107,7 +105,7 @@ final chairmaker = IndustryType(
     wood: 10,
   },
   outputsPerSize: {
-    chair: 2,
+    chair: 5,
   },
   operatingCostPerSizePerDay: 10,
   workersPerSize: 6,

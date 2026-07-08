@@ -6,7 +6,7 @@ const donkey = AnimalType(
   maxHp: 100,
   lifeExpectancyYears: 30,
   averageAdultWeightKg: 200,
-  speed: 0.8,
+  speed: 4.5,
   basePrice: 10000,
 );
 
@@ -16,7 +16,7 @@ const horse = AnimalType(
   maxHp: 120,
   lifeExpectancyYears: 25,
   averageAdultWeightKg: 500,
-  speed: 1.5,
+  speed: 12,
   basePrice: 25000,
 );
 
@@ -26,7 +26,7 @@ const ox = AnimalType(
   maxHp: 180,
   lifeExpectancyYears: 20,
   averageAdultWeightKg: 800,
-  speed: 0.6,
+  speed: 4,
   basePrice: 100000,
 );
 
@@ -36,7 +36,7 @@ const camel = AnimalType(
   maxHp: 150,
   lifeExpectancyYears: 35,
   averageAdultWeightKg: 600,
-  speed: 1.2,
+  speed: 3.5,
   basePrice: 150000,
 );
 

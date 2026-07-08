@@ -14,6 +14,7 @@ class JourneyService {
     required City destination,
     double? originX,
     double? originY,
+    double tickFractionOffset = 0,
   }) {
     if (!CaravanService.canTravel(
       playerState.caravan,
@@ -59,6 +60,8 @@ class JourneyService {
       destinationCity:
           destination,
       totalHours: travelHours,
+      tickFractionOffset:
+          tickFractionOffset,
     );
 
     playerState.activeJourney =
@@ -74,6 +77,7 @@ class JourneyService {
     required double destinationY,
     double? originX,
     double? originY,
+    double tickFractionOffset = 0,
   }) {
     if (!CaravanService.canTravel(
       playerState.caravan,
@@ -117,6 +121,8 @@ class JourneyService {
       destinationY:
           destinationY,
       totalHours: travelHours,
+      tickFractionOffset:
+          tickFractionOffset,
     );
 
     playerState.activeJourney =
@@ -136,7 +142,18 @@ class JourneyService {
       return;
     }
 
-    journey.elapsedHours += hours;
+    if (journey.tickFractionOffset >
+        0) {
+      journey.elapsedHours +=
+          hours -
+          journey.tickFractionOffset;
+
+      journey.tickFractionOffset =
+          0.0;
+    } else {
+      journey.elapsedHours +=
+          hours;
+    }
 
     if (journey.elapsedHours >
         journey.totalHours) {
@@ -188,9 +205,15 @@ class JourneyService {
       return playerState.worldX;
     }
 
+    final effectiveFraction =
+        (tickFraction -
+                journey
+                    .tickFractionOffset)
+            .clamp(0.0, 1.0);
+
     final progress =
         ((journey.elapsedHours +
-                    tickFraction) /
+                    effectiveFraction) /
                 journey.totalHours)
             .clamp(0.0, 1.0);
 
@@ -211,9 +234,15 @@ class JourneyService {
       return playerState.worldY;
     }
 
+    final effectiveFraction =
+        (tickFraction -
+                journey
+                    .tickFractionOffset)
+            .clamp(0.0, 1.0);
+
     final progress =
         ((journey.elapsedHours +
-                    tickFraction) /
+                    effectiveFraction) /
                 journey.totalHours)
             .clamp(0.0, 1.0);
 

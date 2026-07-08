@@ -53,6 +53,10 @@ class TimeController {
     required World world,
     required VoidCallback onTick,
   }) {
+    if (currentSpeed == speed) {
+      return;
+    }
+
     final resumeFraction =
         _pausedTickFraction;
 

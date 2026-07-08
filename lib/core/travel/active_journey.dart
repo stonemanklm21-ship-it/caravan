@@ -14,6 +14,8 @@ class ActiveJourney {
 
   double elapsedHours;
 
+  double tickFractionOffset;
+
   ActiveJourney({
     required this.originX,
     required this.originY,
@@ -22,6 +24,7 @@ class ActiveJourney {
     this.destinationCity,
     required this.totalHours,
     this.elapsedHours = 0,
+    this.tickFractionOffset = 0,
   });
 
   double get progress {
@@ -50,6 +53,8 @@ class ActiveJourney {
           destinationCity?.id,
       'totalHours': totalHours,
       'elapsedHours': elapsedHours,
+      'tickFractionOffset':
+          tickFractionOffset,
     };
   }
 
@@ -96,6 +101,11 @@ class ActiveJourney {
           (json['elapsedHours']
                   as num)
               .toDouble(),
+      tickFractionOffset:
+          (json['tickFractionOffset']
+                      as num?)
+                  ?.toDouble() ??
+              0.0,
     );
   }
 }

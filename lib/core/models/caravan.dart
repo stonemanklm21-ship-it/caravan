@@ -48,7 +48,91 @@ class Caravan {
   }
 
   double get speed {
-    return 1;
+    double slowest = leader.speed;
+
+    for (final companion
+        in companions) {
+      if (companion.alive &&
+          companion.speed <
+              slowest) {
+        slowest =
+            companion.speed;
+      }
+    }
+
+    for (final animal
+        in animals) {
+      if (animal.alive &&
+          animal.type.speed <
+              slowest) {
+        slowest =
+            animal.type.speed;
+      }
+    }
+
+    return slowest;
+  }
+
+  int get doctorSkill {
+    int total = leader.doctorSkill;
+
+    for (final companion
+        in companions) {
+      total +=
+          companion.doctorSkill;
+    }
+
+    return total;
+  }
+
+  int get vetSkill {
+    int total = leader.vetSkill;
+
+    for (final companion
+        in companions) {
+      total += companion.vetSkill;
+    }
+
+    return total;
+  }
+
+  int get mechanicSkill {
+    int total =
+        leader.mechanicSkill;
+
+    for (final companion
+        in companions) {
+      total +=
+          companion.mechanicSkill;
+    }
+
+    return total;
+  }
+
+  int get scoutSkill {
+    int total =
+        leader.scoutSkill;
+
+    for (final companion
+        in companions) {
+      total +=
+          companion.scoutSkill;
+    }
+
+    return total;
+  }
+
+  int get combatSkill {
+    int total =
+        leader.combatSkill;
+
+    for (final companion
+        in companions) {
+      total +=
+          companion.combatSkill;
+    }
+
+    return total;
   }
 
   double get calorieRequirementPerDay {

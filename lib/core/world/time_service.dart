@@ -31,6 +31,7 @@ class TimeService {
     );
 
     VehicleService.advanceTimeForAll(
+      caravan: playerState.caravan,
       vehicles: playerState.caravan.vehicles,
       hours: hours,
     );
@@ -43,6 +44,7 @@ class TimeService {
       );
 
       VehicleService.advanceTimeForAll(
+        caravan: npc.caravan,
         vehicles: npc.caravan.vehicles,
         hours: hours,
       );

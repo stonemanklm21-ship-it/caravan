@@ -3,6 +3,12 @@ import 'dart:math';
 import '../models/character.dart';
 import '../models/recruit.dart';
 
+enum RecruitmentMarketTier {
+  basic,
+  regional,
+  major,
+}
+
 class RecruitmentService {
   static final Random _random =
       Random();
@@ -22,22 +28,55 @@ class RecruitmentService {
 
   static List<Recruit>
       generateRecruits({
+    required RecruitmentMarketTier tier,
     int count = 5,
   }) {
     return List.generate(
       count,
-      (_) => generateRecruit(),
+      (_) => generateRecruit(
+        tier: tier,
+      ),
     );
   }
 
-  static Recruit generateRecruit() {
+  static Recruit generateRecruit({
+    required RecruitmentMarketTier tier,
+  }) {
     final age =
         18 + _random.nextInt(43);
 
-    final wage =
-        (1 +
-                _random.nextInt(10))
-            .toDouble();
+    final maxSkill = switch (tier) {
+      RecruitmentMarketTier.basic => 20,
+      RecruitmentMarketTier.regional => 40,
+      RecruitmentMarketTier.major => 60,
+    };
+
+    final doctorSkill =
+        _random.nextInt(maxSkill + 1);
+
+    final vetSkill =
+        _random.nextInt(maxSkill + 1);
+
+    final mechanicSkill =
+        _random.nextInt(maxSkill + 1);
+
+    final scoutSkill =
+        _random.nextInt(maxSkill + 1);
+
+    final combatSkill =
+        _random.nextInt(maxSkill + 1);
+
+final totalSkill =
+    doctorSkill +
+    vetSkill +
+    mechanicSkill +
+    scoutSkill +
+    combatSkill;
+
+final wage =
+    (100 +
+    (totalSkill * 2)).toDouble();
+
 
     final character = Character(
       id:
@@ -59,6 +98,14 @@ class RecruitmentService {
       wagePerDay: wage,
       hp: 100,
       maxHp: 100,
+      speed:
+          3 +
+          (_random.nextDouble() * 3),
+      doctorSkill: doctorSkill,
+      vetSkill: vetSkill,
+      mechanicSkill: mechanicSkill,
+      scoutSkill: scoutSkill,
+      combatSkill: combatSkill,
     );
 
     return Recruit(

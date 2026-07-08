@@ -71,6 +71,7 @@ class _MarketScreenState
                               PricingService
                                   .calculatePrice(
                             market: market,
+                            city: city,
                           );
 
                           return Card(
@@ -95,6 +96,7 @@ class _MarketScreenState
                                         () {
                                           TradingService
                                               .buy(
+                                                city: city,
                                             caravan:
                                                 game.player.caravan,
                                             market:
@@ -121,6 +123,7 @@ class _MarketScreenState
                                         () {
                                           TradingService
                                               .sell(
+                                                city: city,
                                             caravan:
                                                 game.player.caravan,
                                             market:

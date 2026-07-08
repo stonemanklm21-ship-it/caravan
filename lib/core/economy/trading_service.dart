@@ -1,3 +1,4 @@
+import '../models/city.dart';
 import '../models/caravan.dart';
 import '../models/cargo_item.dart';
 import '../models/market_good.dart';
@@ -5,12 +6,14 @@ import 'pricing_service.dart';
 
 class TradingService {
   static bool buy({
+    required City city,
     required Caravan caravan,
     required MarketGood market,
     required int quantity,
   }) {
     final cost =
         PricingService.transactionCost(
+      city: city,
       market: market,
       quantity: quantity,
     );
@@ -61,6 +64,7 @@ class TradingService {
   }
 
   static bool sell({
+    required City city,
     required Caravan caravan,
     required MarketGood market,
     required int quantity,
@@ -87,6 +91,7 @@ class TradingService {
     final revenue =
         PricingService
             .transactionRevenue(
+      city: city,
       market: market,
       quantity: quantity,
     );

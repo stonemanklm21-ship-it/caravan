@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import '../economy/market_observation.dart';
 import '../economy/pricing_service.dart';
 import '../economy/trading_service.dart';
@@ -21,19 +19,16 @@ class NpcCaravanService {
     for (final market in city.marketGoods) {
       npc.ledger.observations.removeWhere(
         (observation) =>
-            observation.cityId ==
-                city.id &&
-            observation.goodId ==
-                market.good.id,
+            observation.cityId == city.id &&
+            observation.goodId == market.good.id,
       );
 
       npc.ledger.observations.add(
         MarketObservation(
           cityId: city.id,
           goodId: market.good.id,
-          price:
-              PricingService
-                  .calculatePrice(
+          price: PricingService.calculatePrice(
+            city: city,
             market: market,
           ),
           day: 0,
@@ -43,9 +38,15 @@ class NpcCaravanService {
     }
   }
 
-  static void tradeAndDepart({
+  static void clearMission(
+    NpcCaravan npc,
+  ) {
+    npc.activeMission = null;
+    npc.state = CaravanState.idle;
+  }
+
+  static void sellCargo({
     required NpcCaravan npc,
-    required World world,
   }) {
     final city = npc.currentCity;
 
@@ -53,69 +54,111 @@ class NpcCaravanService {
       return;
     }
 
-    final trade =
-        NpcTradingService.bestTrade(
+    final mission = npc.activeMission;
+
+    if (mission == null) {
+      return;
+    }
+
+    final inventoryItem =
+        npc.caravan.inventory.cast<dynamic?>().firstWhere(
+      (item) => item?.good.id == mission.good.id,
+      orElse: () => null,
+    );
+
+    if (inventoryItem == null) {
+      return;
+    }
+
+    final market = city.marketForGood(
+      mission.good,
+    );
+
+    TradingService.sell(
+      city: city,
+      caravan: npc.caravan,
+      market: market,
+      quantity: inventoryItem.quantity.floor(),
+    );
+
+    npc.lastDecision =
+        'Sold ${mission.good.name} '
+        'in ${city.name}';
+  }
+
+  static void startMission({
+    required NpcCaravan npc,
+    required World world,
+  }) {
+    final city = npc.currentCity;
+
+    if (city == null) {
+      npc.lastDecision = 'No city';
+      return;
+    }
+
+    final mission =
+        NpcTradingService.generateMission(
       world: world,
       origin: city,
       npc: npc,
     );
 
-    if (trade == null) {
+    if (mission == null) {
+      final destination =
+          NpcTradingService.randomRelocation(
+        world: world,
+        origin: city,
+      );
+
+      npc.lastDecision =
+          'Relocating to ${destination.name}';
+
+      npc.state =
+          CaravanState.travelling;
+
+      NpcTravelService.startJourney(
+        npc: npc,
+        destination: destination,
+      );
+
       return;
     }
+
+    npc.activeMission = mission;
 
     final market =
         city.marketForGood(
-      trade.good,
+      mission.good,
     );
 
-    final price =
-        PricingService.calculatePrice(
-      market: market,
-    );
-
-    final affordableQuantity =
-        (npc.caravan.gold / price)
-            .floor();
-
-    final availableQuantity =
-        market.quantity.floor();
-
-    final remainingCargoKg =
-        npc.caravan.cargoCapacityKg -
-            npc.caravan.cargoWeightKg;
-
-    final cargoLimitedQuantity =
-        (remainingCargoKg /
-                market.good.weight)
-            .floor();
-
-    final quantity = min(
-      affordableQuantity,
-      min(
-        availableQuantity,
-        cargoLimitedQuantity,
-      ),
-    );
-
-    if (quantity <= 0) {
-      return;
-    }
-
-    final bought =
-        TradingService.buy(
+    final bought = TradingService.buy(
+      city: city,
       caravan: npc.caravan,
       market: market,
-      quantity: quantity,
+      quantity: mission.quantity,
     );
 
     if (!bought) {
+      npc.activeMission = null;
+
+      npc.lastDecision =
+          'Buy failed unexpectedly';
+
       return;
     }
 
+    npc.lastDecision =
+        'Bought ${mission.good.name} '
+        'x${mission.quantity} '
+        'for ${mission.destination.name}';
+
+    npc.state =
+        CaravanState.travelling;
+
     NpcTravelService.startJourney(
       npc: npc,
-      destination: trade.destination,
+      destination: mission.destination,
     );
   }
 
@@ -124,55 +167,50 @@ class NpcCaravanService {
     required World world,
     required double hours,
   }) {
-    if (npc.activeJourney == null) {
-      tradeAndDepart(
-        npc: npc,
-        world: world,
-      );
-      return;
-    }
+    switch (npc.state) {
+      case CaravanState.idle:
+        startMission(
+          npc: npc,
+          world: world,
+        );
+        break;
 
-    NpcTravelService.advanceJourney(
-      npc: npc,
-      hours: hours,
-    );
+      case CaravanState.travelling:
+        NpcTravelService.advanceJourney(
+          npc: npc,
+          hours: hours,
+        );
 
-    if (npc.activeJourney != null &&
-        npc.activeJourney!.completed) {
-      final destination =
-          npc.activeJourney!
-              .destinationCity;
-
-      NpcTravelService.arrive(
-        npc: npc,
-      );
-
-      observeCurrentCity(
-        npc: npc,
-      );
-
-      if (destination != null) {
-        for (final item
-            in npc.caravan.inventory
-                .toList()) {
-          final market =
-              destination.marketForGood(
-            item.good,
+        if (npc.activeJourney != null &&
+            npc.activeJourney!.completed) {
+          NpcTravelService.arrive(
+            npc: npc,
           );
 
-          TradingService.sell(
-            caravan: npc.caravan,
-            market: market,
-            quantity:
-                item.quantity.floor(),
+          observeCurrentCity(
+            npc: npc,
           );
+
+          npc.lastDecision =
+              'Arrived at '
+              '${npc.currentCity?.name ?? 'Unknown'}';
+
+          npc.state =
+              CaravanState.selling;
         }
-      }
 
-      tradeAndDepart(
-        npc: npc,
-        world: world,
-      );
+        break;
+
+      case CaravanState.selling:
+        sellCargo(
+          npc: npc,
+        );
+
+        clearMission(
+          npc,
+        );
+
+        break;
     }
   }
 
@@ -180,8 +218,7 @@ class NpcCaravanService {
     required World world,
     required double hours,
   }) {
-    for (final npc
-        in world.npcCaravans) {
+    for (final npc in world.npcCaravans) {
       advanceTime(
         npc: npc,
         world: world,

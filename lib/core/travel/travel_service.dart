@@ -10,6 +10,7 @@ class TravelService {
     required City destination,
     double? originX,
     double? originY,
+    double tickFractionOffset = 0,
   }) {
     playerState.currentCity = null;
 
@@ -18,6 +19,8 @@ class TravelService {
       destination: destination,
       originX: originX,
       originY: originY,
+      tickFractionOffset:
+          tickFractionOffset,
     );
   }
 
@@ -27,15 +30,19 @@ class TravelService {
     required double destinationY,
     double? originX,
     double? originY,
+    double tickFractionOffset = 0,
   }) {
     playerState.currentCity = null;
 
-    JourneyService.startJourneyToCoordinates(
+    JourneyService
+        .startJourneyToCoordinates(
       playerState: playerState,
       destinationX: destinationX,
       destinationY: destinationY,
       originX: originX,
       originY: originY,
+      tickFractionOffset:
+          tickFractionOffset,
     );
   }
 

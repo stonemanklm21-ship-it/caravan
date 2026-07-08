@@ -3,11 +3,19 @@ import '../../data/vehicle_data.dart';
 
 import '../economy/market_ledger.dart';
 import '../travel/active_journey.dart';
+
 import 'animal.dart';
 import 'caravan.dart';
 import 'city.dart';
+import 'trade_mission.dart';
 import 'vehicle.dart';
 import 'world.dart';
+
+enum CaravanState {
+  idle,
+  travelling,
+  selling,
+}
 
 class NpcCaravan {
   double worldX;
@@ -21,6 +29,12 @@ class NpcCaravan {
 
   MarketLedger ledger;
 
+  String lastDecision;
+
+  TradeMission? activeMission;
+
+  CaravanState state;
+
   NpcCaravan({
     required this.worldX,
     required this.worldY,
@@ -28,6 +42,9 @@ class NpcCaravan {
     required this.caravan,
     required this.ledger,
     this.activeJourney,
+    this.lastDecision = 'None',
+    this.activeMission,
+    this.state = CaravanState.idle,
   });
 
   Map<String, dynamic> toJson() {
@@ -37,8 +54,12 @@ class NpcCaravan {
       'currentCity': currentCity?.id,
       'caravan': caravan.toJson(),
       'ledger': ledger.toJson(),
-      'activeJourney':
-          activeJourney?.toJson(),
+      'activeJourney': activeJourney?.toJson(),
+      'lastDecision': lastDecision,
+      'state': state.name,
+
+      // Mission persistence can be added later
+      // 'activeMission': activeMission?.toJson(),
     };
   }
 
@@ -46,8 +67,7 @@ class NpcCaravan {
     Map<String, dynamic> json,
     World world,
   ) {
-    final cityId =
-        json['currentCity'] as String?;
+    final cityId = json['currentCity'] as String?;
 
     City? currentCity;
 
@@ -58,53 +78,46 @@ class NpcCaravan {
     }
 
     return NpcCaravan(
-      worldX:
-          (json['worldX'] as num)
-              .toDouble(),
-      worldY:
-          (json['worldY'] as num)
-              .toDouble(),
+      worldX: (json['worldX'] as num).toDouble(),
+      worldY: (json['worldY'] as num).toDouble(),
       currentCity: currentCity,
       caravan: Caravan.fromJson(
-        json: json['caravan']
-            as Map<String, dynamic>,
-        animalFromJson:
-            (animalJson) =>
-                Animal.fromJson(
+        json: json['caravan'] as Map<String, dynamic>,
+        animalFromJson: (animalJson) => Animal.fromJson(
           json: animalJson,
-          animalTypeForId:
-              animalTypeForId,
+          animalTypeForId: animalTypeForId,
         ),
-        vehicleFromJson:
-            (vehicleJson) =>
-                Vehicle.fromJson(
+        vehicleFromJson: (vehicleJson) => Vehicle.fromJson(
           json: vehicleJson,
-          vehicleTypeForId:
-              vehicleTypeForId,
-          animalFromJson:
-              (animalJson) =>
-                  Animal.fromJson(
+          vehicleTypeForId: vehicleTypeForId,
+          animalFromJson: (animalJson) => Animal.fromJson(
             json: animalJson,
-            animalTypeForId:
-                animalTypeForId,
+            animalTypeForId: animalTypeForId,
           ),
         ),
       ),
-      ledger:
-          MarketLedger.fromJson(
-        json['ledger']
-            as Map<String, dynamic>,
+      ledger: MarketLedger.fromJson(
+        json['ledger'] as Map<String, dynamic>,
       ),
-      activeJourney:
-          json['activeJourney'] ==
-                  null
-              ? null
-              : ActiveJourney.fromJson(
-                  json['activeJourney']
-                      as Map<String,
-                          dynamic>,
-                  world,
-                ),
+      activeJourney: json['activeJourney'] == null
+          ? null
+          : ActiveJourney.fromJson(
+              json['activeJourney']
+                  as Map<String, dynamic>,
+              world,
+            ),
+      lastDecision:
+          json['lastDecision'] as String? ??
+              'None',
+      state: CaravanState.values.firstWhere(
+        (state) =>
+            state.name ==
+            (json['state'] as String? ?? 'idle'),
+        orElse: () => CaravanState.idle,
+      ),
+
+      // Mission loading can be added later
+      activeMission: null,
     );
   }
 }

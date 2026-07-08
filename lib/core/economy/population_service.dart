@@ -46,7 +46,7 @@ class PopulationService {
 
       toolsMarket.quantity -=
           city.population *
-          0.001 *
+          0.002 *
           days;
 
       woodMarket.quantity -=
@@ -56,7 +56,7 @@ class PopulationService {
 
       chairMarket.quantity -=
           city.population *
-          0.001 *
+          0.002 *
           days;
 
       if (breadMarket.quantity < 0) {

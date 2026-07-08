@@ -5,7 +5,8 @@ import '../models/npc_caravan.dart';
 import '../travel/active_journey.dart';
 
 class NpcTravelService {
-  static const double mapUnitsPerDay = 500;
+  static const double mapUnitsPerDay =
+      500;
 
   static void startJourney({
     required NpcCaravan npc,
@@ -40,10 +41,14 @@ class NpcTravelService {
     npc.activeJourney = ActiveJourney(
       originX: startX,
       originY: startY,
-      destinationX: destination.x,
-      destinationY: destination.y,
-      destinationCity: destination,
-      totalHours: travelHours,
+      destinationX:
+          destination.x,
+      destinationY:
+          destination.y,
+      destinationCity:
+          destination,
+      totalHours:
+          travelHours,
     );
 
     npc.currentCity = null;
@@ -53,13 +58,15 @@ class NpcTravelService {
     required NpcCaravan npc,
     required double hours,
   }) {
-    final journey = npc.activeJourney;
+    final journey =
+        npc.activeJourney;
 
     if (journey == null) {
       return;
     }
 
-    journey.elapsedHours += hours;
+    journey.elapsedHours +=
+        hours;
 
     if (journey.elapsedHours >
         journey.totalHours) {
@@ -71,7 +78,8 @@ class NpcTravelService {
   static void arrive({
     required NpcCaravan npc,
   }) {
-    final journey = npc.activeJourney;
+    final journey =
+        npc.activeJourney;
 
     if (journey == null) {
       return;
@@ -92,7 +100,8 @@ class NpcTravelService {
   static double currentX(
     NpcCaravan npc,
   ) {
-    final journey = npc.activeJourney;
+    final journey =
+        npc.activeJourney;
 
     if (journey == null) {
       return npc.worldX;
@@ -107,7 +116,8 @@ class NpcTravelService {
   static double currentY(
     NpcCaravan npc,
   ) {
-    final journey = npc.activeJourney;
+    final journey =
+        npc.activeJourney;
 
     if (journey == null) {
       return npc.worldY;
@@ -123,7 +133,8 @@ class NpcTravelService {
     NpcCaravan npc,
     double tickFraction,
   ) {
-    final journey = npc.activeJourney;
+    final journey =
+        npc.activeJourney;
 
     if (journey == null) {
       return npc.worldX;
@@ -145,7 +156,8 @@ class NpcTravelService {
     NpcCaravan npc,
     double tickFraction,
   ) {
-    final journey = npc.activeJourney;
+    final journey =
+        npc.activeJourney;
 
     if (journey == null) {
       return npc.worldY;
@@ -161,5 +173,25 @@ class NpcTravelService {
         ((journey.destinationY -
                 journey.originY) *
             progress);
+  }
+
+  static bool hasActiveJourney(
+    NpcCaravan npc,
+  ) {
+    return npc.activeJourney !=
+        null;
+  }
+
+  static bool isComplete(
+    NpcCaravan npc,
+  ) {
+    final journey =
+        npc.activeJourney;
+
+    if (journey == null) {
+      return false;
+    }
+
+    return journey.completed;
   }
 }

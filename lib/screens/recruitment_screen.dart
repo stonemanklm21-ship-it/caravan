@@ -29,7 +29,10 @@ class _RecruitmentScreenState
 
     recruits =
         RecruitmentService
-            .generateRecruits();
+            .generateRecruits(
+      tier:
+          RecruitmentMarketTier.basic,
+    );
   }
 
   @override
@@ -65,7 +68,7 @@ class _RecruitmentScreenState
             ),
             child: ListTile(
               title: Text(
-                character.name,
+                '${character.name} (${character.ageYears})',
               ),
               subtitle: Column(
                 crossAxisAlignment:
@@ -73,8 +76,15 @@ class _RecruitmentScreenState
                         .start,
                 children: [
                   Text(
-                    'Age: ${character.ageYears}',
+                    '🩺${character.doctorSkill}  '
+                    '🐴${character.vetSkill}  '
+                    '🔧${character.mechanicSkill}  '
+                    '👁️${character.scoutSkill}  '
+                    '⚔️${character.combatSkill}',
                   ),
+                  Text(
+  '🏃 ${character.speed.toStringAsFixed(1)} km/h',
+),
                   Text(
                     'HP: '
                     '${character.hp.toStringAsFixed(0)}'
@@ -82,23 +92,23 @@ class _RecruitmentScreenState
                     '${character.maxHp.toStringAsFixed(0)}',
                   ),
                   Text(
-                    'Cargo Capacity: '
+                    '📦 '
                     '${character.cargoCapacityKg.toStringAsFixed(1)} kg',
                   ),
                   Text(
-                    'Food: '
+                    '🍖 '
                     '${character.caloriesPerDay.toStringAsFixed(0)} / day',
                   ),
                   Text(
-                    'Water: '
+                    '💧 '
                     '${character.waterPerDay.toStringAsFixed(1)} / day',
                   ),
                   Text(
-                    'Wage: '
+                    '💰 Wage: '
                     '${character.wagePerDay.toStringAsFixed(0)} / day',
                   ),
                   Text(
-                    'Hiring Cost: '
+                    '🏷️ Hire: '
                     '${recruit.hiringCost.toStringAsFixed(0)}',
                   ),
                 ],

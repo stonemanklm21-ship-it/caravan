@@ -32,16 +32,19 @@ class WorldMapTravelService {
       return;
     }
 
+    final tickFraction =
+        timeController.tickFraction;
+
     final originX =
         JourneyService.currentXSmooth(
       playerState,
-      timeController.tickFraction,
+      tickFraction,
     );
 
     final originY =
         JourneyService.currentYSmooth(
       playerState,
-      timeController.tickFraction,
+      tickFraction,
     );
 
     TravelService.startTravel(
@@ -49,14 +52,19 @@ class WorldMapTravelService {
       destination: city,
       originX: originX,
       originY: originY,
+      tickFractionOffset:
+          tickFraction,
     );
 
-    timeController.setSpeed(
-      speed: TimeSpeed.x1,
-      playerState: playerState,
-      world: world,
-      onTick: onChanged,
-    );
+    if (timeController.currentSpeed ==
+        TimeSpeed.paused) {
+      timeController.setSpeed(
+        speed: TimeSpeed.x1,
+        playerState: playerState,
+        world: world,
+        onTick: onChanged,
+      );
+    }
 
     onChanged();
   }
@@ -91,16 +99,19 @@ class WorldMapTravelService {
       }
     }
 
+    final tickFraction =
+        timeController.tickFraction;
+
     final originX =
         JourneyService.currentXSmooth(
       playerState,
-      timeController.tickFraction,
+      tickFraction,
     );
 
     final originY =
         JourneyService.currentYSmooth(
       playerState,
-      timeController.tickFraction,
+      tickFraction,
     );
 
     TravelService
@@ -110,14 +121,19 @@ class WorldMapTravelService {
       destinationY: destinationY,
       originX: originX,
       originY: originY,
+      tickFractionOffset:
+          tickFraction,
     );
 
-    timeController.setSpeed(
-      speed: TimeSpeed.x1,
-      playerState: playerState,
-      world: world,
-      onTick: onChanged,
-    );
+    if (timeController.currentSpeed ==
+        TimeSpeed.paused) {
+      timeController.setSpeed(
+        speed: TimeSpeed.x1,
+        playerState: playerState,
+        world: world,
+        onTick: onChanged,
+      );
+    }
 
     onChanged();
   }

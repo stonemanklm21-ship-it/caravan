@@ -36,7 +36,7 @@ class NpcCaravanGenerator {
               leader: defaultNpc,
               companions: [],
               gold:
-                  (200 +
+                  (2000 +
                           _random.nextInt(
                             301,
                           ))

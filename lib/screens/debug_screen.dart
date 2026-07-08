@@ -6,6 +6,7 @@ import '../core/economy/pricing_service.dart';
 import '../core/world/time_service.dart';
 import '../data/goods_data.dart';
 import '../core/models/good.dart';
+import '../core/economy/demand_service.dart';
 
 class DebugScreen extends StatefulWidget {
   const DebugScreen({
@@ -40,52 +41,20 @@ class _DebugScreenState
     return total;
   }
 
-  double totalConsumedPerDay(
-    Good good,
-  ) {
-    double total = 0;
+double totalConsumedPerDay(
+  Good good,
+) {
+  double total = 0;
 
-    for (final city
-        in game.world.cities) {
-      for (final industry
-          in city.industries) {
-        total +=
-            (industry.type
-                        .inputsPerSize[
-                    good] ??
-                0) *
-            industry.size;
-      }
-
-      switch (good.id) {
-        case 'bread':
-          total +=
-              city.population *
-              0.01;
-          break;
-
-        case 'water':
-          total +=
-              city.population *
-              0.01;
-          break;
-
-        case 'wood':
-          total +=
-              city.population *
-              0.002;
-          break;
-
-        case 'tools':
-          total +=
-              city.population *
-              0.001;
-          break;
-      }
-    }
-
-    return total;
+  for (final city in game.world.cities) {
+    total += DemandService.totalDemandPerDay(
+      city: city,
+      good: good,
+    );
   }
+
+  return total;
+}
 
   double totalWorldStock(
     Good good,
@@ -330,6 +299,7 @@ class _DebugScreenState
                           PricingService
                               .calculatePrice(
                         market: market,
+                        city: city,
                       );
 
                       return Text(
@@ -394,6 +364,47 @@ class _DebugScreenState
                         ' / '
                         '${industry.storageCapacity.toStringAsFixed(1)}',
                       ),
+                 Text(
+  'Cash: ${industry.cash.toStringAsFixed(0)}',
+),
+Text(
+  'Revenue: ${industry.lastRevenue.toStringAsFixed(1)}',
+),
+Text(
+  'Expenses: ${industry.lastExpenses.toStringAsFixed(1)}',
+),
+Text(
+  'Profit: ${industry.lastProfit.toStringAsFixed(1)}',
+  style: TextStyle(
+    color:
+        industry.lastProfit >= 0
+            ? Colors.green
+            : Colors.red,
+    fontWeight:
+        FontWeight.bold,
+  ),
+),
+const SizedBox(
+  height: 4,
+),
+Text(
+  'Lifetime Revenue: ${industry.lifetimeRevenue.toStringAsFixed(0)}',
+),
+Text(
+  'Lifetime Expenses: ${industry.lifetimeExpenses.toStringAsFixed(0)}',
+),
+Text(
+  'Lifetime Profit: ${industry.lifetimeProfit.toStringAsFixed(0)}',
+  style: TextStyle(
+    color:
+        industry.lifetimeProfit >= 0
+            ? Colors.green
+            : Colors.red,
+    fontWeight:
+        FontWeight.bold,
+  ),
+),
+
                       const SizedBox(
                         height: 8,
                       ),

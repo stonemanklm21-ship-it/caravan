@@ -7,9 +7,15 @@ final defaultPlayer = Character(
   wagePerDay: 0,
   hp: 100,
   maxHp: 100,
+  speed: 4,
   cargoCapacityKg: 10,
   caloriesPerDay: 2500,
   waterPerDay: 3,
+  doctorSkill: 50,
+  vetSkill: 50,
+  mechanicSkill: 50,
+  scoutSkill: 50,
+  combatSkill: 50,
 );
 
 final defaultNpc = Character(
@@ -22,4 +28,10 @@ final defaultNpc = Character(
   waterPerDay: 3,
   hp: 100,
   maxHp: 100,
+  speed: 4,
+  doctorSkill: 50,
+  vetSkill: 50,
+  mechanicSkill: 50,
+  scoutSkill: 50,
+  combatSkill: 50,
 );

@@ -1,20 +1,34 @@
+import '../models/city.dart';
 import '../models/market_good.dart';
+import 'demand_service.dart';
 
 class PricingService {
-  static const double targetQuantity =
-      100;
+  static const double targetDaysSupply =
+      7;
 
   static double calculatePrice({
+    required City city,
     required MarketGood market,
   }) {
-    final quantity =
-        market.quantity.clamp(
-      0.0,
-      targetQuantity,
+    final demandPerDay =
+        DemandService.totalDemandPerDay(
+      city: city,
+      good: market.good,
     );
 
+    if (demandPerDay <= 0) {
+      return market.good.priceFloor;
+    }
+
+    final targetQuantity =
+        demandPerDay *
+        targetDaysSupply;
+
     final scarcity =
-        1 - (quantity / targetQuantity);
+        (1 -
+                (market.quantity /
+                    targetQuantity))
+            .clamp(0.0, 1.0);
 
     return market.good.priceFloor +
         ((market.good.priceCeiling -
@@ -23,6 +37,7 @@ class PricingService {
   }
 
   static double transactionCost({
+    required City city,
     required MarketGood market,
     required int quantity,
   }) {
@@ -31,6 +46,7 @@ class PricingService {
 
     final startPrice =
         calculatePrice(
+      city: city,
       market: market,
     );
 
@@ -46,18 +62,19 @@ class PricingService {
 
     final endPrice =
         calculatePrice(
+      city: city,
       market: market,
     );
 
     market.quantity =
         originalQuantity;
 
-    return ((startPrice + endPrice) /
-            2) *
+    return ((startPrice + endPrice) / 2) *
         quantity;
   }
 
   static double transactionRevenue({
+    required City city,
     required MarketGood market,
     required int quantity,
   }) {
@@ -66,6 +83,7 @@ class PricingService {
 
     final startPrice =
         calculatePrice(
+      city: city,
       market: market,
     );
 
@@ -74,14 +92,14 @@ class PricingService {
 
     final endPrice =
         calculatePrice(
+      city: city,
       market: market,
     );
 
     market.quantity =
         originalQuantity;
 
-    return ((startPrice + endPrice) /
-            2) *
+    return ((startPrice + endPrice) / 2) *
         quantity;
   }
 }
