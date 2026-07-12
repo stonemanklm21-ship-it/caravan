@@ -3,20 +3,22 @@ import 'package:flutter/material.dart';
 import '../core/npc/npc_travel_service.dart';
 import '../core/travel/journey_service.dart';
 import '../core/world/time_controller.dart';
+import '../core/world/location_service.dart';
 import '../data/cities_data.dart';
 import '../data/game_data.dart';
-import '../world_map/city_info_panel.dart';
-import '../world_map/npc_caravan_info_panel.dart';
+import '../world_map/world_map_background_layer.dart';
 import '../world_map/world_map_camera.dart';
 import '../world_map/world_map_city_layer.dart';
+import '../world_map/world_map_control_bar.dart';
 import '../world_map/world_map_gesture_layer.dart';
-import '../world_map/world_map_hud.dart';
-import '../world_map/world_map_location_panel.dart';
 import '../world_map/world_map_npc_layer.dart';
 import '../world_map/world_map_player_layer.dart';
 import '../world_map/world_map_selection.dart';
 import '../world_map/world_map_selection_controller.dart';
+import '../world_map/world_map_selection_strip.dart';
+import '../world_map/world_map_status_bar.dart';
 import '../world_map/world_map_travel_service.dart';
+import '../world_map/world_map_navigation.dart';
 
 class WorldMapScreen extends StatefulWidget {
   const WorldMapScreen({
@@ -42,9 +44,20 @@ class _WorldMapScreenState
   WorldMapSelection selection =
       const WorldMapSelection.none();
 
+  bool _followPlayer = false;
+  bool _playerWasInCity = false;
+  bool _returningToCity = false;
+  double? _lastRenderedX;
+  double? _lastRenderedY;
+
+
   @override
   void initState() {
     super.initState();
+
+_playerWasInCity =
+    game.player.currentCity != null;
+
 
     camera = WorldMapCamera(
       x: JourneyService.currentX(
@@ -55,7 +68,19 @@ class _WorldMapScreenState
       ),
       zoom: 1.5,
     );
+WidgetsBinding.instance
+    .addPostFrameCallback((_) {
+  if (!mounted) {
+    return;
+  }
 
+  camera.clampToWorld(
+    viewportSize:
+        MediaQuery.sizeOf(context),
+  );
+
+  setState(() {});
+});
     _renderController =
         AnimationController.unbounded(
       vsync: this,
@@ -67,14 +92,81 @@ class _WorldMapScreenState
             ),
           );
 
-    _renderController.addListener(() {
-      if (!mounted) {
-        return;
+_renderController.addListener(() {
+  if (!mounted) {
+    return;
+  }
+
+  final renderedX =
+      JourneyService.currentXSmooth(
+    game.player,
+    _timeController.tickFraction,
+  );
+
+  final renderedY =
+            JourneyService.currentYSmooth(game.player,
+    _timeController.tickFraction,
+  );
+
+  if (game.player.activeJourney != null &&
+      _lastRenderedX != null &&
+      _lastRenderedY != null) {
+    for (final city in game.world.cities) {
+      if (city ==
+          game.player.activeJourney!.originCity) {
+        continue;
       }
 
-      final playerTravelling =
-          game.player.activeJourney !=
-              null;
+      if (LocationService.segmentIntersectsCity(
+        startX: _lastRenderedX!,
+        startY: _lastRenderedY!,
+        endX: renderedX,
+        endY: renderedY,
+        city: city,
+      )) {
+game.player.currentCity = city;
+game.player.worldX = city.x;
+game.player.worldY = city.y;
+
+JourneyService.clearJourney(
+  game.player,
+);
+
+        break;
+      }
+    }
+  }
+
+  _lastRenderedX = renderedX;
+  _lastRenderedY = renderedY;
+
+  final currentlyInCity =
+      game.player.currentCity != null;
+
+
+if (!_playerWasInCity &&
+    currentlyInCity &&
+    !_returningToCity) {
+  _returningToCity = true;
+
+  Future.microtask(() {
+    if (mounted) {
+
+      print('POPPING MAP');
+      
+      Navigator.of(context).pop();
+    }
+  });
+
+  return;
+}
+
+  _playerWasInCity =
+      currentlyInCity;
+
+  final playerTravelling =
+      game.player.activeJourney !=
+          null;
 
       final npcTravelling = game
           .world.npcCaravans
@@ -83,6 +175,30 @@ class _WorldMapScreenState
                 npc.activeJourney !=
                 null,
           );
+
+      if (_followPlayer &&
+          playerTravelling) {
+        final viewportSize =
+            MediaQuery.sizeOf(
+          context,
+        );
+
+        camera.x =
+            JourneyService.currentXSmooth(
+          game.player,
+          _timeController.tickFraction,
+        );
+
+        camera.y =
+            JourneyService.currentYSmooth(
+          game.player,
+          _timeController.tickFraction,
+        );
+
+        camera.clampToWorld(
+          viewportSize: viewportSize,
+        );
+      }
 
       if (playerTravelling ||
           npcTravelling) {
@@ -116,6 +232,10 @@ class _WorldMapScreenState
         setState(() {});
       },
     );
+
+    if (mounted) {
+      _centreOnPlayer();
+    }
   }
 
   Future<void>
@@ -139,24 +259,35 @@ class _WorldMapScreenState
         setState(() {});
       },
     );
+
+    if (mounted) {
+      _centreOnPlayer();
+    }
   }
 
   void _centreOnPlayer() {
+    final viewportSize =
+        MediaQuery.sizeOf(context);
+
     setState(() {
+      _followPlayer = true;
+
+      camera.zoom = 1.5;
+
       camera.x =
-          JourneyService
-              .currentXSmooth(
+          JourneyService.currentXSmooth(
         game.player,
-        _timeController
-            .tickFraction,
+        _timeController.tickFraction,
       );
 
       camera.y =
-          JourneyService
-              .currentYSmooth(
+          JourneyService.currentYSmooth(
         game.player,
-        _timeController
-            .tickFraction,
+        _timeController.tickFraction,
+      );
+
+      camera.clampToWorld(
+        viewportSize: viewportSize,
       );
     });
   }
@@ -233,11 +364,6 @@ class _WorldMapScreenState
         _timeController.tickFraction;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'World Map',
-        ),
-      ),
       body: LayoutBuilder(
         builder: (
           context,
@@ -260,6 +386,14 @@ class _WorldMapScreenState
             },
             child: WorldMapGestureLayer(
               camera: camera,
+              onManualMove: () {
+                if (_followPlayer) {
+                  setState(() {
+                    _followPlayer =
+                        false;
+                  });
+                }
+              },
               onCameraChanged: () {
                 setState(() {});
               },
@@ -267,6 +401,12 @@ class _WorldMapScreenState
                 color: Colors.white,
                 child: Stack(
                   children: [
+                    WorldMapBackgroundLayer(
+                      camera: camera,
+                      viewportSize:
+                          viewportSize,
+                    ),
+
                     WorldMapCityLayer(
                       cities: cities,
                       selectedCity:
@@ -300,38 +440,71 @@ class _WorldMapScreenState
                       ),
                     ),
 
-                    WorldMapPlayerLayer(
-                      playerX:
-                          JourneyService
-                              .currentXSmooth(
-                        game.player,
-                        tickFraction,
-                      ),
-                      playerY:
-                          JourneyService
-                              .currentYSmooth(
-                        game.player,
-                        tickFraction,
-                      ),
-                      camera: camera,
-                      viewportSize:
-                          viewportSize,
-                    ),
+WorldMapPlayerLayer(
+  playerX:
+      JourneyService.currentXSmooth(
+    game.player,
+    tickFraction,
+  ),
+  playerY:
+      JourneyService.currentYSmooth(
+    game.player,
+    tickFraction,
+  ),
+  headingDegrees:
+      game.player.activeJourney ==
+              null
+          ? 0
+          : WorldMapNavigation
+              .headingDegrees(
+              fromX:
+                  JourneyService
+                      .currentXSmooth(
+                game.player,
+                tickFraction,
+              ),
+              fromY:
+                  JourneyService
+                      .currentYSmooth(
+                game.player,
+                tickFraction,
+              ),
+              toX: game
+                  .player
+                  .activeJourney!
+                  .destinationX,
+              toY: game
+                  .player
+                  .activeJourney!
+                  .destinationY,
+            ),
+  camera: camera,
+  viewportSize:
+      viewportSize,
+),
 
                     if (selection.isCity)
-                      CityInfoPanel(
-                        city:
-                            selection.city!,
-                        onTravel:
+                      WorldMapSelectionStrip(
+                        title:
+                            selection
+                                .city!
+                                .name,
+                        actionText:
+                            'Travel',
+                        onAction:
                             _travelToSelectedCity,
                       ),
 
                     if (selection
                         .isNpcCaravan)
-                      NpcCaravanInfoPanel(
-                        npcCaravan:
-                            selection
-                                .npcCaravan!,
+                      WorldMapSelectionStrip(
+                        title:
+                            'Merchant Caravan',
+                        actionText:
+                            'Follow',
+                        onAction: () {
+                          // TODO
+                        },
                       ),
 
                     if (selection
@@ -339,18 +512,16 @@ class _WorldMapScreenState
                         game.player
                                 .currentCity !=
                             null)
-                      WorldMapLocationPanel(
-                        worldX:
-                            selection
-                                .worldX!,
-                        worldY:
-                            selection
-                                .worldY!,
-                        onTravel:
+                      WorldMapSelectionStrip(
+                        title:
+                            '${selection.worldX!.round()}, ${selection.worldY!.round()}',
+                        actionText:
+                            'Travel',
+                        onAction:
                             _travelToSelectedLocation,
                       ),
 
-                    WorldMapHud(
+                    WorldMapStatusBar(
                       timeController:
                           _timeController,
                       playerState:
@@ -361,20 +532,29 @@ class _WorldMapScreenState
                         setState(() {});
                       },
                     ),
+
+                    WorldMapControlBar(
+                      timeController:
+                          _timeController,
+                      playerState:
+                          game.player,
+                      world:
+                          game.world,
+                      onChanged: () {
+                        setState(() {});
+                      },
+                      onCentrePlayer:
+                          _centreOnPlayer,
+                      onSettings: () {Navigator.of(context).pop();
+                        // TODO
+                      },
+                    ),
                   ],
                 ),
               ),
             ),
           );
         },
-      ),
-      floatingActionButton:
-          FloatingActionButton(
-        onPressed:
-            _centreOnPlayer,
-        child: const Icon(
-          Icons.my_location,
-        ),
       ),
     );
   }

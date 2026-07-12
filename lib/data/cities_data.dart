@@ -23,7 +23,7 @@ final farmingVillage = City(
     ),
     Industry(
       type: well,
-      size: 2,
+      size: 4,
       inputDaysTarget: 0,
       cash: 25000,
       inventory: [],
@@ -35,16 +35,24 @@ final farmingVillage = City(
       cash: 25000,
       inventory: [],
     ),
+        Industry(
+      type: turnipFarm,
+      size: 4,
+      inputDaysTarget: 5,
+      cash: 25000,
+      inventory: [],
+    ),
   ],
   marketGoods: [
     MarketGood(good: grain, quantity: 120),
     MarketGood(good: bread, quantity: 250),
-    MarketGood(good: water, quantity: 200),
+    MarketGood(good: water, quantity: 3000),
     MarketGood(good: forage, quantity: 150),
     MarketGood(good: wood, quantity: 60),
     MarketGood(good: ironOre, quantity: 20),
     MarketGood(good: tools, quantity: 3),
     MarketGood(good: chair, quantity: 1),
+    MarketGood(good: turnips, quantity: 100)
   ],
   shopGoods: [],
   animalMarketTier: AnimalMarketTier.major,
@@ -76,13 +84,6 @@ final miningTown = City(
       inventory: [],
     ),
     Industry(
-      type: well,
-      size: 1,
-      inputDaysTarget: 0,
-      cash: 25000,
-      inventory: [],
-    ),
-    Industry(
       type: gatheringCamp,
       size: 8,
       inputDaysTarget: 5,
@@ -98,7 +99,7 @@ final miningTown = City(
     ),
     Industry(
       type: well,
-      size: 3,
+      size: 2,
       inputDaysTarget: 0,
       cash: 25000,
       inventory: [],
@@ -114,12 +115,13 @@ final miningTown = City(
   marketGoods: [
     MarketGood(good: grain, quantity: 40),
     MarketGood(good: bread, quantity: 300),
-    MarketGood(good: water, quantity: 80),
-    MarketGood(good: forage, quantity: 60),
+    MarketGood(good: water, quantity: 1000),
+    MarketGood(good: forage, quantity: 600),
     MarketGood(good: wood, quantity: 50),
     MarketGood(good: ironOre, quantity: 150),
     MarketGood(good: tools, quantity: 10),
     MarketGood(good: chair, quantity: 1),
+    MarketGood(good: turnips, quantity: 100)
   ],
   shopGoods: [],
   animalMarketTier: AnimalMarketTier.major,
@@ -161,12 +163,13 @@ final forestCamp = City(
   marketGoods: [
     MarketGood(good: grain, quantity: 30),
     MarketGood(good: bread, quantity: 250),
-    MarketGood(good: water, quantity: 100),
+    MarketGood(good: water, quantity: 1000),
     MarketGood(good: forage, quantity: 180),
     MarketGood(good: wood, quantity: 180),
     MarketGood(good: ironOre, quantity: 10),
     MarketGood(good: tools, quantity: 3),
     MarketGood(good: chair, quantity: 1),
+    MarketGood(good: turnips, quantity: 100)
   ],
   shopGoods: [],
   animalMarketTier: AnimalMarketTier.major,

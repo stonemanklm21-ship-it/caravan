@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import '../caravan/caravan_service.dart';
-import '../travel/active_journey.dart';
 import '../models/city.dart';
 import '../models/player_state.dart';
+import '../travel/active_journey.dart';
 
 class JourneyService {
   static const double mapUnitsPerDay =
@@ -12,6 +12,7 @@ class JourneyService {
   static ActiveJourney startJourney({
     required PlayerState playerState,
     required City destination,
+    City? originCity,
     double? originX,
     double? originY,
     double tickFractionOffset = 0,
@@ -53,6 +54,7 @@ class JourneyService {
     final journey = ActiveJourney(
       originX: startX,
       originY: startY,
+      originCity: originCity,
       destinationX:
           destination.x,
       destinationY:
@@ -73,6 +75,7 @@ class JourneyService {
   static ActiveJourney
       startJourneyToCoordinates({
     required PlayerState playerState,
+    City? originCity,
     required double destinationX,
     required double destinationY,
     double? originX,
@@ -116,6 +119,7 @@ class JourneyService {
     final journey = ActiveJourney(
       originX: startX,
       originY: startY,
+      originCity: originCity,
       destinationX:
           destinationX,
       destinationY:
@@ -286,10 +290,10 @@ class JourneyService {
         journey.totalHours;
   }
 
-  static void clearJourney(
-    PlayerState playerState,
-  ) {
-    playerState.activeJourney =
-        null;
-  }
+static void clearJourney(
+  PlayerState playerState,
+) {
+  playerState.activeJourney =
+      null;
+}
 }

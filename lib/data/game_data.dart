@@ -21,10 +21,11 @@ final game = Game(
     caravan: Caravan(
       leader: defaultPlayer,
       companions: [],
-      gold: 100,
+      gold: 100000,
       inventory: [],
       animals: [],
       vehicles: [],
+      manifest: [],
     ),
   ),
 );

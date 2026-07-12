@@ -39,28 +39,104 @@ class WorldMapCityLayer
           final isSelected =
               city == selectedCity;
 
-          return Positioned(
-            left: position.dx,
-            top: position.dy,
-            child: Column(
-              mainAxisSize:
-                  MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.location_city,
-                  color: isSelected
-                      ? Colors.blue
-                      : Colors.black,
-                  size:
-                      32 *
-                      camera.zoom.clamp(
-                        0.5,
-                        2.0,
+          final markerSize =
+              (20 * camera.zoom)
+                  .clamp(
+            10.0,
+            32.0,
+          );
+
+          return Stack(
+            children: [
+              Positioned(
+                left:
+                    position.dx -
+                    (markerSize + 8) / 2,
+                top:
+                    position.dy -
+                    (markerSize + 8) / 2,
+                child: SizedBox(
+                  width:
+                      markerSize + 8,
+                  height:
+                      markerSize + 8,
+                  child: Stack(
+                    alignment:
+                        Alignment.center,
+                    children: [
+                      if (isSelected)
+                        Container(
+                          width:
+                              markerSize + 8,
+                          height:
+                              markerSize + 8,
+                          decoration:
+                              BoxDecoration(
+                            shape:
+                                BoxShape
+                                    .circle,
+                            border:
+                                Border.all(
+                              color:
+                                  Colors.blue,
+                              width: 2,
+                            ),
+                          ),
+                        ),
+                      Container(
+                        width:
+                            markerSize,
+                        height:
+                            markerSize,
+                        decoration:
+                            BoxDecoration(
+                          color:
+                              Colors.black,
+                          shape:
+                              BoxShape
+                                  .circle,
+                          border:
+                              Border.all(
+                            color:
+                                Colors.white,
+                            width: 1,
+                          ),
+                        ),
                       ),
+                    ],
+                  ),
                 ),
-                Text(city.name),
-              ],
-            ),
+              ),
+              Positioned(
+                left:
+                    position.dx - 50,
+                top:
+                    position.dy +
+                    markerSize / 2 +
+                    4,
+                child: SizedBox(
+                  width: 100,
+                  child: Text(
+                    city.name,
+                    textAlign:
+                        TextAlign.center,
+                    style:
+                        const TextStyle(
+                      color:
+                          Colors.white,
+                      fontSize: 12,
+                      shadows: [
+                        Shadow(
+                          color:
+                              Colors.black,
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ).toList(),

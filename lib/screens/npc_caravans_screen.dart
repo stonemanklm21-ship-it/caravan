@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../core/world/time_controller.dart';
 import '../core/world/time_speed.dart';
 import '../data/game_data.dart';
-import '../core/caravan/animal_service.dart';
 
 class NpcCaravansScreen extends StatefulWidget {
   const NpcCaravansScreen({super.key});

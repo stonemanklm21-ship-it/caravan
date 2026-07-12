@@ -1,11 +1,11 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../core/models/npc_caravan.dart';
 import 'world_map_camera.dart';
+import 'world_map_npc_marker.dart';
 
-class WorldMapNpcLayer extends StatelessWidget {
+class WorldMapNpcLayer
+    extends StatelessWidget {
   final List<NpcCaravan> npcCaravans;
 
   final NpcCaravan? selectedNpcCaravan;
@@ -52,38 +52,61 @@ class WorldMapNpcLayer extends StatelessWidget {
                     viewportSize,
               );
 
+              final markerSize =
+                  (18 * camera.zoom)
+                      .clamp(
+                8.0,
+                28.0,
+              );
+
               return Positioned(
-                left: screenPosition.dx,
-                top: screenPosition.dy,
-                child: Stack(
-                  alignment:
-                      Alignment.center,
-                  children: [
-                    if (npc ==
-                        selectedNpcCaravan)
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration:
-                            BoxDecoration(
-                          shape:
-                              BoxShape.circle,
-                          border:
-                              Border.all(
-                            color:
-                                Colors.blue,
-                            width: 2,
+                left:
+                    screenPosition.dx -
+                    (markerSize + 8) / 2,
+                top:
+                    screenPosition.dy -
+                    (markerSize + 8) / 2,
+                child: SizedBox(
+                  width:
+                      markerSize + 8,
+                  height:
+                      markerSize + 8,
+                  child: Stack(
+                    alignment:
+                        Alignment.center,
+                    children: [
+                      if (npc ==
+                          selectedNpcCaravan)
+                        Container(
+                          width:
+                              markerSize +
+                              8,
+                          height:
+                              markerSize +
+                              8,
+                          decoration:
+                              BoxDecoration(
+                            shape:
+                                BoxShape
+                                    .circle,
+                            border:
+                                Border.all(
+                              color:
+                                  Colors.blue,
+                              width: 2,
+                            ),
                           ),
                         ),
+                      WorldMapNpcMarker(
+                        zoom:
+                            camera.zoom,
+                        color: npc ==
+                                selectedNpcCaravan
+                            ? Colors.blue
+                            : Colors.orange,
                       ),
-                    Icon(
-                      Icons.local_shipping,
-                      color: npc ==
-                              selectedNpcCaravan
-                          ? Colors.blue
-                          : Colors.green,
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },

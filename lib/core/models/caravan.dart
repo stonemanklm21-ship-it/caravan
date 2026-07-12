@@ -1,7 +1,7 @@
 import '../caravan/caravan_service.dart';
-
 import 'animal.dart';
 import 'cargo_item.dart';
+import 'cargo_manifest_entry.dart';
 import 'character.dart';
 import 'vehicle.dart';
 
@@ -18,6 +18,8 @@ class Caravan {
 
   List<Vehicle> vehicles;
 
+  final List<CargoManifestEntry> manifest;
+
   Caravan({
     required this.leader,
     required this.companions,
@@ -25,6 +27,7 @@ class Caravan {
     required this.inventory,
     required this.animals,
     required this.vehicles,
+    required this.manifest,
   });
 
   double get cargoCapacityKg =>
@@ -47,31 +50,32 @@ class Caravan {
         cargoWeightKg;
   }
 
-  double get speed {
-    double slowest = leader.speed;
+double get speed {
+  double slowest =
+      leader.effectiveSpeed;
 
-    for (final companion
-        in companions) {
-      if (companion.alive &&
-          companion.speed <
-              slowest) {
-        slowest =
-            companion.speed;
-      }
+  for (final companion
+      in companions) {
+    if (companion.alive &&
+        companion.effectiveSpeed <
+            slowest) {
+      slowest =
+          companion.effectiveSpeed;
     }
-
-    for (final animal
-        in animals) {
-      if (animal.alive &&
-          animal.type.speed <
-              slowest) {
-        slowest =
-            animal.type.speed;
-      }
-    }
-
-    return slowest;
   }
+
+  for (final animal
+      in animals) {
+    if (animal.alive &&
+        animal.type.speed <
+            slowest) {
+      slowest =
+          animal.type.speed;
+    }
+  }
+
+  return slowest;
+}
 
   int get doctorSkill {
     int total = leader.doctorSkill;
@@ -177,7 +181,8 @@ class Caravan {
     String goodId,
   ) {
     final item = inventory.where(
-      (item) => item.good.id == goodId,
+      (item) =>
+          item.good.id == goodId,
     );
 
     if (item.isEmpty) {
@@ -214,6 +219,11 @@ class Caravan {
                 vehicle.toJson(),
           )
           .toList(),
+      'manifest': manifest
+          .map(
+            (entry) => entry.toJson(),
+          )
+          .toList(),
     };
   }
 
@@ -233,6 +243,10 @@ class Caravan {
       leader: Character.fromJson(
         json['leader']
             as Map<String, dynamic>,
+        animalFromJson:
+            animalFromJson,
+        vehicleFromJson:
+            vehicleFromJson,
       ),
       companions:
           (json['companions']
@@ -243,6 +257,10 @@ class Caravan {
                       character
                           as Map<String,
                               dynamic>,
+                      animalFromJson:
+                          animalFromJson,
+                      vehicleFromJson:
+                          vehicleFromJson,
                     ),
                   )
                   .toList() ??
@@ -281,6 +299,19 @@ class Caravan {
                 ),
               )
               .toList(),
+      manifest:
+          (json['manifest'] as List?)
+                  ?.map(
+                    (entry) =>
+                        CargoManifestEntry
+                            .fromJson(
+                      entry
+                          as Map<String,
+                              dynamic>,
+                    ),
+                  )
+                  .toList() ??
+              [],
     );
   }
 }

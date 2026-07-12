@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'world_map_coordinates.dart';
 
 class WorldMapLocationPanel
     extends StatelessWidget {
@@ -44,14 +45,16 @@ class WorldMapLocationPanel
               height: 8,
             ),
 
-            Text(
-              'X: ${worldX.toStringAsFixed(0)}',
-            ),
-
-            Text(
-              'Y: ${worldY.toStringAsFixed(0)}',
-            ),
-
+Text(
+  WorldMapCoordinates.eastWest(
+    worldX,
+  ),
+),
+Text(
+  WorldMapCoordinates.northSouth(
+    worldY,
+  ),
+),
             const SizedBox(
               height: 8,
             ),

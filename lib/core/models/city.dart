@@ -1,9 +1,12 @@
 import '../economy/animal_market_service.dart';
 import '../economy/vehicle_market_service.dart';
 
+import 'animal.dart';
 import 'good.dart';
 import 'industry.dart';
 import 'market_good.dart';
+import 'recruit.dart';
+import 'vehicle.dart';
 
 class City {
   final String id;
@@ -34,6 +37,18 @@ class City {
 
   final bool hasDoctor;
 
+  List<Recruit> recruits;
+
+  List<Animal> animalMarketStock;
+
+  List<Vehicle> vehicleMarketStock;
+
+  int lastRecruitRefreshHour;
+
+  int lastAnimalMarketRefreshHour;
+
+  int lastVehicleMarketRefreshHour;
+
   City({
     required this.id,
     required this.name,
@@ -48,6 +63,16 @@ class City {
     this.hasVet = false,
     this.hasCartwright = false,
     this.hasDoctor = false,
+    this.recruits = const [],
+    this.animalMarketStock =
+        const [],
+    this.vehicleMarketStock =
+        const [],
+    this.lastRecruitRefreshHour = 0,
+    this.lastAnimalMarketRefreshHour =
+        0,
+    this.lastVehicleMarketRefreshHour =
+        0,
   });
 
   MarketGood marketForGood(
@@ -101,11 +126,38 @@ class City {
           hasCartwright,
       'hasDoctor':
           hasDoctor,
+      'recruits': recruits
+          .map(
+            (recruit) =>
+                recruit.toJson(),
+          )
+          .toList(),
+      'animalMarketStock':
+          animalMarketStock
+              .map(
+                (animal) =>
+                    animal.toJson(),
+              )
+              .toList(),
+      'vehicleMarketStock':
+          vehicleMarketStock
+              .map(
+                (vehicle) =>
+                    vehicle.toJson(),
+              )
+              .toList(),
+      'lastRecruitRefreshHour':
+          lastRecruitRefreshHour,
+      'lastAnimalMarketRefreshHour':
+          lastAnimalMarketRefreshHour,
+      'lastVehicleMarketRefreshHour':
+          lastVehicleMarketRefreshHour,
     };
   }
 
   factory City.fromJson({
-    required Map<String, dynamic> json,
+    required Map<String, dynamic>
+        json,
     required Industry Function(
       Map<String, dynamic> json,
     )
@@ -118,6 +170,18 @@ class City {
       String id,
     )
     goodForId,
+    required Recruit Function(
+      Map<String, dynamic> json,
+    )
+    recruitFromJson,
+    required Animal Function(
+      Map<String, dynamic> json,
+    )
+    animalFromJson,
+    required Vehicle Function(
+      Map<String, dynamic> json,
+    )
+    vehicleFromJson,
   }) {
     return City(
       id: json['id'] as String,
@@ -198,6 +262,57 @@ class City {
           json['hasDoctor']
                   as bool? ??
               false,
+      recruits:
+          (json['recruits']
+                      as List?)
+                  ?.map(
+                    (recruitJson) =>
+                        recruitFromJson(
+                      recruitJson
+                          as Map<String,
+                              dynamic>,
+                    ),
+                  )
+                  .toList() ??
+              [],
+      animalMarketStock:
+          (json['animalMarketStock']
+                      as List?)
+                  ?.map(
+                    (animalJson) =>
+                        animalFromJson(
+                      animalJson
+                          as Map<String,
+                              dynamic>,
+                    ),
+                  )
+                  .toList() ??
+              [],
+      vehicleMarketStock:
+          (json['vehicleMarketStock']
+                      as List?)
+                  ?.map(
+                    (vehicleJson) =>
+                        vehicleFromJson(
+                      vehicleJson
+                          as Map<String,
+                              dynamic>,
+                    ),
+                  )
+                  .toList() ??
+              [],
+      lastRecruitRefreshHour:
+          json['lastRecruitRefreshHour']
+                  as int? ??
+              0,
+      lastAnimalMarketRefreshHour:
+          json['lastAnimalMarketRefreshHour']
+                  as int? ??
+              0,
+      lastVehicleMarketRefreshHour:
+          json['lastVehicleMarketRefreshHour']
+                  as int? ??
+              0,
     );
   }
 }

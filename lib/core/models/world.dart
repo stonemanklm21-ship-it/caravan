@@ -1,13 +1,19 @@
+import '../../data/animal_data.dart';
 import '../../data/goods_data.dart';
 import '../../data/industry_data.dart';
+import '../../data/vehicle_data.dart';
 
+import 'animal.dart';
 import 'city.dart';
 import 'industry.dart';
 import 'market_good.dart';
 import 'npc_caravan.dart';
+import 'recruit.dart';
+import 'vehicle.dart';
 
 class World {
   final List<City> cities;
+
   final List<NpcCaravan> npcCaravans;
 
   World({
@@ -17,14 +23,16 @@ class World {
 
   Map<String, dynamic> toJson() {
     return {
-      'cities':
-          cities
-              .map((city) => city.toJson())
-              .toList(),
-      'npcCaravans':
-          npcCaravans
-              .map((npc) => npc.toJson())
-              .toList(),
+      'cities': cities
+          .map(
+            (city) => city.toJson(),
+          )
+          .toList(),
+      'npcCaravans': npcCaravans
+          .map(
+            (npc) => npc.toJson(),
+          )
+          .toList(),
     };
   }
 
@@ -57,6 +65,53 @@ class World {
                 ),
                 goodForId:
                     goodForId,
+                recruitFromJson:
+                    (recruitJson) =>
+                        Recruit.fromJson(
+                  json: recruitJson,
+                  animalFromJson:
+                      (animalJson) =>
+                          Animal.fromJson(
+                    json: animalJson,
+                    animalTypeForId:
+                        animalTypeForId,
+                  ),
+                  vehicleFromJson:
+                      (vehicleJson) =>
+                          Vehicle.fromJson(
+                    json: vehicleJson,
+                    vehicleTypeForId:
+                        vehicleTypeForId,
+                    animalFromJson:
+                        (animalJson) =>
+                            Animal.fromJson(
+                      json: animalJson,
+                      animalTypeForId:
+                          animalTypeForId,
+                    ),
+                  ),
+                ),
+                animalFromJson:
+                    (animalJson) =>
+                        Animal.fromJson(
+                  json: animalJson,
+                  animalTypeForId:
+                      animalTypeForId,
+                ),
+                vehicleFromJson:
+                    (vehicleJson) =>
+                        Vehicle.fromJson(
+                  json: vehicleJson,
+                  vehicleTypeForId:
+                      vehicleTypeForId,
+                  animalFromJson:
+                      (animalJson) =>
+                          Animal.fromJson(
+                    json: animalJson,
+                    animalTypeForId:
+                        animalTypeForId,
+                  ),
+                ),
               ),
             )
             .toList();

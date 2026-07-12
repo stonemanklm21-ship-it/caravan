@@ -5,6 +5,8 @@ class ActiveJourney {
   double originX;
   double originY;
 
+  final City? originCity;
+
   final double destinationX;
   final double destinationY;
 
@@ -19,6 +21,7 @@ class ActiveJourney {
   ActiveJourney({
     required this.originX,
     required this.originY,
+    this.originCity,
     required this.destinationX,
     required this.destinationY,
     this.destinationCity,
@@ -47,6 +50,7 @@ class ActiveJourney {
     return {
       'originX': originX,
       'originY': originY,
+      'originCity': originCity?.id,
       'destinationX': destinationX,
       'destinationY': destinationY,
       'destinationCity':
@@ -62,17 +66,31 @@ class ActiveJourney {
     Map<String, dynamic> json,
     World world,
   ) {
-    final cityId =
+    final originCityId =
+        json['originCity']
+            as String?;
+
+    final destinationCityId =
         json['destinationCity']
             as String?;
 
+    City? originCity;
     City? destinationCity;
 
-    if (cityId != null) {
+    if (originCityId != null) {
+      originCity =
+          world.cities.firstWhere(
+        (city) =>
+            city.id == originCityId,
+      );
+    }
+
+    if (destinationCityId != null) {
       destinationCity =
           world.cities.firstWhere(
         (city) =>
-            city.id == cityId,
+            city.id ==
+            destinationCityId,
       );
     }
 
@@ -83,6 +101,7 @@ class ActiveJourney {
       originY:
           (json['originY'] as num)
               .toDouble(),
+      originCity: originCity,
       destinationX:
           (json['destinationX']
                   as num)

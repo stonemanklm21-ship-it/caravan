@@ -31,8 +31,14 @@ class _VehicleMarketScreenState
     super.initState();
 
     stock =
-        VehicleMarketService.generateStock(
-      tier: widget.tier,
+        VehicleMarketService
+            .marketStock(
+      city:
+          widget.playerState.currentCity!,
+      currentHour:
+          widget.playerState
+              .worldTimeHours
+              .floor(),
       stockSize: 8,
     );
   }
@@ -97,7 +103,8 @@ class _VehicleMarketScreenState
                   ),
                 ],
               ),
-              trailing: ElevatedButton(
+              trailing:
+                  ElevatedButton(
                 onPressed:
                     widget
                                 .playerState

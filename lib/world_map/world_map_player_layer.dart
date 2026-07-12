@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'world_map_camera.dart';
+import 'world_map_player_marker.dart';
 
-class WorldMapPlayerLayer extends StatelessWidget {
+class WorldMapPlayerLayer
+    extends StatelessWidget {
   final double playerX;
   final double playerY;
+  final double headingDegrees;
   final WorldMapCamera camera;
   final Size viewportSize;
 
@@ -12,6 +15,7 @@ class WorldMapPlayerLayer extends StatelessWidget {
     super.key,
     required this.playerX,
     required this.playerY,
+    required this.headingDegrees,
     required this.camera,
     required this.viewportSize,
   });
@@ -25,14 +29,24 @@ class WorldMapPlayerLayer extends StatelessWidget {
       viewportSize: viewportSize,
     );
 
-    return Positioned(
-      left: screenPosition.dx,
-      top: screenPosition.dy,
-      child: const Icon(
-        Icons.person_pin_circle,
-        color: Colors.red,
-        size: 40,
-      ),
+final markerSize =
+    (24 * camera.zoom).clamp(
+      12.0,
+      36.0,
     );
+
+return Positioned(
+  left:
+      screenPosition.dx -
+      markerSize / 2,
+  top:
+      screenPosition.dy -
+      markerSize / 2,
+  child: WorldMapPlayerMarker(
+    headingDegrees:
+        headingDegrees,
+    zoom: camera.zoom,
+  ),
+);
   }
 }

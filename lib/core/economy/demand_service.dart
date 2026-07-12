@@ -27,6 +27,10 @@ class DemandService {
       return city.population * 0.01;
     }
 
+        if (good == turnips) {
+      return city.population * 0.1;
+    }
+
     return 0;
   }
 

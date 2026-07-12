@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import '../models/animal.dart';
+import '../models/character.dart';
 import '../world/calendar_service.dart';
 
 class AnimalService {
@@ -81,6 +82,25 @@ class AnimalService {
     Animal animal,
   ) {
     return weightKg(animal) * 0.25;
+  }
+
+  static bool canCarryRider({
+    required Animal animal,
+    required Character character,
+  }) {
+    return cargoCapacityKg(animal) >=
+        character.weightKg;
+  }
+
+  static double cargoCapacityWithRiderKg({
+    required Animal animal,
+    required Character character,
+  }) {
+    return max(
+      0,
+      cargoCapacityKg(animal) -
+          character.weightKg,
+    );
   }
 
   static double waterPerDay(

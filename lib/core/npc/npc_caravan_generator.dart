@@ -233,6 +233,7 @@ final companions =
       inventory: [],
       animals: animals,
       vehicles: vehicles,
+      manifest: [],
     );
   }
 

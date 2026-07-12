@@ -8,6 +8,7 @@ import '../travel/consumption_service.dart';
 import '../travel/discovery_service.dart';
 import '../travel/journey_service.dart';
 import '../travel/travel_service.dart';
+import '../world/location_service.dart';
 
 class TimeService {
   static void advanceTime({
@@ -15,9 +16,15 @@ class TimeService {
     required World world,
     required double hours,
   }) {
-    EconomyService.advanceTime(world: world, hours: hours);
+    EconomyService.advanceTime(
+      world: world,
+      hours: hours,
+    );
 
-    NpcCaravanService.advanceAll(world: world, hours: hours);
+    NpcCaravanService.advanceAll(
+      world: world,
+      hours: hours,
+    );
 
     ConsumptionService.consume(
       caravan: playerState.caravan,
@@ -32,7 +39,8 @@ class TimeService {
     if (playerState.activeJourney != null) {
       VehicleService.advanceTimeForAll(
         caravan: playerState.caravan,
-        vehicles: playerState.caravan.vehicles,
+        vehicles:
+            playerState.caravan.vehicles,
         hours: hours,
       );
     }
@@ -51,27 +59,90 @@ class TimeService {
       if (npc.activeJourney != null) {
         VehicleService.advanceTimeForAll(
           caravan: npc.caravan,
-          vehicles: npc.caravan.vehicles,
+          vehicles:
+              npc.caravan.vehicles,
           hours: hours,
         );
       }
     }
 
-    JourneyService.advanceJourney(
-      playerState: playerState,
-      hours: hours,
-    );
+    bool enteredCity = false;
 
-    final activeJourney = playerState.activeJourney;
-
-    if (activeJourney != null && activeJourney.completed) {
-      TravelService.arrive(
-        world: world,
-        playerState: playerState,
+    if (playerState.activeJourney != null) {
+      final startX =
+          JourneyService.currentX(
+        playerState,
       );
+
+      final startY =
+          JourneyService.currentY(
+        playerState,
+      );
+
+      JourneyService.advanceJourney(
+        playerState: playerState,
+        hours: hours,
+      );
+
+      final endX =
+          JourneyService.currentX(
+        playerState,
+      );
+
+      final endY =
+          JourneyService.currentY(
+        playerState,
+      );
+
+      final journey =
+          playerState.activeJourney;
+
+      for (final city in world.cities) {
+        if (city ==
+            journey?.originCity) {
+          continue;
+        }
+
+        if (LocationService
+            .segmentIntersectsCity(
+          startX: startX,
+          startY: startY,
+          endX: endX,
+          endY: endY,
+          city: city,
+        )) {
+
+          playerState.worldX = city.x;
+          playerState.worldY = city.y;
+
+          playerState.currentCity =
+              city;
+
+          JourneyService.clearJourney(
+            playerState,
+          );
+
+          enteredCity = true;
+          break;
+        }
+      }
+
+      if (!enteredCity) {
+        final activeJourney =
+            playerState.activeJourney;
+
+        if (activeJourney != null &&
+            activeJourney.completed) {
+          TravelService.arrive(
+            world: world,
+            playerState: playerState,
+          );
+        }
+      }
     }
 
-    playerState.worldTimeHours += hours;
+    playerState.worldTimeHours +=
+        hours;
 
     DiscoveryService.discoverNearbyCities(
       playerState: playerState,

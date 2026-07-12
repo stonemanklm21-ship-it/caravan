@@ -18,8 +18,9 @@ class AnimalMarketScreen
   });
 
   @override
-  State<AnimalMarketScreen> createState() =>
-      _AnimalMarketScreenState();
+  State<AnimalMarketScreen>
+      createState() =>
+          _AnimalMarketScreenState();
 }
 
 class _AnimalMarketScreenState
@@ -31,8 +32,14 @@ class _AnimalMarketScreenState
     super.initState();
 
     stock =
-        AnimalMarketService.generateStock(
-      tier: widget.tier,
+        AnimalMarketService
+            .marketStock(
+      city:
+          widget.playerState.currentCity!,
+      currentHour:
+          widget.playerState
+              .worldTimeHours
+              .floor(),
       stockSize: 8,
     );
   }
@@ -49,7 +56,8 @@ class _AnimalMarketScreenState
         itemCount: stock.length,
         itemBuilder:
             (context, index) {
-          final animal = stock[index];
+          final animal =
+              stock[index];
 
           final price =
               AnimalMarketService
@@ -79,21 +87,23 @@ class _AnimalMarketScreenState
                     'Age: ${CalendarService.formatAge(animal.ageYears)}',
                   ),
                   Text(
-                    'Weight: ${animal.adultWeightKg.toStringAsFixed(1)} kg'
-                    ' (adult)',
+                    'Weight: ${animal.adultWeightKg.toStringAsFixed(1)} kg (adult)',
                   ),
                   Text(
                     'HP: ${animal.hp.toStringAsFixed(0)}'
-                    ' / ${animal.type.maxHp.toStringAsFixed(0)}',
+                    ' / '
+                    '${animal.type.maxHp.toStringAsFixed(0)}',
                   ),
                   Text(
                     'Price: ${price.toStringAsFixed(0)}',
                   ),
                 ],
               ),
-              trailing: ElevatedButton(
+              trailing:
+                  ElevatedButton(
                 onPressed:
-                    widget.playerState
+                    widget
+                                .playerState
                                 .caravan
                                 .gold <
                             price
@@ -103,13 +113,16 @@ class _AnimalMarketScreenState
                               widget
                                   .playerState
                                   .caravan
-                                  .gold -= price;
+                                  .gold -=
+                                  price;
 
                               widget
                                   .playerState
                                   .caravan
                                   .animals
-                                  .add(animal);
+                                  .add(
+                                    animal,
+                                  );
 
                               stock.removeAt(
                                 index,

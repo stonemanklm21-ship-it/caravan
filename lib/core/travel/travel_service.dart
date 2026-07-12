@@ -1,8 +1,8 @@
 import '../models/city.dart';
 import '../models/player_state.dart';
-import 'journey_service.dart';
-import '../world/location_service.dart';
 import '../models/world.dart';
+import '../world/location_service.dart';
+import 'journey_service.dart';
 
 class TravelService {
   static void startTravel({
@@ -12,11 +12,15 @@ class TravelService {
     double? originY,
     double tickFractionOffset = 0,
   }) {
+    final originCity =
+        playerState.currentCity;
+
     playerState.currentCity = null;
 
     JourneyService.startJourney(
       playerState: playerState,
       destination: destination,
+      originCity: originCity,
       originX: originX,
       originY: originY,
       tickFractionOffset:
@@ -32,11 +36,15 @@ class TravelService {
     double? originY,
     double tickFractionOffset = 0,
   }) {
+    final originCity =
+        playerState.currentCity;
+
     playerState.currentCity = null;
 
     JourneyService
         .startJourneyToCoordinates(
       playerState: playerState,
+      originCity: originCity,
       destinationX: destinationX,
       destinationY: destinationY,
       originX: originX,

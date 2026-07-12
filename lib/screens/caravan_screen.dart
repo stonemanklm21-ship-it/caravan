@@ -3,23 +3,32 @@ import 'package:flutter/material.dart';
 import '../../data/animal_data.dart';
 import '../../data/vehicle_data.dart';
 
-import '../../core/caravan/animal_service.dart';
+import '../widgets/caravan_animal_tile.dart';
+import '../widgets/caravan_character_tile.dart';
+import '../widgets/caravan_vehicle_tile.dart';
+
 import '../../core/caravan/caravan_service.dart';
-import '../../core/caravan/vehicle_service.dart';
 import '../../core/models/animal.dart';
 import '../../core/models/caravan.dart';
 import '../../core/models/vehicle.dart';
-import '../../core/world/calendar_service.dart';
 
 class CaravanScreen extends StatefulWidget {
   final Caravan caravan;
 
-  const CaravanScreen({super.key, required this.caravan,});
+  const CaravanScreen({
+    super.key,
+    required this.caravan,
+  });
 
-  @override State<CaravanScreen> createState() => _CaravanScreenState();}
+  @override
+  State<CaravanScreen> createState() =>
+      _CaravanScreenState();
+}
 
-class _CaravanScreenState extends State<CaravanScreen> {
-  Caravan get caravan => widget.caravan;
+class _CaravanScreenState
+    extends State<CaravanScreen> {
+  Caravan get caravan =>
+      widget.caravan;
 
   void _addDonkey() {
     setState(() {
@@ -30,8 +39,7 @@ class _CaravanScreenState extends State<CaravanScreen> {
           hp: donkey.maxHp,
           ageYears: 5,
           adultWeightKg:
-              donkey
-                  .averageAdultWeightKg,
+              donkey.averageAdultWeightKg,
         ),
       );
     });
@@ -50,7 +58,9 @@ class _CaravanScreenState extends State<CaravanScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -90,57 +100,58 @@ class _CaravanScreenState extends State<CaravanScreen> {
                     'Cargo Weight: '
                     '${caravan.cargoWeightKg.toStringAsFixed(1)} kg',
                   ),
-                Text(
-  'Available Capacity: '
-  '${caravan.availableCapacityKg.toStringAsFixed(1)} kg',
-),
-Text(
-  'Speed: '
-  '${caravan.speed.toStringAsFixed(1)} km/h',
-),
-const SizedBox(
-  height: 8,
-),
-const Text(
-  'Skills',
-  style: TextStyle(
-    fontWeight: FontWeight.bold,
-  ),
-),
-Text(
-  '🩺 Doctor: ${caravan.doctorSkill}',
-),
-Text(
-  '🐴 Vet: ${caravan.vetSkill}',
-),
-Text(
-  '🔧 Mechanic: ${caravan.mechanicSkill}',
-),
-Text(
-  '👁️ Scout: ${caravan.scoutSkill}',
-),
-Text(
-  '⚔️ Combat: ${caravan.combatSkill}',
-),
-const SizedBox(
-  height: 8,
-),
-Text(
-  'Water / Day: '
-  '${caravan.waterRequirementPerDay.toStringAsFixed(1)}',
-),
-Text(
-  'Calories / Day: '
-  '${caravan.calorieRequirementPerDay.toStringAsFixed(0)}',
-),
-Text(
-  'Wages / Day: '
-  '${caravan.wagesPerDay.toStringAsFixed(0)}',
-),
-Text(
-  'Forage / Day: '
-  '${caravan.forageRequirementPerDay.toStringAsFixed(1)}',
-),
+                  Text(
+                    'Available Capacity: '
+                    '${caravan.availableCapacityKg.toStringAsFixed(1)} kg',
+                  ),
+                  Text(
+                    'Speed: '
+                    '${caravan.speed.toStringAsFixed(1)} km/h',
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  const Text(
+                    'Skills',
+                    style: TextStyle(
+                      fontWeight:
+                          FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    '🩺 Doctor: ${caravan.doctorSkill}',
+                  ),
+                  Text(
+                    '🐴 Vet: ${caravan.vetSkill}',
+                  ),
+                  Text(
+                    '🔧 Mechanic: ${caravan.mechanicSkill}',
+                  ),
+                  Text(
+                    '👁️ Scout: ${caravan.scoutSkill}',
+                  ),
+                  Text(
+                    '⚔️ Combat: ${caravan.combatSkill}',
+                  ),
+                  const SizedBox(
+                    height: 8,
+                  ),
+                  Text(
+                    'Water / Day: '
+                    '${caravan.waterRequirementPerDay.toStringAsFixed(1)}',
+                  ),
+                  Text(
+                    'Calories / Day: '
+                    '${caravan.calorieRequirementPerDay.toStringAsFixed(0)}',
+                  ),
+                  Text(
+                    'Wages / Day: '
+                    '${caravan.wagesPerDay.toStringAsFixed(0)}',
+                  ),
+                  Text(
+                    'Forage / Day: '
+                    '${caravan.forageRequirementPerDay.toStringAsFixed(1)}',
+                  ),
                   Text(
                     'Can Travel: '
                     '${CaravanService.canTravel(caravan) ? 'Yes' : 'No'}',
@@ -154,14 +165,16 @@ Text(
                       ElevatedButton(
                         onPressed:
                             _addDonkey,
-                        child: const Text(
+                        child:
+                            const Text(
                           '+ Donkey',
                         ),
                       ),
                       ElevatedButton(
                         onPressed:
                             _addCart,
-                        child: const Text(
+                        child:
+                            const Text(
                           '+ Cart',
                         ),
                       ),
@@ -172,7 +185,9 @@ Text(
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(
+            height: 16,
+          ),
 
           const Text(
             'People',
@@ -183,31 +198,30 @@ Text(
             ),
           ),
 
-          const SizedBox(height: 8),
-
-          Card(
-            child: ListTile(
-              leading: const Icon(
-                Icons.person,
-              ),
-              title: Text(
-                caravan.leader.name,
-              ),
-              subtitle: Text(
-                'Leader\n'
-                'Age: ${caravan.leader.ageYears}\n'
-                'HP: ${caravan.leader.hp.toStringAsFixed(0)}'
-                ' / '
-                '${caravan.leader.maxHp.toStringAsFixed(0)}',
-              ),
-            ),
+          const SizedBox(
+            height: 8,
           ),
 
-          if (caravan.companions.isEmpty)
+          CaravanCharacterTile(
+            caravan: caravan,
+            character:
+                caravan.leader,
+            role: 'Leader',
+            icon: Icons.person,
+            onChanged: () {
+              setState(() {});
+            },
+          ),
+
+          if (caravan
+              .companions
+              .isEmpty)
             const Card(
               child: Padding(
                 padding:
-                    EdgeInsets.all(12),
+                    EdgeInsets.all(
+                  12,
+                ),
                 child: Text(
                   'No companions.',
                 ),
@@ -215,27 +229,24 @@ Text(
             ),
 
           ...caravan.companions.map(
-            (companion) => Card(
-              child: ListTile(
-                leading: const Icon(
+            (companion) =>
+                CaravanCharacterTile(
+              caravan: caravan,
+              character:
+                  companion,
+              role:
+                  'Companion',
+              icon:
                   Icons.people,
-                ),
-                title: Text(
-                  companion.name,
-                ),
-                subtitle: Text(
-                  'Companion\n'
-                  'Age: ${companion.ageYears}\n'
-                  'HP: ${companion.hp.toStringAsFixed(0)}'
-                  ' / '
-                  '${companion.maxHp.toStringAsFixed(0)}\n'
-                  'Wage: ${companion.wagePerDay.toStringAsFixed(0)} / day',
-                ),
-              ),
+              onChanged: () {
+                setState(() {});
+              },
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(
+            height: 16,
+          ),
 
           const Text(
             'Animals',
@@ -246,14 +257,21 @@ Text(
             ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 8,
+          ),
 
           ...caravan.animals.map(
             (animal) =>
-                _animalTile(animal),
+                CaravanAnimalTile(
+              caravan: caravan,
+              animal: animal,
+            ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(
+            height: 16,
+          ),
 
           const Text(
             'Vehicles',
@@ -264,154 +282,21 @@ Text(
             ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(
+            height: 8,
+          ),
 
           ...caravan.vehicles.map(
             (vehicle) =>
-                _vehicleTile(vehicle),
+                CaravanVehicleTile(
+              caravan: caravan,
+              vehicle: vehicle,
+              onChanged: () {
+                setState(() {});
+              },
+            ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _animalTile(
-    Animal animal,
-  ) {
-    Vehicle? assignedVehicle;
-
-    for (final vehicle
-        in caravan.vehicles) {
-      if (identical(
-        vehicle.draftAnimal,
-        animal,
-      )) {
-        assignedVehicle = vehicle;
-        break;
-      }
-    }
-
-    return Card(
-      child: ListTile(
-        title: Text(
-          animal.type.name,
-        ),
-        subtitle: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Age: ${CalendarService.formatAge(animal.ageYears)}',
-            ),
-            Text(
-              'Weight: ${AnimalService.weightKg(animal).toStringAsFixed(1)} kg',
-            ),
-            Text(
-              'HP: ${animal.hp.toStringAsFixed(0)} / ${animal.type.maxHp.toStringAsFixed(0)}',
-            ),
-            Text(
-              'Capacity: ${AnimalService.cargoCapacityKg(animal).toStringAsFixed(1)} kg',
-            ),
-            Text(
-              'Assigned Vehicle: ${assignedVehicle?.type.name ?? 'None'}',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _vehicleTile(
-    Vehicle vehicle,
-  ) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          vehicle.type.name,
-        ),
-        subtitle: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Condition: ${vehicle.condition.toStringAsFixed(1)} / ${vehicle.type.maxCondition.toStringAsFixed(0)}',
-            ),
-            Text(
-              'Operational: ${VehicleService.operational(vehicle) ? 'Yes' : 'No'}',
-            ),
-            Text(
-              'Required Pulling Capacity: ${vehicle.type.requiredPullingCapacityKg.toStringAsFixed(1)} kg',
-            ),
-            Text(
-              'Assigned Animal: ${vehicle.draftAnimal?.type.name ?? 'None'}',
-            ),
-            Text(
-              'Can Pull: ${VehicleService.canPull(vehicle) ? 'Yes' : 'No'}',
-            ),
-            Text(
-              'Cargo Capacity: ${VehicleService.cargoCapacityKg(vehicle).toStringAsFixed(1)} kg',
-            ),
-          ],
-        ),
-        trailing:
-            PopupMenuButton<String>(
-          onSelected: (value) {
-            if (value ==
-                'unassign') {
-              setState(() {
-                CaravanService
-                    .unassignAnimal(
-                  vehicle,
-                );
-              });
-              return;
-            }
-
-            final animal =
-                caravan.animals
-                    .firstWhere(
-              (animal) =>
-                  animal.type.id ==
-                  value,
-            );
-
-            setState(() {
-              CaravanService
-                  .assignAnimal(
-                vehicle: vehicle,
-                animal: animal,
-              );
-            });
-          },
-          itemBuilder:
-              (context) => [
-            const PopupMenuItem(
-              value: 'unassign',
-              child: Text(
-                'Unassign',
-              ),
-            ),
-            ...caravan.animals
-                .where(
-                  (animal) =>
-                      !CaravanService
-                          .animalAssigned(
-                    caravan,
-                    animal,
-                  ),
-                )
-                .map(
-                  (animal) =>
-                      PopupMenuItem(
-                    value:
-                        animal.type.id,
-                    child: Text(
-                      animal.type.name,
-                    ),
-                  ),
-                ),
-          ],
-        ),
       ),
     );
   }

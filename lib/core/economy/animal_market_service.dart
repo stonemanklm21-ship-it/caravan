@@ -1,9 +1,10 @@
 import 'dart:math';
 
 import '../../data/animal_data.dart';
-import '../caravan/animal_service.dart';
 import '../models/animal.dart';
 import '../models/animal_type.dart';
+import '../models/city.dart';
+import '../caravan/animal_service.dart';
 
 enum AnimalMarketTier {
   basic,
@@ -14,6 +15,40 @@ enum AnimalMarketTier {
 class AnimalMarketService {
   static final Random _random =
       Random();
+
+  static List<Animal> marketStock({
+    required City city,
+    required int currentHour,
+    int stockSize = 10,
+  }) {
+    final tier =
+        city.animalMarketTier;
+
+    if (tier == null) {
+      return [];
+    }
+
+    final hoursSinceRefresh =
+        currentHour -
+        city
+            .lastAnimalMarketRefreshHour;
+
+    if (city.animalMarketStock
+            .isEmpty ||
+        hoursSinceRefresh >= 72) {
+      city.animalMarketStock =
+          generateStock(
+        tier: tier,
+        stockSize: stockSize,
+      );
+
+      city
+          .lastAnimalMarketRefreshHour =
+          currentHour;
+    }
+
+    return city.animalMarketStock;
+  }
 
   static List<AnimalType>
       availableAnimals(

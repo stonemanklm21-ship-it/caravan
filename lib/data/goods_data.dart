@@ -13,7 +13,7 @@ const bread = Good(
   id: 'bread',
   name: 'Bread',
   priceFloor: 10,
-  priceCeiling: 20,
+  priceCeiling: 40,
   weight: 0.5,
   caloriesPerUnit: 1200,
 );
@@ -67,6 +67,15 @@ const chair = Good(
   priceCeiling: 500,
 );
 
+const turnips = Good(
+  id: 'turnips',
+  name: 'Turnips',
+  weight: 0.3,
+  priceFloor: 5,
+  priceCeiling: 15,
+  caloriesPerUnit: 500,
+);
+
 const goods = [
   grain,
   bread,
@@ -76,6 +85,7 @@ const goods = [
   ironOre,
   tools,
   chair,
+  turnips,
 ];
 
 final goodsById = {

@@ -20,7 +20,7 @@ final well = IndustryType(
   name: 'Well',
   inputsPerSize: {},
   outputsPerSize: {
-    water: 100,
+    water: 300,
   },
   operatingCostPerSizePerDay: 2,
   workersPerSize: 2,
@@ -73,7 +73,7 @@ final bakery = IndustryType(
   name: 'Bakery',
   inputsPerSize: {
     grain: 200,
-    water: 200,
+    water: 100,
   },
   outputsPerSize: {
     bread: 200,
@@ -112,6 +112,20 @@ final chairmaker = IndustryType(
   storagePerSize: 100,
 );
 
+final turnipFarm = IndustryType(
+  id: 'turnip_farm',
+  name: 'Turnip Farm',
+  inputsPerSize: {
+    water: 100,
+  },
+  outputsPerSize: {
+    turnips: 200,
+  },
+  operatingCostPerSizePerDay: 5,
+  workersPerSize: 5,
+  storagePerSize: 100,
+);
+
 final industryTypes = [
   farm,
   well,
@@ -121,6 +135,7 @@ final industryTypes = [
   bakery,
   toolmaker,
   chairmaker,
+  turnipFarm,
 ];
 
 final industryTypesById = {

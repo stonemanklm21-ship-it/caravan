@@ -42,16 +42,15 @@ class NpcTradingService {
     return affordable;
   }
 
-  static TradeMission? generateMission({
-    required World world,
+  static List<TradeMission>
+      generateMissionsForDestination({
     required City origin,
+    required City destination,
     required NpcCaravan npc,
     required double availableGold,
     required double availableCargoKg,
   }) {
-    TradeMission? bestMission;
-
-    double bestScore = 0;
+    final missions = <TradeMission>[];
 
     for (final market in origin.marketGoods) {
       final availableQuantity =
@@ -102,88 +101,135 @@ class NpcTradingService {
         continue;
       }
 
+      final sellMarket =
+          destination.marketForGood(
+        market.good,
+      );
+
       final buyPrice =
           PricingService.calculatePrice(
         city: origin,
         market: market,
       );
 
-      for (final destination
-          in world.cities) {
-        if (destination.id ==
-            origin.id) {
-          continue;
-        }
+      final sellPrice =
+          PricingService.calculatePrice(
+        city: destination,
+        market: sellMarket,
+      );
 
-        final sellMarket =
-            destination.marketForGood(
-          market.good,
-        );
+      final cost =
+          PricingService.transactionCost(
+        city: origin,
+        market: market,
+        quantity: quantity,
+      );
 
-        final sellPrice =
-            PricingService.calculatePrice(
-          city: destination,
-          market: sellMarket,
-        );
+      final revenue =
+          PricingService.transactionRevenue(
+        city: destination,
+        market: sellMarket,
+        quantity: quantity,
+      );
 
-        final cost =
-            PricingService.transactionCost(
-          city: origin,
-          market: market,
+      final profit =
+          revenue - cost;
+
+      if (profit < minimumProfit) {
+        continue;
+      }
+
+      missions.add(
+        TradeMission(
+          good: market.good,
+          origin: origin,
+          destination: destination,
           quantity: quantity,
-        );
+          expectedBuyPrice:
+              buyPrice,
+          expectedSellPrice:
+              sellPrice,
+          expectedProfit:
+              profit,
+        ),
+      );
+    }
 
-        final revenue =
-            PricingService.transactionRevenue(
-          city: destination,
-          market: sellMarket,
-          quantity: quantity,
-        );
+    missions.sort(
+      (a, b) => b.expectedProfit
+          .compareTo(
+        a.expectedProfit,
+      ),
+    );
 
-        final profit =
-            revenue - cost;
+    return missions;
+  }
 
-        if (profit < minimumProfit) {
-          continue;
-        }
+  static TradeMission? generateMission({
+    required World world,
+    required City origin,
+    required NpcCaravan npc,
+    required double availableGold,
+    required double availableCargoKg,
+  }) {
+    TradeMission? bestMission;
 
-        final dx =
-            destination.x - origin.x;
+    double bestScore = 0;
 
-        final dy =
-            destination.y - origin.y;
+    for (final destination
+        in world.cities) {
+      if (destination.id ==
+          origin.id) {
+        continue;
+      }
 
-        final distance = sqrt(
-          (dx * dx) + (dy * dy),
-        );
+      final missions =
+          generateMissionsForDestination(
+        origin: origin,
+        destination: destination,
+        npc: npc,
+        availableGold:
+            availableGold,
+        availableCargoKg:
+            availableCargoKg,
+      );
 
-        final travelDays =
-            distance /
-            (500 * npc.caravan.speed);
+      if (missions.isEmpty) {
+        continue;
+      }
 
-        final score =
-            profit /
-            max(
-              1.0,
-              travelDays,
-            );
+      final mission =
+          missions.first;
 
-        if (score > bestScore) {
-          bestScore = score;
+      final dx =
+          destination.x -
+          origin.x;
 
-          bestMission = TradeMission(
-            good: market.good,
-            origin: origin,
-            destination: destination,
-            quantity: quantity,
-            expectedBuyPrice:
-                buyPrice,
-            expectedSellPrice:
-                sellPrice,
-            expectedProfit:
-                profit,
+      final dy =
+          destination.y -
+          origin.y;
+
+      final distance =
+          sqrt(
+            (dx * dx) +
+                (dy * dy),
           );
-        }
+
+      final travelDays =
+          distance /
+          (500 *
+              npc.caravan.speed);
+
+      final score =
+          mission.expectedProfit /
+          max(
+            1.0,
+            travelDays,
+          );
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMission = mission;
       }
     }
 

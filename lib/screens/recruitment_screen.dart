@@ -28,10 +28,15 @@ class _RecruitmentScreenState
     super.initState();
 
     recruits =
-        RecruitmentService
-            .generateRecruits(
+        RecruitmentService.marketStock(
+      city:
+          widget.playerState.currentCity!,
       tier:
           RecruitmentMarketTier.basic,
+      currentHour:
+          widget.playerState
+              .worldTimeHours
+              .floor(),
     );
   }
 
@@ -83,8 +88,8 @@ class _RecruitmentScreenState
                     '⚔️${character.combatSkill}',
                   ),
                   Text(
-  '🏃 ${character.speed.toStringAsFixed(1)} km/h',
-),
+                    '🏃 ${character.speed.toStringAsFixed(1)} km/h',
+                  ),
                   Text(
                     'HP: '
                     '${character.hp.toStringAsFixed(0)}'
