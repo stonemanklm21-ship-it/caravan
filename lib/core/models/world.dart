@@ -1,7 +1,10 @@
 import '../../data/animal_data.dart';
+import '../../data/armour_data.dart';
 import '../../data/goods_data.dart';
+import '../../data/helmet_data.dart';
 import '../../data/industry_data.dart';
 import '../../data/vehicle_data.dart';
+import '../../data/weapon_data.dart';
 
 import 'animal.dart';
 import 'city.dart';
@@ -112,6 +115,12 @@ class World {
                         animalTypeForId,
                   ),
                 ),
+                weaponForId:
+                    weaponForId,
+                armourForId:
+                    armourForId,
+                helmetForId:
+                    helmetForId,
               ),
             )
             .toList();

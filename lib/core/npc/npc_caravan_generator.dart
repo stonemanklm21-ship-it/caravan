@@ -11,6 +11,7 @@ import '../models/caravan.dart';
 import '../models/city.dart';
 import '../models/npc_caravan.dart';
 import '../models/vehicle.dart';
+import '../models/caravan_faction.dart';
 
 class NpcCaravanGenerator {
   static final Random _random =
@@ -42,6 +43,10 @@ class NpcCaravanGenerator {
             currentCity: city,
             caravan:
                 _buildCaravan(template),
+                
+            faction:
+               CaravanFaction.merchant,
+
             ledger: MarketLedger(
               observations: [],
             ),
@@ -231,6 +236,9 @@ final companions =
               (template.maxGold -
                   template.minGold)),
       inventory: [],
+      weapons: [],
+      armours: [],
+      helmets: [],
       animals: animals,
       vehicles: vehicles,
       manifest: [],

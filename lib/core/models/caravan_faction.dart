@@ -1,0 +1,4 @@
+enum CaravanFaction {
+  merchant,
+  bandit,
+}

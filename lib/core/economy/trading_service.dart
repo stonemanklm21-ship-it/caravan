@@ -110,4 +110,113 @@ class TradingService {
 
     return true;
   }
+
+  static bool buyFromNpc({
+    required Caravan player,
+    required Caravan npc,
+    required CargoItem item,
+    required int quantity,
+    required double unitPrice,
+  }) {
+    if (item.quantity < quantity) {
+      return false;
+    }
+
+    final cost = unitPrice * quantity;
+
+    if (player.gold < cost) {
+      return false;
+    }
+
+    final addedWeight =
+        item.good.weight * quantity;
+
+    if (player.cargoWeightKg +
+            addedWeight >
+        player.cargoCapacityKg) {
+      return false;
+    }
+
+    player.gold -= cost;
+    npc.gold += cost;
+
+    final playerIndex =
+        player.inventory.indexWhere(
+      (cargo) =>
+          cargo.good.id ==
+          item.good.id,
+    );
+
+    if (playerIndex >= 0) {
+      player
+          .inventory[playerIndex]
+          .quantity += quantity;
+    } else {
+      player.inventory.add(
+        CargoItem(
+          good: item.good,
+          quantity:
+              quantity.toDouble(),
+        ),
+      );
+    }
+
+    item.quantity -= quantity;
+
+    if (item.quantity <= 0.0001) {
+      npc.inventory.remove(item);
+    }
+
+    return true;
+  }
+
+  static bool sellToNpc({
+    required Caravan player,
+    required Caravan npc,
+    required CargoItem item,
+    required int quantity,
+    required double unitPrice,
+  }) {
+    if (item.quantity < quantity) {
+      return false;
+    }
+
+    final revenue =
+        unitPrice * quantity;
+
+    if (npc.gold < revenue) {
+      return false;
+    }
+
+    npc.gold -= revenue;
+    player.gold += revenue;
+
+    item.quantity -= quantity;
+
+    final npcIndex =
+        npc.inventory.indexWhere(
+      (cargo) =>
+          cargo.good.id ==
+          item.good.id,
+    );
+
+    if (npcIndex >= 0) {
+      npc.inventory[npcIndex]
+          .quantity += quantity;
+    } else {
+      npc.inventory.add(
+        CargoItem(
+          good: item.good,
+          quantity:
+              quantity.toDouble(),
+        ),
+      );
+    }
+
+    if (item.quantity <= 0.0001) {
+      player.inventory.remove(item);
+    }
+
+    return true;
+  }
 }

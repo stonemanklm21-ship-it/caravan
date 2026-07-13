@@ -4,6 +4,12 @@ import 'cargo_item.dart';
 import 'cargo_manifest_entry.dart';
 import 'character.dart';
 import 'vehicle.dart';
+import 'weapon.dart';
+import 'armour.dart';
+import 'helmet.dart';
+import '../../data/weapon_data.dart';
+import '../../data/armour_data.dart';
+import '../../data/helmet_data.dart';
 
 class Caravan {
   Character leader;
@@ -13,6 +19,12 @@ class Caravan {
   double gold;
 
   List<CargoItem> inventory;
+
+  List<Weapon> weapons;
+
+  List<Armour> armours;
+
+  List<Helmet> helmets;
 
   List<Animal> animals;
 
@@ -25,6 +37,9 @@ class Caravan {
     required this.companions,
     required this.gold,
     required this.inventory,
+    required this.weapons,
+    required this.armours,
+    required this.helmets,
     required this.animals,
     required this.vehicles,
     required this.manifest,
@@ -207,6 +222,17 @@ double get speed {
             (item) => item.toJson(),
           )
           .toList(),
+          'weapons': weapons
+    .map((weapon) => weapon.id)
+    .toList(),
+
+'armours': armours
+    .map((armour) => armour.id)
+    .toList(),
+
+'helmets': helmets
+    .map((helmet) => helmet.id)
+    .toList(),
       'animals': animals
           .map(
             (animal) =>
@@ -277,6 +303,36 @@ double get speed {
                 ),
               )
               .toList(),
+weapons:
+    (json['weapons'] as List?)
+            ?.map(
+              (id) => weaponForId(
+                id as String,
+              ),
+            )
+            .toList() ??
+        [],
+
+armours:
+    (json['armours'] as List?)
+            ?.map(
+              (id) => armourForId(
+                id as String,
+              ),
+            )
+            .toList() ??
+        [],
+
+helmets:
+    (json['helmets'] as List?)
+            ?.map(
+              (id) => helmetForId(
+                id as String,
+              ),
+            )
+            .toList() ??
+        [],
+              
       animals:
           (json['animals'] as List)
               .map(

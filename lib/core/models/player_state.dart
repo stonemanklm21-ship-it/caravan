@@ -8,6 +8,7 @@ import 'caravan.dart';
 import 'city.dart';
 import '../economy/market_ledger.dart';
 import 'vehicle.dart';
+import 'npc_caravan.dart';
 
 class PlayerState {
   /// Total world time since the start of the game.
@@ -34,6 +35,11 @@ class PlayerState {
   /// Non-null when travelling.
   ActiveJourney? activeJourney;
 
+  /// Temporary encounter currently being handled.
+  /// Not saved.
+  NpcCaravan? encounteredNpc;
+ final Set<NpcCaravan> ignoredNpcs = {};
+  
   PlayerState({
     required this.worldTimeHours,
     required this.worldX,
@@ -43,6 +49,7 @@ class PlayerState {
     required this.caravan,
     required this.ledger,
     this.activeJourney,
+    this.encounteredNpc,
   });
 
   int get day => (worldTimeHours ~/ 24) + 1;

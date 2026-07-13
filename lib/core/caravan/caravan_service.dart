@@ -36,7 +36,7 @@ class CaravanService {
             ? 0
             : caravan
                 .leader
-                .cargoCapacityKg;
+                .availableCargoCapacityKg;
 
     final companionCapacity =
         caravan.companions.fold<double>(
@@ -48,7 +48,7 @@ class CaravanService {
 
         return total +
             companion
-                .cargoCapacityKg;
+                .availableCargoCapacityKg;
       },
     );
 

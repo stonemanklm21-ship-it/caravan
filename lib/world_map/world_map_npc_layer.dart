@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../core/models/npc_caravan.dart';
+import '../core/models/caravan_faction.dart';
 import 'world_map_camera.dart';
 import 'world_map_npc_marker.dart';
 
@@ -97,14 +98,16 @@ class WorldMapNpcLayer
                             ),
                           ),
                         ),
-                      WorldMapNpcMarker(
-                        zoom:
-                            camera.zoom,
-                        color: npc ==
-                                selectedNpcCaravan
-                            ? Colors.blue
-                            : Colors.orange,
-                      ),
+WorldMapNpcMarker(
+  zoom: camera.zoom,
+  color: npc ==
+          selectedNpcCaravan
+      ? Colors.blue
+      : npc.faction ==
+              CaravanFaction.bandit
+          ? Colors.red
+          : Colors.orange,
+),
                     ],
                   ),
                 ),

@@ -1,12 +1,16 @@
 import '../economy/animal_market_service.dart';
+import '../economy/equipment_market_service.dart';
 import '../economy/vehicle_market_service.dart';
 
 import 'animal.dart';
+import 'armour.dart';
 import 'good.dart';
+import 'helmet.dart';
 import 'industry.dart';
 import 'market_good.dart';
 import 'recruit.dart';
 import 'vehicle.dart';
+import 'weapon.dart';
 
 class City {
   final String id;
@@ -31,6 +35,9 @@ class City {
   final VehicleMarketTier?
       vehicleMarketTier;
 
+  final EquipmentMarketTier?
+      equipmentMarketTier;
+
   final bool hasVet;
 
   final bool hasCartwright;
@@ -43,11 +50,19 @@ class City {
 
   List<Vehicle> vehicleMarketStock;
 
+  List<Weapon> weaponMarketStock;
+
+  List<Armour> armourMarketStock;
+
+  List<Helmet> helmetMarketStock;
+
   int lastRecruitRefreshHour;
 
   int lastAnimalMarketRefreshHour;
 
   int lastVehicleMarketRefreshHour;
+
+  int lastEquipmentMarketRefreshHour;
 
   City({
     required this.id,
@@ -60,6 +75,7 @@ class City {
     required this.shopGoods,
     this.animalMarketTier,
     this.vehicleMarketTier,
+    this.equipmentMarketTier,
     this.hasVet = false,
     this.hasCartwright = false,
     this.hasDoctor = false,
@@ -68,10 +84,18 @@ class City {
         const [],
     this.vehicleMarketStock =
         const [],
+    this.weaponMarketStock =
+        const [],
+    this.armourMarketStock =
+        const [],
+    this.helmetMarketStock =
+        const [],
     this.lastRecruitRefreshHour = 0,
     this.lastAnimalMarketRefreshHour =
         0,
     this.lastVehicleMarketRefreshHour =
+        0,
+    this.lastEquipmentMarketRefreshHour =
         0,
   });
 
@@ -121,6 +145,8 @@ class City {
           animalMarketTier?.name,
       'vehicleMarketTier':
           vehicleMarketTier?.name,
+      'equipmentMarketTier':
+          equipmentMarketTier?.name,
       'hasVet': hasVet,
       'hasCartwright':
           hasCartwright,
@@ -146,12 +172,35 @@ class City {
                     vehicle.toJson(),
               )
               .toList(),
+      'weaponMarketStock':
+          weaponMarketStock
+              .map(
+                (weapon) =>
+                    weapon.id,
+              )
+              .toList(),
+      'armourMarketStock':
+          armourMarketStock
+              .map(
+                (armour) =>
+                    armour.id,
+              )
+              .toList(),
+      'helmetMarketStock':
+          helmetMarketStock
+              .map(
+                (helmet) =>
+                    helmet.id,
+              )
+              .toList(),
       'lastRecruitRefreshHour':
           lastRecruitRefreshHour,
       'lastAnimalMarketRefreshHour':
           lastAnimalMarketRefreshHour,
       'lastVehicleMarketRefreshHour':
           lastVehicleMarketRefreshHour,
+      'lastEquipmentMarketRefreshHour':
+          lastEquipmentMarketRefreshHour,
     };
   }
 
@@ -182,6 +231,18 @@ class City {
       Map<String, dynamic> json,
     )
     vehicleFromJson,
+    required Weapon Function(
+      String id,
+    )
+    weaponForId,
+    required Armour Function(
+      String id,
+    )
+    armourForId,
+    required Helmet Function(
+      String id,
+    )
+    helmetForId,
   }) {
     return City(
       id: json['id'] as String,
@@ -250,6 +311,17 @@ class City {
                           tier.name ==
                           json['vehicleMarketTier'],
                     ),
+      equipmentMarketTier:
+          json['equipmentMarketTier'] ==
+                  null
+              ? null
+              : EquipmentMarketTier
+                    .values
+                    .firstWhere(
+                      (tier) =>
+                          tier.name ==
+                          json['equipmentMarketTier'],
+                    ),
       hasVet:
           json['hasVet']
                   as bool? ??
@@ -301,6 +373,36 @@ class City {
                   )
                   .toList() ??
               [],
+      weaponMarketStock:
+          (json['weaponMarketStock']
+                      as List?)
+                  ?.map(
+                    (id) => weaponForId(
+                      id as String,
+                    ),
+                  )
+                  .toList() ??
+              [],
+      armourMarketStock:
+          (json['armourMarketStock']
+                      as List?)
+                  ?.map(
+                    (id) => armourForId(
+                      id as String,
+                    ),
+                  )
+                  .toList() ??
+              [],
+      helmetMarketStock:
+          (json['helmetMarketStock']
+                      as List?)
+                  ?.map(
+                    (id) => helmetForId(
+                      id as String,
+                    ),
+                  )
+                  .toList() ??
+              [],
       lastRecruitRefreshHour:
           json['lastRecruitRefreshHour']
                   as int? ??
@@ -311,6 +413,10 @@ class City {
               0,
       lastVehicleMarketRefreshHour:
           json['lastVehicleMarketRefreshHour']
+                  as int? ??
+              0,
+      lastEquipmentMarketRefreshHour:
+          json['lastEquipmentMarketRefreshHour']
                   as int? ??
               0,
     );

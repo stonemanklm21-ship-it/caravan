@@ -1,5 +1,6 @@
 import '../core/economy/animal_market_service.dart';
 import '../core/economy/vehicle_market_service.dart';
+import '../core/economy/equipment_market_service.dart';
 import '../core/models/city.dart';
 import '../core/models/industry.dart';
 import '../core/models/market_good.dart';
@@ -57,6 +58,7 @@ final farmingVillage = City(
   shopGoods: [],
   animalMarketTier: AnimalMarketTier.major,
   vehicleMarketTier: VehicleMarketTier.major,
+  equipmentMarketTier: EquipmentMarketTier.major,
   hasVet: true,
   hasCartwright: true,
   hasDoctor: true,
@@ -126,6 +128,7 @@ final miningTown = City(
   shopGoods: [],
   animalMarketTier: AnimalMarketTier.major,
   vehicleMarketTier: VehicleMarketTier.major,
+  equipmentMarketTier: EquipmentMarketTier.major,
   hasVet: true,
   hasCartwright: true,
   hasDoctor: true,
@@ -174,6 +177,7 @@ final forestCamp = City(
   shopGoods: [],
   animalMarketTier: AnimalMarketTier.major,
   vehicleMarketTier: VehicleMarketTier.major,
+  equipmentMarketTier: EquipmentMarketTier.major,
   hasVet: true,
   hasCartwright: true,
   hasDoctor: true,

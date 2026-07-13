@@ -6,6 +6,12 @@ class PricingService {
   static const double targetDaysSupply =
       7;
 
+  static const double npcBuyMultiplier =
+      0.90;
+
+  static const double npcSellMultiplier =
+      1.10;
+
   static double calculatePrice({
     required City city,
     required MarketGood market,
@@ -34,6 +40,28 @@ class PricingService {
         ((market.good.priceCeiling -
                 market.good.priceFloor) *
             scarcity);
+  }
+
+  static double npcSellPrice({
+    required City city,
+    required MarketGood market,
+  }) {
+    return calculatePrice(
+          city: city,
+          market: market,
+        ) *
+        npcSellMultiplier;
+  }
+
+  static double npcBuyPrice({
+    required City city,
+    required MarketGood market,
+  }) {
+    return calculatePrice(
+          city: city,
+          market: market,
+        ) *
+        npcBuyMultiplier;
   }
 
   static double transactionCost({

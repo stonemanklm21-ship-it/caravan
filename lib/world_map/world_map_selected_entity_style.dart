@@ -11,5 +11,5 @@ class WorldMapSelectedEntityStyle {
       Colors.blue;
 
   static const selectionRingRadius =
-      24.0;
+      15.0;
 }

@@ -1,5 +1,12 @@
+import '../../data/armour_data.dart';
+import '../../data/helmet_data.dart';
+import '../../data/weapon_data.dart';
+
 import 'animal.dart';
+import 'armour.dart';
+import 'helmet.dart';
 import 'vehicle.dart';
+import 'weapon.dart';
 
 class Character {
   final String id;
@@ -28,6 +35,12 @@ class Character {
 
   Vehicle? mountedVehicle;
 
+  Weapon? weapon;
+
+  Armour? armour;
+
+  Helmet? helmet;
+
   int doctorSkill;
 
   int vetSkill;
@@ -52,6 +65,9 @@ class Character {
     required this.speed,
     this.mountedAnimal,
     this.mountedVehicle,
+    this.weapon,
+    this.armour,
+    this.helmet,
     this.doctorSkill = 0,
     this.vetSkill = 0,
     this.mechanicSkill = 0,
@@ -60,6 +76,30 @@ class Character {
   });
 
   bool get alive => hp > 0;
+
+  double get equipmentWeightKg {
+    return (weapon?.weightKg ?? 0) +
+        (armour?.weightKg ?? 0) +
+        (helmet?.weightKg ?? 0);
+  }
+
+  double get availableCargoCapacityKg {
+    return cargoCapacityKg -
+        equipmentWeightKg;
+  }
+
+  int get accuracy {
+    return weapon?.accuracy ?? 6;
+  }
+
+  int get damageDie {
+    return weapon?.damageDie ?? 5;
+  }
+
+  int get protection {
+    return (armour?.protection ?? 0) +
+        (helmet?.protection ?? 0);
+  }
 
   double get effectiveSpeed {
     if (mountedAnimal != null) {
@@ -99,6 +139,9 @@ class Character {
           mountedAnimal?.toJson(),
       'mountedVehicle':
           mountedVehicle?.toJson(),
+      'weapon': weapon?.id,
+      'armour': armour?.id,
+      'helmet': helmet?.id,
       'doctorSkill': doctorSkill,
       'vetSkill': vetSkill,
       'mechanicSkill': mechanicSkill,
@@ -126,16 +169,20 @@ class Character {
           (json['weightKg'] as num)
               .toDouble(),
       cargoCapacityKg:
-          (json['cargoCapacityKg'] as num)
+          (json['cargoCapacityKg']
+                  as num)
               .toDouble(),
       caloriesPerDay:
-          (json['caloriesPerDay'] as num)
+          (json['caloriesPerDay']
+                  as num)
               .toDouble(),
       waterPerDay:
-          (json['waterPerDay'] as num)
+          (json['waterPerDay']
+                  as num)
               .toDouble(),
       wagePerDay:
-          (json['wagePerDay'] as num)
+          (json['wagePerDay']
+                  as num)
               .toDouble(),
       hp:
           (json['hp'] as num)
@@ -162,16 +209,45 @@ class Character {
                       as Map<String,
                           dynamic>,
                 ),
+      weapon:
+          json['weapon'] == null
+              ? null
+              : weaponForId(
+                  json['weapon']
+                      as String,
+                ),
+      armour:
+          json['armour'] == null
+              ? null
+              : armourForId(
+                  json['armour']
+                      as String,
+                ),
+      helmet:
+          json['helmet'] == null
+              ? null
+              : helmetForId(
+                  json['helmet']
+                      as String,
+                ),
       doctorSkill:
-          json['doctorSkill'] as int? ?? 0,
+          json['doctorSkill']
+                  as int? ??
+              0,
       vetSkill:
-          json['vetSkill'] as int? ?? 0,
+          json['vetSkill'] as int? ??
+              0,
       mechanicSkill:
-          json['mechanicSkill'] as int? ?? 0,
+          json['mechanicSkill']
+                  as int? ??
+              0,
       scoutSkill:
-          json['scoutSkill'] as int? ?? 0,
+          json['scoutSkill'] as int? ??
+              0,
       combatSkill:
-          json['combatSkill'] as int? ?? 0,
+          json['combatSkill']
+                  as int? ??
+              0,
     );
   }
 }

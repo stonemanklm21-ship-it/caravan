@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'dart:math';
 import '../core/npc/npc_travel_service.dart';
 import '../core/travel/journey_service.dart';
 import '../core/world/time_controller.dart';
@@ -19,6 +19,10 @@ import '../world_map/world_map_selection_strip.dart';
 import '../world_map/world_map_status_bar.dart';
 import '../world_map/world_map_travel_service.dart';
 import '../world_map/world_map_navigation.dart';
+import '../screens/npc_trade_screen.dart';
+import '../core/models/caravan_faction.dart';
+import '../core/combat/combat_encounter.dart';
+import '../screens/combat_screen.dart';
 
 class WorldMapScreen extends StatefulWidget {
   const WorldMapScreen({
@@ -44,12 +48,13 @@ class _WorldMapScreenState
   WorldMapSelection selection =
       const WorldMapSelection.none();
 
-  bool _followPlayer = false;
-  bool _playerWasInCity = false;
-  bool _returningToCity = false;
-  double? _lastRenderedX;
-  double? _lastRenderedY;
+bool _followPlayer = false;
+bool _playerWasInCity = false;
+bool _returningToCity = false;
+bool _encounterActive = false;
 
+double? _lastRenderedX;
+double? _lastRenderedY;
 
   @override
   void initState() {
@@ -96,7 +101,155 @@ _renderController.addListener(() {
   if (!mounted) {
     return;
   }
+if (game.player.encounteredNpc != null 
+&&
+    !_encounterActive
+) {
 
+
+  _encounterActive = true;
+    _timeController.stop();
+
+    final npc =
+        game.player.encounteredNpc!;
+
+if (npc.faction ==
+    CaravanFaction.bandit) {
+  Future.microtask(() {
+    if (!mounted) {
+      return;
+    }
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text(
+            'Bandit Encounter',
+          ),
+          content: const Text(
+            'A bandit caravan blocks your path.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                game.player.encounteredNpc =
+                    null;
+
+                _encounterActive = false;
+
+                Navigator.pop(context);
+              },
+              child: const Text(
+                'Continue',
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                game.player.encounteredNpc =
+                    null;
+
+                _encounterActive = false;
+
+                Navigator.pop(context);
+
+Navigator.push<bool>(
+  this.context,
+  MaterialPageRoute(
+    builder: (_) => CombatScreen(
+      encounter: CombatEncounter(
+        attackers: npc.caravan,
+        defenders: game.player.caravan,
+        attackerFaction: npc.faction,
+        defenderFaction:
+            CaravanFaction.merchant,
+      ),
+    ),
+  ),
+).then(
+  (playerWon) {
+    if (playerWon == true) {
+      setState(() {
+        game.world.npcCaravans.remove(
+          npc,
+        );
+      });
+    }
+  },
+);
+              },
+              child: const Text(
+                'Fight',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  });
+
+  return;
+}
+
+    Future.microtask(() {
+      if (!mounted) {
+        return;
+      }
+
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text(
+              'Caravan Encounter',
+            ),
+            content: const Text(
+              'You have encountered a merchant caravan.',
+            ),
+            actions: [
+              TextButton(
+onPressed: () {
+game.player.ignoredNpcs.add(npc);
+print('IGNORING NPC');
+  game.player.encounteredNpc = null;
+
+  _encounterActive = false;
+
+  Navigator.pop(context);
+},
+                child: const Text(
+                  'Ignore',
+                ),
+              ),
+              TextButton(
+onPressed: () {
+  game.player.encounteredNpc = null;
+
+  _encounterActive = false;
+
+  Navigator.pop(context);
+
+  Navigator.push(
+    this.context,
+    MaterialPageRoute(
+      builder: (_) => NpcTradeScreen(
+        npc: npc,
+      ),
+    ),
+  );
+},
+                child: const Text(
+                  'Trade',
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    });
+
+    return;
+  }
   final renderedX =
       JourneyService.currentXSmooth(
     game.player,
@@ -107,6 +260,45 @@ _renderController.addListener(() {
             JourneyService.currentYSmooth(game.player,
     _timeController.tickFraction,
   );
+
+if (game.player.encounteredNpc == null &&
+    game.player.currentCity == null) {
+  for (final npc in game.world.npcCaravans) {
+
+if (game.player.ignoredNpcs.contains(npc)) {
+  continue;
+}
+    if (npc.activeJourney == null) {
+      continue;
+    }
+
+    final npcX =
+        NpcTravelService.currentXSmooth(
+      npc,
+      _timeController.tickFraction,
+    );
+
+    final npcY =
+        NpcTravelService.currentYSmooth(
+      npc,
+      _timeController.tickFraction,
+    );
+
+    final dx = renderedX - npcX;
+    final dy = renderedY - npcY;
+
+    final distance = sqrt(
+      (dx * dx) + (dy * dy),
+    );
+
+if (distance < 25) {
+  game.player.encounteredNpc = npc;
+  game.player.ignoredNpcs.add(npc);
+  break;
+}
+  }
+}
+
 
   if (game.player.activeJourney != null &&
       _lastRenderedX != null &&
@@ -127,6 +319,8 @@ _renderController.addListener(() {
 game.player.currentCity = city;
 game.player.worldX = city.x;
 game.player.worldY = city.y;
+
+game.player.ignoredNpcs.clear();
 
 JourneyService.clearJourney(
   game.player,
@@ -328,6 +522,23 @@ if (!_playerWasInCity &&
             .tickFraction,
       ),
     );
+
+if (newSelection.isCity &&
+    game.player.currentCity == null) {
+  await WorldMapTravelService
+      .travelToCity(
+    context: context,
+    playerState: game.player,
+    city: newSelection.city!,
+    world: game.world,
+    timeController: _timeController,
+    onChanged: () {
+      setState(() {});
+    },
+  );
+
+  return;
+}
 
     if (newSelection.isLocation &&
         game.player.currentCity ==

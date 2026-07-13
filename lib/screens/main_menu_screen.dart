@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import '../data/game_data.dart';
 import '../core/save/save_service.dart';
 import '../core/world/time_service.dart';
+import '../core/combat/combat_encounter.dart';
+import '../core/models/caravan_faction.dart';
 
+import 'equipment_market_screen.dart';
 import 'animal_market_screen.dart';
 import 'caravan_screen.dart';
 import 'cartwright_screen.dart';
@@ -17,6 +20,7 @@ import 'recruitment_screen.dart';
 import 'vehicle_market_screen.dart';
 import 'vet_screen.dart';
 import 'world_map_screen.dart';
+import 'combat_screen.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({
@@ -249,6 +253,28 @@ class _MainMenuScreenState
                     ),
                   ),
 
+if (city?.equipmentMarketTier !=
+    null)
+  ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              EquipmentMarketScreen(
+            playerState:
+                game.player,
+          ),
+        ),
+      ).then(
+        (_) => setState(() {}),
+      );
+    },
+    child: const Text(
+      'Equipment Shop',
+    ),
+  ),
+
                 if (city?.hasVet ?? false)
                   ElevatedButton(
                     onPressed: () {
@@ -330,7 +356,36 @@ class _MainMenuScreenState
                     'Debug',
                   ),
                 ),
-
+ElevatedButton(
+  onPressed: () {
+    Navigator.push(
+      context,
+MaterialPageRoute(
+  builder: (_) => CombatScreen(
+    encounter: CombatEncounter(
+      attackers:
+          game.world
+              .npcCaravans
+              .first
+              .caravan,
+      defenders:
+          game.player.caravan,
+      attackerFaction:
+          game.world
+              .npcCaravans
+              .first
+              .faction,
+      defenderFaction:
+          CaravanFaction.merchant,
+    ),
+  ),
+),
+    );
+  },
+  child: const Text(
+    'Combat Debug',
+  ),
+),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(

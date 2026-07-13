@@ -12,6 +12,8 @@ import '../../core/models/animal.dart';
 import '../../core/models/caravan.dart';
 import '../../core/models/vehicle.dart';
 
+import 'character_screen.dart';
+
 class CaravanScreen extends StatefulWidget {
   final Caravan caravan;
 
@@ -202,16 +204,28 @@ class _CaravanScreenState
             height: 8,
           ),
 
-          CaravanCharacterTile(
-            caravan: caravan,
-            character:
-                caravan.leader,
-            role: 'Leader',
-            icon: Icons.person,
-            onChanged: () {
-              setState(() {});
-            },
-          ),
+GestureDetector(
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CharacterScreen(
+          character: caravan.leader,
+          caravan: caravan,
+        ),
+      ),
+    );
+  },
+  child: CaravanCharacterTile(
+    caravan: caravan,
+    character: caravan.leader,
+    role: 'Leader',
+    icon: Icons.person,
+    onChanged: () {
+      setState(() {});
+    },
+  ),
+),
 
           if (caravan
               .companions
@@ -228,21 +242,30 @@ class _CaravanScreenState
               ),
             ),
 
-          ...caravan.companions.map(
-            (companion) =>
-                CaravanCharacterTile(
-              caravan: caravan,
-              character:
-                  companion,
-              role:
-                  'Companion',
-              icon:
-                  Icons.people,
-              onChanged: () {
-                setState(() {});
-              },
-            ),
+...caravan.companions.map(
+  (companion) => GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => CharacterScreen(
+            character: companion,
+            caravan: caravan,
           ),
+        ),
+      );
+    },
+    child: CaravanCharacterTile(
+      caravan: caravan,
+      character: companion,
+      role: 'Companion',
+      icon: Icons.people,
+      onChanged: () {
+        setState(() {});
+      },
+    ),
+  ),
+),
 
           const SizedBox(
             height: 16,

@@ -111,7 +111,6 @@ class TimeService {
           endY: endY,
           city: city,
         )) {
-
           playerState.worldX = city.x;
           playerState.worldY = city.y;
 

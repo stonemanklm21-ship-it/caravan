@@ -27,6 +27,81 @@ class LocationService {
     return null;
   }
 
+  static City nearestCity({
+    required World world,
+    required double x,
+    required double y,
+  }) {
+    City? nearest;
+    double nearestDistance =
+        double.infinity;
+
+    for (final city in world.cities) {
+      final dx = city.x - x;
+      final dy = city.y - y;
+
+      final distance = sqrt(
+        (dx * dx) + (dy * dy),
+      );
+
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = city;
+      }
+    }
+
+    return nearest!;
+  }
+
+  static double segmentDistance({
+    required double startAX,
+    required double startAY,
+    required double endAX,
+    required double endAY,
+    required double startBX,
+    required double startBY,
+    required double endBX,
+    required double endBY,
+  }) {
+    double minDistance =
+        double.infinity;
+
+    const samples = 100;
+
+    for (int i = 0; i <= samples; i++) {
+      final t = i / samples;
+
+      final ax =
+          startAX +
+          ((endAX - startAX) * t);
+
+      final ay =
+          startAY +
+          ((endAY - startAY) * t);
+
+      final bx =
+          startBX +
+          ((endBX - startBX) * t);
+
+      final by =
+          startBY +
+          ((endBY - startBY) * t);
+
+      final dx = ax - bx;
+      final dy = ay - by;
+
+      final distance = sqrt(
+        (dx * dx) + (dy * dy),
+      );
+
+      if (distance < minDistance) {
+        minDistance = distance;
+      }
+    }
+
+    return minDistance;
+  }
+
   static bool segmentIntersectsCity({
     required double startX,
     required double startY,
@@ -34,7 +109,6 @@ class LocationService {
     required double endY,
     required City city,
   }) {
-    print('CITY HIT: ${city.name}');
     final dx = endX - startX;
     final dy = endY - startY;
 
