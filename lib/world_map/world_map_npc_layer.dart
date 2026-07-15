@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../core/models/npc_caravan.dart';
 import '../core/models/caravan_faction.dart';
+import '../core/world/visibility_service.dart';
+
 import 'world_map_camera.dart';
 import 'world_map_npc_marker.dart';
 
@@ -14,6 +16,10 @@ class WorldMapNpcLayer
   final WorldMapCamera camera;
 
   final Size viewportSize;
+
+  final double playerX;
+
+  final double playerY;
 
   final double Function(
     NpcCaravan npc,
@@ -29,6 +35,8 @@ class WorldMapNpcLayer
     required this.selectedNpcCaravan,
     required this.camera,
     required this.viewportSize,
+    required this.playerX,
+    required this.playerY,
     required this.getX,
     required this.getY,
   });
@@ -40,8 +48,23 @@ class WorldMapNpcLayer
     return Stack(
       children: npcCaravans
           .where(
-            (npc) =>
-                npc.activeJourney != null,
+            (npc) {
+              if (npc.activeJourney ==
+                  null) {
+                return false;
+              }
+
+              return VisibilityService
+                  .canSee(
+                observerX: playerX,
+                observerY: playerY,
+                targetX: getX(npc),
+                targetY: getY(npc),
+                range:
+                    VisibilityService
+                        .caravanVisionRange,
+              );
+            },
           )
           .map(
             (npc) {
@@ -98,16 +121,18 @@ class WorldMapNpcLayer
                             ),
                           ),
                         ),
-WorldMapNpcMarker(
-  zoom: camera.zoom,
-  color: npc ==
-          selectedNpcCaravan
-      ? Colors.blue
-      : npc.faction ==
-              CaravanFaction.bandit
-          ? Colors.red
-          : Colors.orange,
-),
+                      WorldMapNpcMarker(
+                        zoom:
+                            camera.zoom,
+                        color: npc ==
+                                selectedNpcCaravan
+                            ? Colors.blue
+                            : npc.faction ==
+                                    CaravanFaction
+                                        .bandit
+                                ? Colors.red
+                                : Colors.orange,
+                      ),
                     ],
                   ),
                 ),

@@ -5,6 +5,7 @@ import '../../data/helmet_data.dart';
 import '../../data/industry_data.dart';
 import '../../data/vehicle_data.dart';
 import '../../data/weapon_data.dart';
+import '../../data/region_data.dart';
 
 import 'animal.dart';
 import 'city.dart';
@@ -19,10 +20,14 @@ class World {
 
   final List<NpcCaravan> npcCaravans;
 
+  final List<NpcCaravan> caravansToRemove;
+
   World({
     required this.cities,
     required this.npcCaravans,
-  });
+    List<NpcCaravan>? caravansToRemove,
+  }) : caravansToRemove =
+           caravansToRemove ?? [];
 
   Map<String, dynamic> toJson() {
     return {
@@ -48,8 +53,11 @@ class World {
         (json['cities'] as List)
             .map(
               (cityJson) => City.fromJson(
-                json: cityJson
-                    as Map<String, dynamic>,
+                json:
+                    cityJson
+                        as Map<String, dynamic>,
+                regionForId:
+                    regionForId,
                 industryFromJson:
                     (industryJson) =>
                         Industry.fromJson(
@@ -128,6 +136,7 @@ class World {
     world = World(
       cities: cities,
       npcCaravans: [],
+      caravansToRemove: [],
     );
 
     final npcCaravans =
@@ -145,6 +154,7 @@ class World {
     return World(
       cities: cities,
       npcCaravans: npcCaravans,
+      caravansToRemove: [],
     );
   }
 }

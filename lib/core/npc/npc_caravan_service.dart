@@ -10,10 +10,10 @@ import 'npc_caravan_supply_service.dart';
 import 'npc_market_observation_service.dart';
 import 'npc_trading_service.dart';
 import 'npc_travel_service.dart';
+import '../bandits/bandit_caravan_service.dart';
+import '../models/caravan_faction.dart';
 
 class NpcCaravanService {
-  static final Random _random =
-      Random();
 
   static void clearMission(
     NpcCaravan npc,
@@ -319,17 +319,38 @@ class NpcCaravanService {
     }
   }
 
-  static void advanceAll({
-    required World world,
-    required double hours,
-  }) {
-    for (final npc
-        in world.npcCaravans) {
-      advanceTime(
+static void advanceAll({
+  required World world,
+  required double hours,
+}) {
+  for (final npc
+      in world.npcCaravans) {
+    if (npc.faction ==
+        CaravanFaction.bandit) {
+      BanditCaravanService
+          .advanceTime(
         npc: npc,
         world: world,
         hours: hours,
       );
+
+      continue;
     }
+
+    advanceTime(
+      npc: npc,
+      world: world,
+      hours: hours,
+    );
   }
+
+  for (final npc
+      in world.caravansToRemove) {
+    world.npcCaravans.remove(
+      npc,
+    );
+  }
+
+  world.caravansToRemove.clear();
+}
 }

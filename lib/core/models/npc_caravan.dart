@@ -1,8 +1,5 @@
 import '../../data/animal_data.dart';
-import '../../data/armour_data.dart';
-import '../../data/helmet_data.dart';
 import '../../data/vehicle_data.dart';
-import '../../data/weapon_data.dart';
 
 import '../economy/market_ledger.dart';
 import '../travel/active_journey.dart';
@@ -11,6 +8,7 @@ import 'animal.dart';
 import 'caravan.dart';
 import 'caravan_faction.dart';
 import 'city.dart';
+import 'region.dart';
 import 'trade_mission.dart';
 import 'vehicle.dart';
 import 'world.dart';
@@ -28,6 +26,8 @@ class NpcCaravan {
 
   City? currentCity;
 
+  Region? homeRegion;
+
   double idleHoursRemaining;
 
   Caravan caravan;
@@ -41,6 +41,7 @@ class NpcCaravan {
   String lastDecision;
 
   TradeMission? activeMission;
+  NpcCaravan? followTarget;
 
   CaravanState state;
 
@@ -51,10 +52,12 @@ class NpcCaravan {
     required this.caravan,
     required this.faction,
     required this.ledger,
+    this.homeRegion,
     this.idleHoursRemaining = 0,
     this.activeJourney,
     this.lastDecision = 'None',
     this.activeMission,
+    this.followTarget,
     this.state = CaravanState.idle,
   });
 
@@ -63,6 +66,7 @@ class NpcCaravan {
       'worldX': worldX,
       'worldY': worldY,
       'currentCity': currentCity?.id,
+      'homeRegion': homeRegion?.id,
       'caravan': caravan.toJson(),
       'faction': faction.name,
       'ledger': ledger.toJson(),
@@ -70,8 +74,6 @@ class NpcCaravan {
       'lastDecision': lastDecision,
       'state': state.name,
 
-      // Mission persistence can be added later
-      // 'activeMission': activeMission?.toJson(),
     };
   }
 
@@ -90,6 +92,21 @@ class NpcCaravan {
       );
     }
 
+    Region? homeRegion;
+
+    final homeRegionId =
+        json['homeRegion'] as String?;
+
+    if (homeRegionId != null) {
+      homeRegion = world.cities
+          .firstWhere(
+            (city) =>
+                city.region.id ==
+                homeRegionId,
+          )
+          .region;
+    }
+
     return NpcCaravan(
       worldX:
           (json['worldX'] as num)
@@ -98,6 +115,7 @@ class NpcCaravan {
           (json['worldY'] as num)
               .toDouble(),
       currentCity: currentCity,
+      homeRegion: homeRegion,
       caravan: Caravan.fromJson(
         json:
             json['caravan']
@@ -156,7 +174,6 @@ class NpcCaravan {
             CaravanState.idle,
       ),
 
-      // Mission loading can be added later
       activeMission: null,
     );
   }

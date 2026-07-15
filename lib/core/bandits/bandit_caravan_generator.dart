@@ -40,6 +40,7 @@ class BanditCaravanGenerator {
           worldX: city.x,
           worldY: city.y,
           currentCity: city,
+          homeRegion: city.region,
           caravan:
               _buildBanditCaravan(
             template,

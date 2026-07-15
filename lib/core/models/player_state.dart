@@ -38,8 +38,13 @@ class PlayerState {
   /// Temporary encounter currently being handled.
   /// Not saved.
   NpcCaravan? encounteredNpc;
- final Set<NpcCaravan> ignoredNpcs = {};
-  
+
+  /// Caravan currently being followed.
+  /// Not saved.
+  NpcCaravan? followTarget;
+
+  final Set<NpcCaravan> ignoredNpcs = {};
+
   PlayerState({
     required this.worldTimeHours,
     required this.worldX,
@@ -50,6 +55,7 @@ class PlayerState {
     required this.ledger,
     this.activeJourney,
     this.encounteredNpc,
+    this.followTarget,
   });
 
   int get day => (worldTimeHours ~/ 24) + 1;

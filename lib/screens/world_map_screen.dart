@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../core/npc/npc_travel_service.dart';
 import '../core/travel/journey_service.dart';
+import '../core/travel/player_follow_service.dart';
 import '../core/world/time_controller.dart';
 import '../core/world/location_service.dart';
 import '../data/cities_data.dart';
@@ -23,6 +24,7 @@ import '../screens/npc_trade_screen.dart';
 import '../core/models/caravan_faction.dart';
 import '../core/combat/combat_encounter.dart';
 import '../screens/combat_screen.dart';
+import '../core/world/visibility_service.dart';
 
 class WorldMapScreen extends StatefulWidget {
   const WorldMapScreen({
@@ -101,6 +103,11 @@ _renderController.addListener(() {
   if (!mounted) {
     return;
   }
+PlayerFollowService.update(
+  player: game.player,
+  tickFraction:
+      _timeController.tickFraction,
+);
 if (game.player.encounteredNpc != null 
 &&
     !_encounterActive
@@ -320,6 +327,8 @@ game.player.currentCity = city;
 game.player.worldX = city.x;
 game.player.worldY = city.y;
 
+game.player.followTarget = null;
+
 game.player.ignoredNpcs.clear();
 
 JourneyService.clearJourney(
@@ -502,6 +511,8 @@ if (!_playerWasInCity &&
     final newSelection =
         WorldMapSelectionController
             .selectionFromWorldPosition(
+
+              
       worldX: worldPosition.dx,
       worldY: worldPosition.dy,
       cities: cities,
@@ -522,7 +533,9 @@ if (!_playerWasInCity &&
             .tickFraction,
       ),
     );
-
+if (!newSelection.isNpcCaravan) {
+  game.player.followTarget = null;
+}
 if (newSelection.isCity &&
     game.player.currentCity == null) {
   await WorldMapTravelService
@@ -627,29 +640,38 @@ if (newSelection.isCity &&
                           viewportSize,
                     ),
 
-                    WorldMapNpcLayer(
-                      npcCaravans: game
-                          .world
-                          .npcCaravans,
-                      selectedNpcCaravan:
-                          selection
-                              .npcCaravan,
-                      camera: camera,
-                      viewportSize:
-                          viewportSize,
-                      getX: (npc) =>
-                          NpcTravelService
-                              .currentXSmooth(
-                        npc,
-                        tickFraction,
-                      ),
-                      getY: (npc) =>
-                          NpcTravelService
-                              .currentYSmooth(
-                        npc,
-                        tickFraction,
-                      ),
-                    ),
+WorldMapNpcLayer(
+  npcCaravans:
+      game.world.npcCaravans,
+  selectedNpcCaravan:
+      selection.npcCaravan,
+  camera: camera,
+  viewportSize:
+      viewportSize,
+  playerX:
+      JourneyService.currentXSmooth(
+    game.player,
+    tickFraction,
+  ),
+  playerY:
+      JourneyService.currentYSmooth(
+    game.player,
+    tickFraction,
+  ),
+  getX: (npc) =>
+      NpcTravelService
+          .currentXSmooth(
+    npc,
+    tickFraction,
+  ),
+  getY: (npc) =>
+      NpcTravelService
+          .currentYSmooth(
+    npc,
+    tickFraction,
+  ),
+),
+
 
 WorldMapPlayerLayer(
   playerX:
@@ -713,9 +735,12 @@ WorldMapPlayerLayer(
                             'Merchant Caravan',
                         actionText:
                             'Follow',
-                        onAction: () {
-                          // TODO
-                        },
+                        
+onAction: () {
+  game.player.followTarget =
+      selection.npcCaravan;
+}
+,
                       ),
 
                     if (selection

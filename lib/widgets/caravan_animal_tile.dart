@@ -4,7 +4,6 @@ import '../../core/caravan/animal_service.dart';
 import '../../core/caravan/caravan_service.dart';
 import '../../core/models/animal.dart';
 import '../../core/models/caravan.dart';
-import '../../core/models/character.dart';
 import '../../core/models/vehicle.dart';
 import '../../core/world/calendar_service.dart';
 

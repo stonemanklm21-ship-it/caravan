@@ -2,6 +2,7 @@ import 'dart:math';
 
 import '../models/city.dart';
 import '../models/npc_caravan.dart';
+import '../models/caravan_faction.dart';
 import '../travel/active_journey.dart';
 
 class NpcTravelService {
@@ -30,10 +31,17 @@ class NpcTravelService {
       (dx * dx) + (dy * dy),
     );
 
+    double speed =
+        npc.caravan.speed;
+
+    if (npc.faction ==
+        CaravanFaction.bandit) {
+      speed *= 0.8;
+    }
+
     final travelDays =
         distance /
-        (mapUnitsPerDay *
-            npc.caravan.speed);
+        (mapUnitsPerDay * speed);
 
     final travelHours =
         travelDays * 24;
@@ -47,6 +55,59 @@ class NpcTravelService {
           destination.y,
       destinationCity:
           destination,
+      totalHours:
+          travelHours,
+    );
+
+    npc.currentCity = null;
+  }
+
+  static void startJourneyToCoordinates({
+    required NpcCaravan npc,
+    required double destinationX,
+    required double destinationY,
+    double? originX,
+    double? originY,
+  }) {
+    final startX =
+        originX ?? npc.worldX;
+
+    final startY =
+        originY ?? npc.worldY;
+
+    final dx =
+        destinationX - startX;
+
+    final dy =
+        destinationY - startY;
+
+    final distance = sqrt(
+      (dx * dx) + (dy * dy),
+    );
+
+    double speed =
+        npc.caravan.speed;
+
+    if (npc.faction ==
+        CaravanFaction.bandit) {
+      speed *= 0.8;
+    }
+
+    final travelDays =
+        distance /
+        (mapUnitsPerDay * speed);
+
+    final travelHours =
+        travelDays * 24;
+
+    npc.activeJourney = ActiveJourney(
+      originX: startX,
+      originY: startY,
+      destinationX:
+          destinationX,
+      destinationY:
+          destinationY,
+      destinationCity: null,
       totalHours:
           travelHours,
     );

@@ -22,7 +22,7 @@ class _CombatScreenState
   final List<String> log = [];
 
   int roundNumber = 0;
-
+  bool rewardsGranted = false;
   bool get playerDefeated =>
       CombatService.combatants(
         widget.encounter.defenders,
@@ -85,11 +85,26 @@ class _CombatScreenState
         );
       }
 
-      if (enemyDefeated) {
-        log.add(
-          'Victory!',
-        );
-      }
+if (enemyDefeated && !rewardsGranted) {
+  
+rewardsGranted = true;
+
+  final goldWon =
+      widget.encounter.attackers.gold;
+
+  widget.encounter.defenders.gold +=
+      goldWon;
+
+  widget.encounter.attackers.gold = 0;
+
+  log.add(
+    'Victory!',
+  );
+
+  log.add(
+    'Looted ${goldWon.toStringAsFixed(0)} gold.',
+  );
+}
 
       if (playerDefeated) {
         log.add(

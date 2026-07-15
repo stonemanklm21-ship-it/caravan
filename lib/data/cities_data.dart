@@ -7,10 +7,12 @@ import '../core/models/market_good.dart';
 
 import 'goods_data.dart';
 import 'industry_data.dart';
+import 'region_data.dart';
 
 final farmingVillage = City(
   id: 'farming_village',
   name: 'Farming Village',
+   region: heartlands,
   x: 100,
   y: 100,
   population: 1000,
@@ -67,6 +69,7 @@ final farmingVillage = City(
 final miningTown = City(
   id: 'mining_town',
   name: 'Mining Town',
+   region: heartlands,
   x: 320,
   y: 250,
   population: 2000,
@@ -137,6 +140,7 @@ final miningTown = City(
 final forestCamp = City(
   id: 'forest_camp',
   name: 'Forest Camp',
+   region: heartlands,
   x: 220,
   y: 50,
   population: 600,

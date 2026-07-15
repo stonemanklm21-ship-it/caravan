@@ -11,11 +11,14 @@ import 'market_good.dart';
 import 'recruit.dart';
 import 'vehicle.dart';
 import 'weapon.dart';
+import 'region.dart';
 
 class City {
   final String id;
 
   final String name;
+
+  final Region region;
 
   final double x;
 
@@ -67,6 +70,7 @@ class City {
   City({
     required this.id,
     required this.name,
+    required this.region,
     required this.x,
     required this.y,
     required this.population,
@@ -121,6 +125,7 @@ class City {
     return {
       'id': id,
       'name': name,
+      'region': region.id,
       'x': x,
       'y': y,
       'population': population,
@@ -207,9 +212,15 @@ class City {
   factory City.fromJson({
     required Map<String, dynamic>
         json,
+
+    required Region Function(
+  String id,
+)
+regionForId,
     required Industry Function(
       Map<String, dynamic> json,
     )
+    
     industryFromJson,
     required MarketGood Function(
       Map<String, dynamic> json,
@@ -247,6 +258,9 @@ class City {
     return City(
       id: json['id'] as String,
       name: json['name'] as String,
+      region: regionForId(
+  json['region'] as String,
+),
       x:
           (json['x'] as num)
               .toDouble(),
