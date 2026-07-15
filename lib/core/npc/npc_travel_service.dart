@@ -7,7 +7,7 @@ import '../travel/active_journey.dart';
 
 class NpcTravelService {
   static const double mapUnitsPerDay =
-      500;
+      250;
 
   static void startJourney({
     required NpcCaravan npc,
