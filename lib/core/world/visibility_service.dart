@@ -2,8 +2,8 @@ import 'dart:math';
 
 class VisibilityService {
   
-  static const double caravanVisionRange = 300.0;
-  static const double banditVisionRange = 40.0;
+  static const double caravanVisionRange = 5000.0;
+  static const double banditVisionRange = 100.0;
 
   static bool canSee({
     required double observerX,

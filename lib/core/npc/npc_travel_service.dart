@@ -36,7 +36,7 @@ class NpcTravelService {
 
     if (npc.faction ==
         CaravanFaction.bandit) {
-      speed *= 0.8;
+      speed *= 0.95;
     }
 
     final travelDays =
@@ -112,6 +112,64 @@ class NpcTravelService {
           travelHours,
     );
 
+    npc.currentCity = null;
+  }
+
+static void moveTowardsCoordinates({
+    required NpcCaravan npc,
+    required double destinationX,
+    required double destinationY,
+    required double hours,
+  }) {
+    final currentX =
+        NpcTravelService.currentX(
+      npc,
+    );
+
+    final currentY =
+        NpcTravelService.currentY(
+      npc,
+    );
+
+    final dx =
+        destinationX - currentX;
+
+    final dy =
+        destinationY - currentY;
+
+    final distance = sqrt(
+      (dx * dx) + (dy * dy),
+    );
+
+    if (distance <= 0) {
+      return;
+    }
+
+    double speed =
+        npc.caravan.speed;
+
+    if (npc.faction ==
+        CaravanFaction.bandit) {
+      speed *= 0.8;
+    }
+
+    final movementDistance =
+        mapUnitsPerDay *
+        speed *
+        (hours / 24);
+
+    final ratio =
+        (movementDistance /
+                distance)
+            .clamp(0.0, 1.0);
+
+    npc.worldX =
+        currentX + (dx * ratio);
+
+    npc.worldY =
+        currentY + (dy * ratio);
+
+    npc.activeJourney = null;
     npc.currentCity = null;
   }
 

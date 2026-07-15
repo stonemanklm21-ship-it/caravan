@@ -4,6 +4,8 @@ import '../models/world.dart';
 import '../npc/npc_travel_service.dart';
 import '../world/visibility_service.dart';
 
+import 'bandit_city_service.dart';
+
 class BanditTargetService {
   static NpcCaravan? findTarget({
     required NpcCaravan bandit,
@@ -22,6 +24,21 @@ class BanditTargetService {
 
       if (other.faction !=
           CaravanFaction.merchant) {
+        continue;
+      }
+
+      if (BanditCityService
+          .isInsideSafeZone(
+        x:
+            NpcTravelService.currentX(
+          other,
+        ),
+        y:
+            NpcTravelService.currentY(
+          other,
+        ),
+        world: world,
+      )) {
         continue;
       }
 

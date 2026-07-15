@@ -3,6 +3,8 @@ import '../models/world.dart';
 import '../npc/npc_travel_service.dart';
 import '../world/visibility_service.dart';
 
+import 'bandit_city_service.dart';
+
 class BanditPursuitService {
   static const double captureRange =
       25;
@@ -19,6 +21,27 @@ class BanditPursuitService {
       return false;
     }
 
+    final targetX =
+        NpcTravelService.currentX(
+      target,
+    );
+
+    final targetY =
+        NpcTravelService.currentY(
+      target,
+    );
+
+    if (BanditCityService
+        .isInsideSafeZone(
+      x: targetX,
+      y: targetY,
+      world: world,
+    )) {
+      npc.followTarget = null;
+
+      return false;
+    }
+
     final distance =
         VisibilityService.distance(
       x1:
@@ -29,15 +52,18 @@ class BanditPursuitService {
           NpcTravelService.currentY(
         npc,
       ),
-      x2:
-          NpcTravelService.currentX(
-        target,
-      ),
-      y2:
-          NpcTravelService.currentY(
-        target,
-      ),
+      x2: targetX,
+      y2: targetY,
     );
+
+    if (distance >
+        VisibilityService
+                .banditVisionRange *
+            1.2) {
+      npc.followTarget = null;
+
+      return false;
+    }
 
     if (distance <=
         captureRange) {
@@ -47,32 +73,24 @@ class BanditPursuitService {
 
       npc.followTarget = null;
 
-      print(
-        'Merchant captured',
-      );
-
       return false;
     }
-
-    if (npc.activeJourney != null) {
-      return false;
-    }
-
-    print('Starting pursuit');
 
     NpcTravelService
         .startJourneyToCoordinates(
       npc: npc,
-      destinationX:
+      destinationX: targetX,
+      destinationY: targetY,
+      originX:
           NpcTravelService.currentX(
-        target,
+        npc,
       ),
-      destinationY:
+      originY:
           NpcTravelService.currentY(
-        target,
+        npc,
       ),
     );
 
-    return false;
+    return true;
   }
 }

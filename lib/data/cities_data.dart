@@ -70,8 +70,8 @@ final miningTown = City(
   id: 'mining_town',
   name: 'Mining Town',
    region: heartlands,
-  x: 320,
-  y: 250,
+  x: 350,
+  y: 50,
   population: 2000,
   industries: [
     Industry(
@@ -141,8 +141,8 @@ final forestCamp = City(
   id: 'forest_camp',
   name: 'Forest Camp',
    region: heartlands,
-  x: 220,
-  y: 50,
+  x: 600,
+  y: 350,
   population: 600,
   industries: [
     Industry(

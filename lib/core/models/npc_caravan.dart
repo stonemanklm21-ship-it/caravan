@@ -12,11 +12,13 @@ import 'region.dart';
 import 'trade_mission.dart';
 import 'vehicle.dart';
 import 'world.dart';
-
 enum CaravanState {
   idle,
   travelling,
   selling,
+
+  roaming,
+  pursuing,
 }
 
 class NpcCaravan {
@@ -41,6 +43,7 @@ class NpcCaravan {
   String lastDecision;
 
   TradeMission? activeMission;
+
   NpcCaravan? followTarget;
 
   CaravanState state;
@@ -73,7 +76,6 @@ class NpcCaravan {
       'activeJourney': activeJourney?.toJson(),
       'lastDecision': lastDecision,
       'state': state.name,
-
     };
   }
 
@@ -127,12 +129,14 @@ class NpcCaravan {
               animalTypeForId,
         ),
         vehicleFromJson:
-            (vehicleJson) => Vehicle.fromJson(
+            (vehicleJson) =>
+                Vehicle.fromJson(
           json: vehicleJson,
           vehicleTypeForId:
               vehicleTypeForId,
           animalFromJson:
-              (animalJson) => Animal.fromJson(
+              (animalJson) =>
+                  Animal.fromJson(
             json: animalJson,
             animalTypeForId:
                 animalTypeForId,
@@ -144,10 +148,10 @@ class NpcCaravan {
               ? CaravanFaction.merchant
               : CaravanFaction.values
                     .firstWhere(
-                    (faction) =>
-                        faction.name ==
-                        json['faction'],
-                  ),
+                  (faction) =>
+                      faction.name ==
+                          json['faction'],
+                ),
       ledger: MarketLedger.fromJson(
         json['ledger']
             as Map<String, dynamic>,
@@ -173,7 +177,6 @@ class NpcCaravan {
         orElse: () =>
             CaravanState.idle,
       ),
-
       activeMission: null,
     );
   }

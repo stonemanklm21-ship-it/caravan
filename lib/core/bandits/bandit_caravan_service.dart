@@ -18,43 +18,73 @@ class BanditCaravanService {
         hours: hours,
       );
 
-      if (!npc.activeJourney!
+      if (npc.activeJourney!
           .completed) {
-        return;
+        NpcTravelService.arrive(
+          npc: npc,
+        );
       }
-
-      NpcTravelService.arrive(
-        npc: npc,
-      );
     }
 
-    final target =
-        BanditTargetService
-            .findTarget(
-      bandit: npc,
-      world: world,
-    );
+    switch (npc.state) {
+      case CaravanState.roaming:
+        final target =
+            BanditTargetService
+                .findTarget(
+          bandit: npc,
+          world: world,
+        );
 
-    if (target != null &&
-        npc.followTarget == null) {
-      print('Target acquired');
+        if (target != null) {
+          npc.followTarget = target;
 
-      npc.followTarget = target;
-    }
+          npc.state =
+              CaravanState.pursuing;
 
-    BanditPursuitService
-        .handlePursuit(
-      npc: npc,
-      world: world,
-      hours: hours,
-    );
+          // Start pursuit immediately so
+          // we don't spend a tick in a
+          // pursuing state with no journey.
+          BanditPursuitService
+              .handlePursuit(
+            npc: npc,
+            world: world,
+            hours: hours,
+          );
 
-    if (npc.activeJourney == null) {
-      BanditRoamingService
-          .startRoaming(
-        npc: npc,
-        world: world,
-      );
+          break;
+        }
+
+        if (npc.activeJourney ==
+            null) {
+          BanditRoamingService
+              .startRoaming(
+            npc: npc,
+            world: world,
+          );
+        }
+
+        break;
+
+      case CaravanState.pursuing:
+        final pursuing =
+            BanditPursuitService
+                .handlePursuit(
+          npc: npc,
+          world: world,
+          hours: hours,
+        );
+
+        if (!pursuing) {
+          npc.followTarget = null;
+
+          npc.state =
+              CaravanState.roaming;
+        }
+
+        break;
+
+      default:
+        break;
     }
   }
 }

@@ -49,7 +49,12 @@ class BanditCaravanGenerator {
               CaravanFaction.bandit,
           ledger: MarketLedger(
             observations: [],
+            
           ),
+          
+ state:
+      CaravanState.roaming,
+
         );
       },
     );

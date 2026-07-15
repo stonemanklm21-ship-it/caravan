@@ -14,7 +14,6 @@ import '../bandits/bandit_caravan_service.dart';
 import '../models/caravan_faction.dart';
 
 class NpcCaravanService {
-
   static void clearMission(
     NpcCaravan npc,
   ) {
@@ -316,41 +315,45 @@ class NpcCaravanService {
         );
 
         break;
+
+        case CaravanState.roaming:
+case CaravanState.pursuing:
+  break;
     }
   }
 
-static void advanceAll({
-  required World world,
-  required double hours,
-}) {
-  for (final npc
-      in world.npcCaravans) {
-    if (npc.faction ==
-        CaravanFaction.bandit) {
-      BanditCaravanService
-          .advanceTime(
+  static void advanceAll({
+    required World world,
+    required double hours,
+  }) {
+    for (final npc
+        in world.npcCaravans) {
+      if (npc.faction ==
+          CaravanFaction.bandit) {
+        BanditCaravanService
+            .advanceTime(
+          npc: npc,
+          world: world,
+          hours: hours,
+        );
+
+        continue;
+      }
+
+      advanceTime(
         npc: npc,
         world: world,
         hours: hours,
       );
-
-      continue;
     }
 
-    advanceTime(
-      npc: npc,
-      world: world,
-      hours: hours,
-    );
-  }
+    for (final npc
+        in world.caravansToRemove) {
+      world.npcCaravans.remove(
+        npc,
+      );
+    }
 
-  for (final npc
-      in world.caravansToRemove) {
-    world.npcCaravans.remove(
-      npc,
-    );
+    world.caravansToRemove.clear();
   }
-
-  world.caravansToRemove.clear();
-}
 }

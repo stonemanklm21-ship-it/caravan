@@ -217,7 +217,6 @@ Navigator.push<bool>(
               TextButton(
 onPressed: () {
 game.player.ignoredNpcs.add(npc);
-print('IGNORING NPC');
   game.player.encounteredNpc = null;
 
   _encounterActive = false;
@@ -354,8 +353,6 @@ if (!_playerWasInCity &&
 
   Future.microtask(() {
     if (mounted) {
-
-      print('POPPING MAP');
       
       Navigator.of(context).pop();
     }
