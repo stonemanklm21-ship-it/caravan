@@ -1,0 +1,5 @@
+﻿id,name,companions,donkeys,horses,ox,camels,smallCarts,carts,largeCarts,minGold,maxGold,weight
+peddler,Peddler,1,1,0,0,0,0,0,0,1000,2000,50
+trader,Trader,2,2,0,0,0,0,0,0,2000,4000,30
+merchant,Merchant,3,0,2,0,0,0,1,0,4000,8000,15
+caravanCompany,Caravan Company,5,0,4,2,0,0,2,1,8000,15000,5

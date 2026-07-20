@@ -21,15 +21,11 @@ class BanditPursuitService {
       return false;
     }
 
-    final targetX =
-        NpcTravelService.currentX(
-      target,
-    );
+final targetX =
+    target.smoothX;
 
-    final targetY =
-        NpcTravelService.currentY(
-      target,
-    );
+final targetY =
+    target.smoothY;
 
     if (BanditCityService
         .isInsideSafeZone(
@@ -67,9 +63,11 @@ class BanditPursuitService {
 
     if (distance <=
         captureRange) {
-      world.caravansToRemove.add(
-        target,
-      );
+      if (target is NpcCaravan) {
+        world.caravansToRemove.add(
+          target,
+        );
+      }
 
       npc.followTarget = null;
 

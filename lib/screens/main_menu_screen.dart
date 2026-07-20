@@ -21,6 +21,7 @@ import 'vehicle_market_screen.dart';
 import 'vet_screen.dart';
 import 'world_map_screen.dart';
 import 'combat_screen.dart';
+import 'city_residents_screen.dart';
 
 class MainMenuScreen extends StatefulWidget {
   const MainMenuScreen({
@@ -203,6 +204,24 @@ class _MainMenuScreenState
                   ),
                 ),
 
+if (city != null)
+  ElevatedButton(
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) =>
+              const CityResidentsScreen(),
+        ),
+      ).then(
+        (_) => setState(() {}),
+      );
+    },
+    child: const Text(
+      'Residents',
+    ),
+  ),
+  
                 if (city?.animalMarketTier !=
                     null)
                   ElevatedButton(

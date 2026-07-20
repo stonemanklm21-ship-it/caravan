@@ -1,0 +1,5 @@
+﻿id,variableName,name,protection,weightKg,basePrice
+cloth_cap,clothCap,Cloth Cap,2,0.1,1000
+leather_cap,leatherCap,Leather Cap,8,0.2,1500
+iron_helmet,ironHelmet,Iron Helmet,14,0.5,1750
+great_helm,greatHelm,Great Helm,22,0.8,2500

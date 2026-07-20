@@ -7,7 +7,7 @@ import '../travel/active_journey.dart';
 
 class JourneyService {
   static const double mapUnitsPerDay =
-      500;
+      250;
 
   static ActiveJourney startJourney({
     required PlayerState playerState,

@@ -1,0 +1,5 @@
+﻿id,variableName,name,protection,weightKg,basePrice
+padded_armour,paddedArmour,Padded Armour,5,0.6,1000
+leather_armour,leatherArmour,Leather Armour,8,0.8,1500
+chainmail,chainmail,Chainmail,12,1,2500
+plate_armour,plateArmour,Plate Armour,15,1.2,5000

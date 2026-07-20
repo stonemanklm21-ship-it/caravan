@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../core/city/recruitment_service.dart';
+import '../core/models/character_portrait.dart';
 import '../core/models/player_state.dart';
 import '../core/models/recruit.dart';
 
-class RecruitmentScreen
-    extends StatefulWidget {
+class RecruitmentScreen extends StatefulWidget {
   final PlayerState playerState;
 
   const RecruitmentScreen({
@@ -14,9 +14,8 @@ class RecruitmentScreen
   });
 
   @override
-  State<RecruitmentScreen>
-      createState() =>
-          _RecruitmentScreenState();
+  State<RecruitmentScreen> createState() =>
+      _RecruitmentScreenState();
 }
 
 class _RecruitmentScreenState
@@ -33,10 +32,9 @@ class _RecruitmentScreenState
           widget.playerState.currentCity!,
       tier:
           RecruitmentMarketTier.basic,
-      currentHour:
-          widget.playerState
-              .worldTimeHours
-              .floor(),
+      currentHour: widget
+          .playerState.worldTimeHours
+          .floor(),
     );
   }
 
@@ -44,22 +42,17 @@ class _RecruitmentScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Recruitment Hall',
-        ),
+        title:
+            const Text('Recruitment Hall'),
       ),
       body: ListView.builder(
         itemCount: recruits.length,
-        itemBuilder:
-            (context, index) {
-          final recruit =
-              recruits[index];
-
+        itemBuilder: (context, index) {
+          final recruit = recruits[index];
           final character =
               recruit.character;
 
-          final canHire =
-              widget
+          final canHire = widget
                   .playerState
                   .caravan
                   .gold >=
@@ -71,57 +64,94 @@ class _RecruitmentScreenState
               horizontal: 12,
               vertical: 6,
             ),
-            child: ListTile(
-              title: Text(
-                '${character.name} (${character.ageYears})',
-              ),
-              subtitle: Column(
+            child: Padding(
+              padding:
+                  const EdgeInsets.all(12),
+              child: Row(
                 crossAxisAlignment:
-                    CrossAxisAlignment
-                        .start,
+                    CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '🩺${character.doctorSkill}  '
-                    '🐴${character.vetSkill}  '
-                    '🔧${character.mechanicSkill}  '
-                    '👁️${character.scoutSkill}  '
-                    '⚔️${character.combatSkill}',
+                  CharacterPortrait(
+                    seed:
+                        character.id.hashCode,
+                    size: 96,
                   ),
-                  Text(
-                    '🏃 ${character.speed.toStringAsFixed(1)} km/h',
+
+                  const SizedBox(
+                    width: 12,
                   ),
-                  Text(
-                    'HP: '
-                    '${character.hp.toStringAsFixed(0)}'
-                    ' / '
-                    '${character.maxHp.toStringAsFixed(0)}',
+
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                          CrossAxisAlignment
+                              .start,
+                      children: [
+                        Text(
+                          '${character.name} (${character.ageYears})',
+                          style:
+                              Theme.of(context)
+                                  .textTheme
+                                  .titleMedium,
+                        ),
+
+                        const SizedBox(
+                          height: 4,
+                        ),
+
+                        Text(
+                          '🩺${character.doctorSkill}  '
+                          '🐴${character.vetSkill}  '
+                          '🔧${character.mechanicSkill}  '
+                          '👁️${character.scoutSkill}  '
+                          '⚔️${character.combatSkill}',
+                        ),
+
+                        Text(
+                          '🏃 ${character.speed.toStringAsFixed(1)} km/h',
+                        ),
+
+                        Text(
+                          'HP: '
+                          '${character.hp.toStringAsFixed(0)}'
+                          ' / '
+                          '${character.maxHp.toStringAsFixed(0)}',
+                        ),
+
+                        Text(
+                          '📦 '
+                          '${character.cargoCapacityKg.toStringAsFixed(1)} kg',
+                        ),
+
+                        Text(
+                          '🍖 '
+                          '${character.caloriesPerDay.toStringAsFixed(0)} / day',
+                        ),
+
+                        Text(
+                          '💧 '
+                          '${character.waterPerDay.toStringAsFixed(1)} / day',
+                        ),
+
+                        Text(
+                          '💰 Wage: '
+                          '${character.wagePerDay.toStringAsFixed(0)} / day',
+                        ),
+
+                        Text(
+                          '🏷️ Hire: '
+                          '${recruit.hiringCost.toStringAsFixed(0)}',
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    '📦 '
-                    '${character.cargoCapacityKg.toStringAsFixed(1)} kg',
+
+                  const SizedBox(
+                    width: 12,
                   ),
-                  Text(
-                    '🍖 '
-                    '${character.caloriesPerDay.toStringAsFixed(0)} / day',
-                  ),
-                  Text(
-                    '💧 '
-                    '${character.waterPerDay.toStringAsFixed(1)} / day',
-                  ),
-                  Text(
-                    '💰 Wage: '
-                    '${character.wagePerDay.toStringAsFixed(0)} / day',
-                  ),
-                  Text(
-                    '🏷️ Hire: '
-                    '${recruit.hiringCost.toStringAsFixed(0)}',
-                  ),
-                ],
-              ),
-              trailing:
+
                   ElevatedButton(
-                onPressed:
-                    canHire
+                    onPressed: canHire
                         ? () {
                             setState(() {
                               widget
@@ -147,9 +177,10 @@ class _RecruitmentScreenState
                             });
                           }
                         : null,
-                child: const Text(
-                  'Hire',
-                ),
+                    child:
+                        const Text('Hire'),
+                  ),
+                ],
               ),
             ),
           );

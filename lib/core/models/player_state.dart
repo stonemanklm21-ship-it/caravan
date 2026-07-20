@@ -1,16 +1,20 @@
 import '../../data/animal_data.dart';
 import '../../data/vehicle_data.dart';
 
-import 'world.dart';
+import '../bandits/bandit_target.dart';
+import '../economy/market_ledger.dart';
 import '../travel/active_journey.dart';
+import '../travel/journey_service.dart';
+
+import 'world.dart';
 import 'animal.dart';
 import 'caravan.dart';
 import 'city.dart';
-import '../economy/market_ledger.dart';
 import 'vehicle.dart';
 import 'npc_caravan.dart';
 
-class PlayerState {
+class PlayerState
+    implements BanditTarget {
   /// Total world time since the start of the game.
   double worldTimeHours;
 
@@ -58,9 +62,41 @@ class PlayerState {
     this.followTarget,
   });
 
-  int get day => (worldTimeHours ~/ 24) + 1;
+  @override
+  double get x =>
+      JourneyService.currentX(
+        this,
+      );
 
-  int get hour => worldTimeHours.floor() % 24;
+  @override
+  double get y =>
+      JourneyService.currentY(
+        this,
+      );
+
+  @override
+  double get smoothX =>
+      JourneyService.currentXSmooth(
+        this,
+        1.0,
+      );
+
+  @override
+  double get smoothY =>
+      JourneyService.currentYSmooth(
+        this,
+        1.0,
+      );
+
+  @override
+  bool get isInSafeZone =>
+      currentCity != null;
+
+  int get day =>
+      (worldTimeHours ~/ 24) + 1;
+
+  int get hour =>
+      worldTimeHours.floor() % 24;
 
   bool get isTravelling =>
       activeJourney != null;

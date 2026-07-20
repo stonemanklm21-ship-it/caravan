@@ -1,3 +1,5 @@
+// GENERATED FILE - DO NOT EDIT
+
 class CaravanTemplate {
   final String name;
 
@@ -33,6 +35,7 @@ class CaravanTemplate {
   });
 }
 
+
 const peddler = CaravanTemplate(
   name: 'Peddler',
   companions: 1,
@@ -48,6 +51,7 @@ const peddler = CaravanTemplate(
   weight: 50,
 );
 
+
 const trader = CaravanTemplate(
   name: 'Trader',
   companions: 2,
@@ -55,13 +59,14 @@ const trader = CaravanTemplate(
   horses: 0,
   ox: 0,
   camels: 0,
-  smallCarts: 1,
+  smallCarts: 0,
   carts: 0,
   largeCarts: 0,
   minGold: 2000,
   maxGold: 4000,
   weight: 30,
 );
+
 
 const merchant = CaravanTemplate(
   name: 'Merchant',
@@ -78,6 +83,7 @@ const merchant = CaravanTemplate(
   weight: 15,
 );
 
+
 const caravanCompany = CaravanTemplate(
   name: 'Caravan Company',
   companions: 5,
@@ -92,6 +98,7 @@ const caravanCompany = CaravanTemplate(
   maxGold: 15000,
   weight: 5,
 );
+
 
 const caravanTemplates = [
   peddler,

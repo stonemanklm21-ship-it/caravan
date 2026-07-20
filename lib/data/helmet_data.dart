@@ -1,36 +1,42 @@
 import '../core/models/helmet.dart';
 
+// GENERATED FILE - DO NOT EDIT
+
 const clothCap = Helmet(
   id: 'cloth_cap',
   name: 'Cloth Cap',
-  protection: 0,
-  weightKg: 0.2,
+  protection: 2,
+  weightKg: 0.1,
   basePrice: 1000,
 );
+
 
 const leatherCap = Helmet(
   id: 'leather_cap',
   name: 'Leather Cap',
-  protection: 1,
-  weightKg: 0.5,
+  protection: 8,
+  weightKg: 0.2,
   basePrice: 1500,
 );
+
 
 const ironHelmet = Helmet(
   id: 'iron_helmet',
   name: 'Iron Helmet',
-  protection: 2,
-  weightKg: 2,
+  protection: 14,
+  weightKg: 0.5,
   basePrice: 1750,
 );
+
 
 const greatHelm = Helmet(
   id: 'great_helm',
   name: 'Great Helm',
-  protection: 3,
-  weightKg: 4,
+  protection: 22,
+  weightKg: 0.8,
   basePrice: 2500,
 );
+
 
 const helmets = <Helmet>[
   clothCap,
@@ -46,3 +52,4 @@ Helmet helmetForId(
     (helmet) => helmet.id == id,
   );
 }
+

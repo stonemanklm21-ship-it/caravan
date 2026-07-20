@@ -5,7 +5,7 @@ import '../models/city.dart';
 import '../models/journey_info.dart';
 
 class JourneyCalculator {
-  static const double mapUnitsPerDay = 500;
+  static const double mapUnitsPerDay = 250;
 
   static JourneyInfo calculate({
     required Caravan caravan,

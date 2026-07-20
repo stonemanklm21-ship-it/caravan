@@ -1,0 +1,4 @@
+﻿id,name,region,x,y,population,animalMarketTier,vehicleMarketTier,equipmentMarketTier,hasVet,hasCartwright,hasDoctor
+farmingVillage,Farming Village,heartlands,100,100,1000,major,major,major,TRUE,TRUE,TRUE
+miningTown,Mining Town,heartlands,350,50,2000,major,major,major,TRUE,TRUE,TRUE
+forestCamp,Forest Camp,heartlands,600,350,600,major,major,major,TRUE,TRUE,TRUE

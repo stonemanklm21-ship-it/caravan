@@ -3,11 +3,12 @@ import '../../data/armour_data.dart';
 import '../../data/goods_data.dart';
 import '../../data/helmet_data.dart';
 import '../../data/industry_data.dart';
+import '../../data/region_data.dart';
 import '../../data/vehicle_data.dart';
 import '../../data/weapon_data.dart';
-import '../../data/region_data.dart';
 
 import 'animal.dart';
+import 'character.dart';
 import 'city.dart';
 import 'industry.dart';
 import 'market_good.dart';
@@ -80,6 +81,32 @@ class World {
                     (recruitJson) =>
                         Recruit.fromJson(
                   json: recruitJson,
+                  animalFromJson:
+                      (animalJson) =>
+                          Animal.fromJson(
+                    json: animalJson,
+                    animalTypeForId:
+                        animalTypeForId,
+                  ),
+                  vehicleFromJson:
+                      (vehicleJson) =>
+                          Vehicle.fromJson(
+                    json: vehicleJson,
+                    vehicleTypeForId:
+                        vehicleTypeForId,
+                    animalFromJson:
+                        (animalJson) =>
+                            Animal.fromJson(
+                      json: animalJson,
+                      animalTypeForId:
+                          animalTypeForId,
+                    ),
+                  ),
+                ),
+                characterFromJson:
+                    (characterJson) =>
+                        Character.fromJson(
+                  characterJson,
                   animalFromJson:
                       (animalJson) =>
                           Animal.fromJson(

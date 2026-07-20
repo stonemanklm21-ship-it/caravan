@@ -1,0 +1,10 @@
+﻿id,name,inputGood1,inputQty1,inputGood2,inputQty2,outputGood,outputQty,operatingCost,workers,storage
+farm,Wheat Farm,water,100,,,grain,200,5,5,500
+well,Well,,,,,water,300,2,2,1000
+gatheringCamp,Gathering Camp,,,,,forage,20,3,4,300
+loggingCamp,Logging Camp,forage,5,,,wood,50,4,6,100
+mine,Mine,water,5,forage,5,ironOre,10,10,10,100
+bakery,Bakery,grain,200,water,100,bread,200,6,4,100
+toolmaker,Toolmaker,ironOre,10,wood,5,tools,10,8,5,100
+chairmaker,Chairmaker,wood,10,,,chair,10,10,6,100
+turnipFarm,Turnip Farm,water,100,,,turnips,200,5,5,500

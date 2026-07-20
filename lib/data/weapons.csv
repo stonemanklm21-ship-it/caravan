@@ -1,0 +1,6 @@
+﻿id,variableName,name,accuracy,damageDie,weightKg,basePrice
+knife,knife,Knife,88,5,0.3,1000
+club,club,Club,96,3,0.4,1500
+spear,spear,Spear,92,12,0.6,2000
+sword,sword,Sword,85,15,0.8,2500
+battle_axe,battleAxe,Battle Axe,75,20,1.2,5000

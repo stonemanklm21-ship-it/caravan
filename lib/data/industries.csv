@@ -1,0 +1,16 @@
+﻿cityId,type,size,inputDaysTarget,cash
+farmingVillage,farm,2,2,25000
+farmingVillage,well,4,0,25000
+farmingVillage,gatheringCamp,1,5,25000
+farmingVillage,turnipFarm,4,5,25000
+,,,,
+miningTown,mine,4,14,25000
+miningTown,bakery,2,3,25000
+miningTown,gatheringCamp,8,5,25000
+miningTown,toolmaker,4,5,25000
+miningTown,well,2,0,25000
+miningTown,chairmaker,4,3,25000
+,,,,
+forestCamp,loggingCamp,4,7,25000
+forestCamp,gatheringCamp,2,5,25000
+forestCamp,well,1,0,25000

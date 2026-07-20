@@ -37,3 +37,22 @@ final defaultNpc = Character(
   scoutSkill: 50,
   combatSkill: 50,
 );
+
+final miningMerchant = Character(
+  id: 'miningMerchant',
+  name: 'Mining Merchant',
+  ageYears: 42,
+  weightKg: 80,
+  wagePerDay: 10,
+  cargoCapacityKg: 10,
+  caloriesPerDay: 2500,
+  waterPerDay: 3,
+  hp: 100,
+  maxHp: 100,
+  speed: 4,
+  doctorSkill: 30,
+  vetSkill: 30,
+  mechanicSkill: 60,
+  scoutSkill: 40,
+  combatSkill: 40,
+);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import '../core/npc/npc_travel_service.dart';
 import '../core/travel/journey_service.dart';
+import '../core/travel/travel_service.dart';
 import '../core/travel/player_follow_service.dart';
 import '../core/world/time_controller.dart';
 import '../core/world/location_service.dart';
@@ -322,9 +323,12 @@ if (distance < 25) {
         endY: renderedY,
         city: city,
       )) {
-game.player.currentCity = city;
-game.player.worldX = city.x;
-game.player.worldY = city.y;
+
+  TravelService.enterCity(
+    playerState: game.player,
+    city: city,
+  );
+
 
 game.player.followTarget = null;
 

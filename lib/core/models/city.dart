@@ -4,6 +4,7 @@ import '../economy/vehicle_market_service.dart';
 
 import 'animal.dart';
 import 'armour.dart';
+import 'character.dart';
 import 'good.dart';
 import 'helmet.dart';
 import 'industry.dart';
@@ -30,8 +31,6 @@ class City {
 
   final List<MarketGood> marketGoods;
 
-  final List<Good> shopGoods;
-
   final AnimalMarketTier?
       animalMarketTier;
 
@@ -48,6 +47,8 @@ class City {
   final bool hasDoctor;
 
   List<Recruit> recruits;
+
+  List<Character> residents;
 
   List<Animal> animalMarketStock;
 
@@ -76,7 +77,6 @@ class City {
     required this.population,
     required this.industries,
     required this.marketGoods,
-    required this.shopGoods,
     this.animalMarketTier,
     this.vehicleMarketTier,
     this.equipmentMarketTier,
@@ -84,6 +84,7 @@ class City {
     this.hasCartwright = false,
     this.hasDoctor = false,
     this.recruits = const [],
+    this.residents = const [],
     this.animalMarketStock =
         const [],
     this.vehicleMarketStock =
@@ -141,11 +142,6 @@ class City {
                 market.toJson(),
           )
           .toList(),
-      'shopGoods': shopGoods
-          .map(
-            (good) => good.id,
-          )
-          .toList(),
       'animalMarketTier':
           animalMarketTier?.name,
       'vehicleMarketTier':
@@ -161,6 +157,12 @@ class City {
           .map(
             (recruit) =>
                 recruit.toJson(),
+          )
+          .toList(),
+      'residents': residents
+          .map(
+            (character) =>
+                character.toJson(),
           )
           .toList(),
       'animalMarketStock':
@@ -212,15 +214,13 @@ class City {
   factory City.fromJson({
     required Map<String, dynamic>
         json,
-
     required Region Function(
-  String id,
-)
-regionForId,
+      String id,
+    )
+    regionForId,
     required Industry Function(
       Map<String, dynamic> json,
     )
-    
     industryFromJson,
     required MarketGood Function(
       Map<String, dynamic> json,
@@ -234,6 +234,10 @@ regionForId,
       Map<String, dynamic> json,
     )
     recruitFromJson,
+    required Character Function(
+      Map<String, dynamic> json,
+    )
+    characterFromJson,
     required Animal Function(
       Map<String, dynamic> json,
     )
@@ -259,8 +263,8 @@ regionForId,
       id: json['id'] as String,
       name: json['name'] as String,
       region: regionForId(
-  json['region'] as String,
-),
+        json['region'] as String,
+      ),
       x:
           (json['x'] as num)
               .toDouble(),
@@ -291,15 +295,6 @@ regionForId,
                   marketJson
                       as Map<String,
                           dynamic>,
-                ),
-              )
-              .toList(),
-      shopGoods:
-          (json['shopGoods']
-                  as List)
-              .map(
-                (id) => goodForId(
-                  id as String,
                 ),
               )
               .toList(),
@@ -355,6 +350,19 @@ regionForId,
                     (recruitJson) =>
                         recruitFromJson(
                       recruitJson
+                          as Map<String,
+                              dynamic>,
+                    ),
+                  )
+                  .toList() ??
+              [],
+      residents:
+          (json['residents']
+                      as List?)
+                  ?.map(
+                    (characterJson) =>
+                        characterFromJson(
+                      characterJson
                           as Map<String,
                               dynamic>,
                     ),

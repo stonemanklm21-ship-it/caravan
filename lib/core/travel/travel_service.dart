@@ -1,3 +1,6 @@
+import '../../data/game_data.dart';
+import '../../data/quest_service_data.dart';
+import '../events/city_arrived_event.dart';
 import '../models/city.dart';
 import '../models/player_state.dart';
 import '../models/world.dart';
@@ -54,6 +57,27 @@ class TravelService {
     );
   }
 
+  static void enterCity({
+    required PlayerState playerState,
+    required City city,
+  }) {
+    playerState.worldX = city.x;
+    playerState.worldY = city.y;
+    playerState.currentCity = city;
+
+    questService.processEvent(
+      event: CityArrivedEvent(
+        cityId: city.id,
+      ),
+      activeQuests:
+          game.quests.activeQuests,
+    );
+
+    JourneyService.clearJourney(
+      playerState,
+    );
+  }
+
   static void arrive({
     required PlayerState playerState,
     required World world,
@@ -71,15 +95,22 @@ class TravelService {
     playerState.worldY =
         journey.destinationY;
 
-    playerState.currentCity =
+    final city =
         LocationService.cityAtPosition(
       world: world,
       x: playerState.worldX,
       y: playerState.worldY,
     );
 
-    JourneyService.clearJourney(
-      playerState,
-    );
+    if (city != null) {
+      enterCity(
+        playerState: playerState,
+        city: city,
+      );
+    } else {
+      JourneyService.clearJourney(
+        playerState,
+      );
+    }
   }
 }

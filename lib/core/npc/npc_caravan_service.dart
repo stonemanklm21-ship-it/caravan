@@ -12,6 +12,7 @@ import 'npc_trading_service.dart';
 import 'npc_travel_service.dart';
 import '../bandits/bandit_caravan_service.dart';
 import '../models/caravan_faction.dart';
+import '../models/player_state.dart';
 
 class NpcCaravanService {
   static void clearMission(
@@ -322,20 +323,22 @@ case CaravanState.pursuing:
     }
   }
 
-  static void advanceAll({
-    required World world,
-    required double hours,
-  }) {
+static void advanceAll({
+  required World world,
+  required PlayerState playerState,
+  required double hours,
+}){
     for (final npc
         in world.npcCaravans) {
       if (npc.faction ==
           CaravanFaction.bandit) {
-        BanditCaravanService
-            .advanceTime(
-          npc: npc,
-          world: world,
-          hours: hours,
-        );
+BanditCaravanService
+    .advanceTime(
+  npc: npc,
+  world: world,
+  playerState: playerState,
+  hours: hours,
+);
 
         continue;
       }

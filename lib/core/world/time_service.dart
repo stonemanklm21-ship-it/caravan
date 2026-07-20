@@ -24,6 +24,7 @@ class TimeService {
     NpcCaravanService.advanceAll(
       world: world,
       hours: hours,
+      playerState: playerState,
     );
 
     ConsumptionService.consume(
@@ -111,14 +112,9 @@ class TimeService {
           endY: endY,
           city: city,
         )) {
-          playerState.worldX = city.x;
-          playerState.worldY = city.y;
-
-          playerState.currentCity =
-              city;
-
-          JourneyService.clearJourney(
-            playerState,
+          TravelService.enterCity(
+            playerState: playerState,
+            city: city,
           );
 
           enteredCity = true;

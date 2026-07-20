@@ -1,8 +1,10 @@
 import '../../data/animal_data.dart';
 import '../../data/vehicle_data.dart';
 
+import '../bandits/bandit_target.dart';
 import '../economy/market_ledger.dart';
 import '../travel/active_journey.dart';
+import '../npc/npc_travel_service.dart';
 
 import 'animal.dart';
 import 'caravan.dart';
@@ -12,6 +14,7 @@ import 'region.dart';
 import 'trade_mission.dart';
 import 'vehicle.dart';
 import 'world.dart';
+
 enum CaravanState {
   idle,
   travelling,
@@ -21,7 +24,8 @@ enum CaravanState {
   pursuing,
 }
 
-class NpcCaravan {
+class NpcCaravan
+    implements BanditTarget {
   double worldX;
 
   double worldY;
@@ -44,7 +48,7 @@ class NpcCaravan {
 
   TradeMission? activeMission;
 
-  NpcCaravan? followTarget;
+  BanditTarget? followTarget;
 
   CaravanState state;
 
@@ -63,6 +67,28 @@ class NpcCaravan {
     this.followTarget,
     this.state = CaravanState.idle,
   });
+
+  @override
+  double get x =>
+      NpcTravelService.currentX(
+        this,
+      );
+
+  @override
+  double get y =>
+      NpcTravelService.currentY(
+        this,
+      );
+
+  @override
+  double get smoothX => x;
+
+  @override
+  double get smoothY => y;
+
+  @override
+  bool get isInSafeZone =>
+      currentCity != null;
 
   Map<String, dynamic> toJson() {
     return {
@@ -150,7 +176,7 @@ class NpcCaravan {
                     .firstWhere(
                   (faction) =>
                       faction.name ==
-                          json['faction'],
+                      json['faction'],
                 ),
       ledger: MarketLedger.fromJson(
         json['ledger']

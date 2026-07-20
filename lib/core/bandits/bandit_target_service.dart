@@ -1,21 +1,25 @@
 import '../models/caravan_faction.dart';
 import '../models/npc_caravan.dart';
+import '../models/player_state.dart';
 import '../models/world.dart';
 import '../npc/npc_travel_service.dart';
 import '../world/visibility_service.dart';
 
 import 'bandit_city_service.dart';
+import 'bandit_target.dart';
 
 class BanditTargetService {
-  static NpcCaravan? findTarget({
+  static BanditTarget? findTarget({
     required NpcCaravan bandit,
     required World world,
+    required PlayerState playerState,
   }) {
-    NpcCaravan? nearestMerchant;
+    BanditTarget? nearestTarget;
 
     double nearestDistance =
         double.infinity;
 
+    // Merchants
     for (final other
         in world.npcCaravans) {
       if (other == bandit) {
@@ -27,39 +31,16 @@ class BanditTargetService {
         continue;
       }
 
-      if (BanditCityService
-          .isInsideSafeZone(
-        x:
-            NpcTravelService.currentX(
-          other,
-        ),
-        y:
-            NpcTravelService.currentY(
-          other,
-        ),
-        world: world,
-      )) {
+      if (other.isInSafeZone) {
         continue;
       }
 
       final distance =
           VisibilityService.distance(
-        x1:
-            NpcTravelService.currentX(
-          bandit,
-        ),
-        y1:
-            NpcTravelService.currentY(
-          bandit,
-        ),
-        x2:
-            NpcTravelService.currentX(
-          other,
-        ),
-        y2:
-            NpcTravelService.currentY(
-          other,
-        ),
+        x1: bandit.x,
+        y1: bandit.y,
+        x2: other.x,
+        y2: other.y,
       );
 
       if (distance >
@@ -73,11 +54,34 @@ class BanditTargetService {
         nearestDistance =
             distance;
 
-        nearestMerchant =
+        nearestTarget =
             other;
       }
     }
 
-    return nearestMerchant;
+    // Player
+    if (!playerState.isInSafeZone) {
+      final playerDistance =
+          VisibilityService.distance(
+        x1: bandit.x,
+        y1: bandit.y,
+        x2: playerState.x,
+        y2: playerState.y,
+      );
+
+      if (playerDistance <=
+              VisibilityService
+                  .banditVisionRange &&
+          playerDistance <
+              nearestDistance) {
+        nearestDistance =
+            playerDistance;
+
+        nearestTarget =
+            playerState;
+      }
+    }
+
+    return nearestTarget;
   }
 }
