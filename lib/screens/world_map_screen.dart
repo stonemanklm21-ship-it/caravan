@@ -640,7 +640,6 @@ if (newSelection.isCity &&
                       viewportSize:
                           viewportSize,
                     ),
-
 WorldMapNpcLayer(
   npcCaravans:
       game.world.npcCaravans,
@@ -659,6 +658,8 @@ WorldMapNpcLayer(
     game.player,
     tickFraction,
   ),
+  scoutSkill:
+      game.player.caravan.scoutSkill,
   getX: (npc) =>
       NpcTravelService
           .currentXSmooth(
@@ -672,7 +673,6 @@ WorldMapNpcLayer(
     tickFraction,
   ),
 ),
-
 
 WorldMapPlayerLayer(
   playerX:

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../../data/game_data.dart';
 import '../../core/city/person_health_service.dart';
 import '../../core/models/character.dart';
+import '../../core/models/skill.dart';
+import '../../core/caravan/skill_service.dart';
 
 class DoctorScreen extends StatefulWidget {
   const DoctorScreen({
@@ -72,9 +74,10 @@ class _DoctorScreenState
                     'HP: ${character.hp.toStringAsFixed(0)}'
                     ' / ${character.maxHp.toStringAsFixed(0)}',
                   ),
-                  Text(
-                    'Doctor Skill: ${character.doctorSkill}',
-                  ),
+Text(
+  'Doctor Skill: ${SkillService.getLevel(character, Skill.doctor)}',
+),
+                  
                   Text(
                     'Cost: ${cost.toStringAsFixed(0)}',
                   ),

@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 
+import '../core/models/character_portrait.dart';
+import '../core/quests/conversation_service.dart';
+import '../data/character_registry_data.dart';
 import '../data/game_data.dart';
 import '../data/quest_service_data.dart';
 import 'npc_quest_screen.dart';
 
-class CityResidentsScreen
-    extends StatelessWidget {
+class CityResidentsScreen extends StatelessWidget {
   const CityResidentsScreen({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final city =
-        game.player.currentCity;
+    final city = game.player.currentCity;
 
-    final residents =
-        city?.residents ?? [];
+    final residents = city == null
+        ? []
+        : characterRegistry.inCity(
+            city.id,
+          );
 
     return Scaffold(
       appBar: AppBar(
@@ -53,8 +57,7 @@ ${quests.isEmpty
 
               showDialog(
                 context: context,
-                builder: (_) =>
-                    AlertDialog(
+                builder: (_) => AlertDialog(
                   title: const Text(
                     'Quest Debug',
                   ),
@@ -71,29 +74,75 @@ ${quests.isEmpty
                 'No residents.',
               ),
             )
-          : ListView.builder(
-              itemCount:
-                  residents.length,
+          : GridView.builder(
+              padding:
+                  const EdgeInsets.all(12),
+              gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 0.75,
+              ),
+              itemCount: residents.length,
               itemBuilder:
                   (context, index) {
                 final resident =
                     residents[index];
 
-                return ListTile(
-                  title: Text(
-                    resident.name,
-                  ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            NpcQuestScreen(
-                          npc: resident,
+                return Card(
+                  clipBehavior:
+                      Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () {
+                      ConversationService
+                          .talkToNpc(
+                        npc: resident,
+                      );
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              NpcQuestScreen(
+                            npc: resident,
+                          ),
                         ),
+                      );
+                    },
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.all(
+                        12,
                       ),
-                    );
-                  },
+                      child: Column(
+                        mainAxisAlignment:
+                            MainAxisAlignment
+                                .center,
+                        children: [
+                          CharacterPortrait(
+                            seed: resident
+                                .id.hashCode,
+                            dna:
+                                resident.portrait,
+                            size: 128,
+                          ),
+                          const SizedBox(
+                            height: 12,
+                          ),
+                          Text(
+                            resident.name,
+                            textAlign:
+                                TextAlign.center,
+                            style:
+                                Theme.of(context)
+                                    .textTheme
+                                    .titleMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 );
               },
             ),

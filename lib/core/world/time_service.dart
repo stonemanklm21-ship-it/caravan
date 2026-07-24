@@ -9,6 +9,8 @@ import '../travel/discovery_service.dart';
 import '../travel/journey_service.dart';
 import '../travel/travel_service.dart';
 import '../world/location_service.dart';
+import '../world/npc_population_service.dart';
+import '../../data/game_balance.dart';
 
 class TimeService {
   static void advanceTime({
@@ -136,8 +138,22 @@ class TimeService {
       }
     }
 
-    playerState.worldTimeHours +=
-        hours;
+playerState.worldTimeHours += hours;
+
+final currentHour =
+    playerState.worldTimeHours.floor();
+
+if (currentHour -
+        world.lastPopulationMaintenanceHour >=
+    GameBalance
+        .populationMaintenanceHours) {
+  NpcPopulationService.maintain(
+    world,
+  );
+
+  world.lastPopulationMaintenanceHour =
+      currentHour;
+}
 
     DiscoveryService.discoverNearbyCities(
       playerState: playerState,

@@ -1,17 +1,20 @@
 import 'dart:math';
 
-import '../../data/caravan_templates.dart';
+import '../../data/game_balance.dart';
 
-import '../city/recruitment_service.dart';
+import '../../data/bandit_faction_data.dart';
+
+import '../bandits/bandit_equipment_service.dart';
+import '../bandits/bandit_recruitment_service.dart';
 import '../economy/market_ledger.dart';
+import '../models/bandit_faction.dart';
 import '../models/caravan.dart';
 import '../models/caravan_faction.dart';
 import '../models/city.dart';
 import '../models/npc_caravan.dart';
 
 class BanditCaravanGenerator {
-  static final Random _random =
-      Random();
+  static final Random _random = Random();
 
   static List<NpcCaravan> generate({
     required List<City> cities,
@@ -19,7 +22,7 @@ class BanditCaravanGenerator {
   }) {
     final banditCount = max(
       1,
-      merchantCount ~/ 5,
+      merchantCount ~/ GameBalance.merchantsPerBandit,
     );
 
     return List.generate(
@@ -30,59 +33,92 @@ class BanditCaravanGenerator {
           cities.length,
         )];
 
-        final template =
-            caravanTemplates[
-                _random.nextInt(
-          caravanTemplates.length,
-        )];
+        final banditFaction =
+            banditFactionForRegion(
+          city.region,
+        );
+
+        final angle =
+            _random.nextDouble() *
+                pi *
+                2;
+
+        final distance =
+            GameBalance.banditMinSpawnDistance +
+            (_random.nextDouble() *
+                GameBalance.banditMaxSpawnDistance);
+
+        final spawnX =
+            city.x +
+            cos(angle) * distance;
+
+        final spawnY =
+            city.y +
+            sin(angle) * distance;
 
         return NpcCaravan(
-          worldX: city.x,
-          worldY: city.y,
-          currentCity: city,
+          worldX: spawnX,
+          worldY: spawnY,
+          currentCity: null,
           homeRegion: city.region,
           caravan:
               _buildBanditCaravan(
-            template,
+            banditFaction,
           ),
           faction:
               CaravanFaction.bandit,
+          banditFaction:
+              banditFaction,
           ledger: MarketLedger(
             observations: [],
-            
           ),
-          
- state:
-      CaravanState.roaming,
-
+          state:
+              CaravanState.roaming,
         );
       },
     );
   }
 
   static Caravan _buildBanditCaravan(
-    CaravanTemplate template,
+    BanditFaction faction,
   ) {
     final leader =
-        RecruitmentService
-            .generateRecruit(
-              tier:
-                  RecruitmentMarketTier
-                      .major,
-            )
-            .character;
+        BanditRecruitmentService
+            .generateBandit(
+      faction: faction,
+    );
+
+    BanditEquipmentService
+        .equipBandit(
+      character: leader,
+      faction: faction,
+      leader: true,
+    );
+
+    final companionCount =
+        _random.nextInt(
+      faction.maxCompanions + 1,
+    );
 
     final companions =
         List.generate(
-      template.companions,
-      (_) =>
-          RecruitmentService
-              .generateRecruit(
-                tier:
-                    RecruitmentMarketTier
-                        .major,
-              )
-              .character,
+      companionCount,
+      (_) {
+        final character =
+            BanditRecruitmentService
+                .generateBandit(
+          faction: faction,
+        );
+
+        BanditEquipmentService
+            .equipBandit(
+          character: character,
+          faction: faction,
+          leader: false,
+        );
+
+        return character;
+      },
     );
 
     return Caravan(

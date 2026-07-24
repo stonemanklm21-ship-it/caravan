@@ -1,10 +1,10 @@
 import '../core/economy/animal_market_service.dart';
 import '../core/economy/vehicle_market_service.dart';
 import '../core/economy/equipment_market_service.dart';
+import '../core/city/recruitment_service.dart';
 import '../core/models/city.dart';
 import '../core/models/industry.dart';
 import '../core/models/market_good.dart';
-import 'character_data.dart';
 import 'goods_data.dart';
 import 'industry_data.dart';
 import 'region_data.dart';
@@ -98,10 +98,6 @@ final farmingVillage = City(
     ),
   ],
 
-  residents: [
-    miningMerchant,
-  ],
-
   animalMarketTier:
       AnimalMarketTier.major,
 
@@ -110,6 +106,10 @@ final farmingVillage = City(
 
   equipmentMarketTier:
       EquipmentMarketTier.major,
+
+  recruitmentMarketTier:
+      RecruitmentMarketTier.major,
+
 
   hasVet: true,
 
@@ -223,8 +223,6 @@ final miningTown = City(
     ),
   ],
 
-  residents: [],
-
   animalMarketTier:
       AnimalMarketTier.major,
 
@@ -233,6 +231,9 @@ final miningTown = City(
 
   equipmentMarketTier:
       EquipmentMarketTier.major,
+
+  recruitmentMarketTier:
+      RecruitmentMarketTier.major,
 
   hasVet: true,
 
@@ -322,8 +323,6 @@ final forestCamp = City(
     ),
   ],
 
-  residents: [],
-
   animalMarketTier:
       AnimalMarketTier.major,
 
@@ -332,6 +331,9 @@ final forestCamp = City(
 
   equipmentMarketTier:
       EquipmentMarketTier.major,
+
+  recruitmentMarketTier:
+      RecruitmentMarketTier.major,
 
   hasVet: true,
 

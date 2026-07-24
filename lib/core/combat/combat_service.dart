@@ -2,8 +2,9 @@ import 'dart:math';
 
 import '../models/caravan.dart';
 import '../models/character.dart';
-
 import 'combat_round_result.dart';
+import '../models/skill.dart';
+import '../caravan/skill_service.dart';
 
 class CombatService {
   static final Random _random =
@@ -36,9 +37,14 @@ class CombatService {
   static int attackRoll(
     Character attacker,
   ) {
-    final ceiling =
-        attacker.combatSkill +
-        attacker.damageDie;
+
+final ceiling =
+    SkillService.getLevel(
+      attacker,
+      Skill.combat,
+    ) +
+    attacker.damageDie;
+
 
     return _random.nextInt(
       ceiling + 1,
@@ -48,9 +54,12 @@ class CombatService {
   static int defenceRoll(
     Character defender,
   ) {
-    final ceiling =
-        defender.combatSkill +
-        defender.protection;
+final ceiling =
+    SkillService.getLevel(
+      defender,
+      Skill.combat,
+    ) +
+    defender.protection;
 
     return _random.nextInt(
       ceiling + 1,
@@ -144,12 +153,19 @@ class CombatService {
             )
             .toList();
 
-    livingAttackers.sort(
-      (a, b) =>
-          b.combatSkill.compareTo(
-        a.combatSkill,
+livingAttackers.sort(
+  (a, b) => SkillService
+      .getLevel(
+        b,
+        Skill.combat,
+      )
+      .compareTo(
+        SkillService.getLevel(
+          a,
+          Skill.combat,
+        ),
       ),
-    );
+);
 
     for (final attacker
         in livingAttackers) {

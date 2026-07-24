@@ -1,6 +1,7 @@
 import '../models/caravan.dart';
 import '../models/vehicle.dart';
 import 'animal_service.dart';
+import '../models/skill.dart';
 import 'skill_service.dart';
 
 class VehicleService {
@@ -9,7 +10,10 @@ class VehicleService {
     required Vehicle vehicle,
     required double hours,
   }) {
-    final dailyConditionLoss =
+
+    const unmitigatedDailyLoss = 5.0;
+
+    final mitigatedDailyLoss =
         SkillService.asymptoticValue(
       skill:
           caravan.mechanicSkill.toDouble(),
@@ -17,13 +21,32 @@ class VehicleService {
       end: 1.0,
     );
 
-    vehicle.condition -=
+    final unmitigatedLoss =
         (hours / 24) *
-        dailyConditionLoss;
+        unmitigatedDailyLoss;
+
+    final actualLoss =
+        (hours / 24) *
+        mitigatedDailyLoss;
+
+    final preventedLoss =
+        unmitigatedLoss - actualLoss;
+
+    vehicle.condition -= actualLoss;
 
     if (vehicle.condition < 0) {
       vehicle.condition = 0;
     }
+
+    SkillService.addSharedXp(
+      characters: [
+        caravan.leader,
+        ...caravan.companions,
+      ],
+      skill: Skill.mechanic,
+      amount:
+          preventedLoss * 10,
+    );
   }
 
   static void advanceTimeForAll({

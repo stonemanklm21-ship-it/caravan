@@ -1,9 +1,19 @@
 import 'dart:math';
 
+import '../caravan/skill_service.dart';
+
 class VisibilityService {
-  
-  static const double caravanVisionRange = 5000.0;
   static const double banditVisionRange = 100.0;
+
+  static double caravanVisionRange(
+    int scoutSkill,
+  ) {
+    return SkillService.asymptoticValue(
+      skill: scoutSkill.toDouble(),
+      start: 40.0,
+      end: 200.0,
+    );
+  }
 
   static bool canSee({
     required double observerX,
@@ -18,8 +28,7 @@ class VisibilityService {
     final dy =
         observerY - targetY;
 
-    final distance =
-        sqrt(
+    final distance = sqrt(
       (dx * dx) +
           (dy * dy),
     );

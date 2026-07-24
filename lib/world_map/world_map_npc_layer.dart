@@ -21,6 +21,8 @@ class WorldMapNpcLayer
 
   final double playerY;
 
+  final int scoutSkill;
+
   final double Function(
     NpcCaravan npc,
   ) getX;
@@ -37,6 +39,7 @@ class WorldMapNpcLayer
     required this.viewportSize,
     required this.playerX,
     required this.playerY,
+    required this.scoutSkill,
     required this.getX,
     required this.getY,
   });
@@ -49,10 +52,11 @@ class WorldMapNpcLayer
       children: npcCaravans
           .where(
             (npc) {
-if (npc.activeJourney == null &&
-    npc.faction != CaravanFaction.bandit) {
-  return false;
-}
+              if (npc.activeJourney == null &&
+                  npc.faction !=
+                      CaravanFaction.bandit) {
+                return false;
+              }
 
               return VisibilityService
                   .canSee(
@@ -60,9 +64,10 @@ if (npc.activeJourney == null &&
                 observerY: playerY,
                 targetX: getX(npc),
                 targetY: getY(npc),
-                range:
-                    VisibilityService
-                        .caravanVisionRange,
+                range: VisibilityService
+                    .caravanVisionRange(
+                  scoutSkill,
+                ),
               );
             },
           )

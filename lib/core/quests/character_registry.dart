@@ -15,4 +15,16 @@ class CharacterRegistry {
   Iterable<Character>
   get characters =>
       _characters.values;
+
+  List<Character> inCity(
+    String cityId,
+  ) {
+    return _characters.values
+        .where(
+          (character) =>
+              character.cityId ==
+              cityId,
+        )
+        .toList();
+  }
 }

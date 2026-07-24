@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../core/models/character.dart';
-import '../core/quests/npc_quest_interaction.dart';
-import '../core/quests/npc_quest_state.dart';
+import '../core/quests/quest_status.dart';
 import '../data/game_data.dart';
+import '../data/quest_registry_data.dart';
 import '../data/quest_service_data.dart';
 
 class NpcQuestScreen extends StatelessWidget {
@@ -16,142 +16,165 @@ class NpcQuestScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final interaction =
-        NpcQuestInteraction(
-      questService: questService,
-    );
-
-    final state =
-        interaction.getState(
-      npcId: npc.id,
-      game: game,
+    final quests =
+        questRegistry.getByGiver(
+      npc.id,
     );
 
     return Scaffold(
       appBar: AppBar(
         title: Text(npc.name),
       ),
-      body: Padding(
-        padding:
-            const EdgeInsets.all(16),
-        child: switch (state) {
-          NpcQuestState.available =>
-            _AvailableQuestView(
-              npc: npc,
-            ),
-
-          NpcQuestState.active =>
-            const Center(
-              child: Text(
-                'Quest in progress.',
-              ),
-            ),
-
-          NpcQuestState.readyToTurnIn =>
-            _ReadyToTurnInView(
-              npc: npc,
-            ),
-
-          NpcQuestState.completed =>
-            const Center(
-              child: Text(
-                'Thanks for your help.',
-              ),
-            ),
-
-          NpcQuestState.none =>
-            const Center(
+      body: quests.isEmpty
+          ? const Center(
               child: Text(
                 'Nothing to discuss.',
               ),
+            )
+          : ListView(
+              padding:
+                  const EdgeInsets.all(16),
+              children: quests
+                  .map(
+                    (quest) =>
+                        _QuestCard(
+                      questId: quest.id,
+                    ),
+                  )
+                  .toList(),
             ),
+    );
+  }
+}
+
+class _QuestCard extends StatelessWidget {
+  final String questId;
+
+  const _QuestCard({
+    required this.questId,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final definition =
+        questRegistry.get(
+      questId,
+    )!;
+
+    final instance = game
+        .quests.activeQuests
+        .where(
+          (q) =>
+              q.definitionId ==
+              questId,
+        )
+        .cast()
+        .firstOrNull;
+
+    final prerequisitesMet =
+        definition
+            .requiredCompletedQuestIds
+            .every(
+              (requiredId) =>
+                  game.quests.activeQuests
+                      .any(
+                (q) =>
+                    q.definitionId ==
+                        requiredId &&
+                    q.status ==
+                        QuestStatus
+                            .completed,
+              ),
+            );
+
+    Widget action;
+
+    if (!prerequisitesMet) {
+      action = const Text(
+        'Locked',
+      );
+    } else if (instance == null) {
+      action = ElevatedButton(
+        onPressed: () {
+          questService.acceptQuest(
+            questId: definition.id,
+            activeQuests:
+                game.quests.activeQuests,
+          );
+
+          Navigator.pop(context);
         },
+        child: const Text(
+          'Accept Quest',
+        ),
+      );
+    } else if (instance.status ==
+        QuestStatus.active) {
+      action = Text(
+        definition.activeText,
+      );
+    } else if (instance.status ==
+        QuestStatus.readyToTurnIn) {
+      action = ElevatedButton(
+        onPressed: () {
+          questService.turnInQuest(
+            questId: definition.id,
+            game: game,
+            activeQuests:
+                game.quests.activeQuests,
+          );
+
+          Navigator.pop(context);
+        },
+        child: const Text(
+          'Turn In Quest',
+        ),
+      );
+    } else if (instance.status ==
+        QuestStatus.completed) {
+      action = Text(
+        definition.completedText,
+      );
+    } else {
+      action = const Text(
+        'Unavailable',
+      );
+    }
+
+    return Card(
+      margin:
+          const EdgeInsets.only(
+        bottom: 12,
       ),
-    );
-  }
-}
-
-class _AvailableQuestView
-    extends StatelessWidget {
-  final Character npc;
-
-  const _AvailableQuestView({
-    required this.npc,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Visit Mining Town',
+      child: Padding(
+        padding:
+            const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment:
+              CrossAxisAlignment.start,
+          children: [
+            Text(
+              definition.title,
+              style:
+                  const TextStyle(
+                fontSize: 18,
+                fontWeight:
+                    FontWeight.bold,
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Text(
+              definition.description,
+            ),
+            const SizedBox(
+              height: 12,
+            ),
+            action,
+          ],
         ),
-        const SizedBox(height: 8),
-        const Text(
-          'Travel to Mining Town.',
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () {
-            questService.acceptQuest(
-              questId:
-                  'visit_miningTown',
-              activeQuests: game
-                  .quests.activeQuests,
-            );
-
-            Navigator.pop(context);
-          },
-          child: const Text(
-            'Accept Quest',
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ReadyToTurnInView
-    extends StatelessWidget {
-  final Character npc;
-
-  const _ReadyToTurnInView({
-    required this.npc,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Visit Mining Town',
-        ),
-        const SizedBox(height: 8),
-        const Text(
-          'Quest complete.',
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () {
-            questService.turnInQuest(
-              questId:
-                  'visit_miningTown',
-              game: game,
-              activeQuests: game
-                  .quests.activeQuests,
-            );
-
-            Navigator.pop(context);
-          },
-          child: const Text(
-            'Turn In Quest',
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

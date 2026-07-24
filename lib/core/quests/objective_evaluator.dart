@@ -10,6 +10,9 @@ class ObjectiveEvaluator {
       case 'visit_city':
         return progress.current >= 1;
 
+      case 'talk_to_npc':
+        return progress.current >= 1;
+
       case 'deliver_goods':
         final quantity =
             definition.params['quantity']

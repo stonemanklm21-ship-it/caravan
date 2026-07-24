@@ -10,6 +10,8 @@ import 'helmet.dart';
 import '../../data/weapon_data.dart';
 import '../../data/armour_data.dart';
 import '../../data/helmet_data.dart';
+import 'skill.dart';
+import '../caravan/skill_service.dart';
 
 class Caravan {
   Character leader;
@@ -92,67 +94,85 @@ double get speed {
   return slowest;
 }
 
-  int get doctorSkill {
-    int total = leader.doctorSkill;
+int get doctorSkill {
+  int total = SkillService.getLevel(
+    leader,
+    Skill.doctor,
+  );
 
-    for (final companion
-        in companions) {
-      total +=
-          companion.doctorSkill;
-    }
-
-    return total;
+  for (final companion in companions) {
+    total += SkillService.getLevel(
+      companion,
+      Skill.doctor,
+    );
   }
 
-  int get vetSkill {
-    int total = leader.vetSkill;
+  return total;
+}
 
-    for (final companion
-        in companions) {
-      total += companion.vetSkill;
-    }
+int get vetSkill {
+  int total = SkillService.getLevel(
+    leader,
+    Skill.vet,
+  );
 
-    return total;
+  for (final companion in companions) {
+    total += SkillService.getLevel(
+      companion,
+      Skill.vet,
+    );
   }
 
-  int get mechanicSkill {
-    int total =
-        leader.mechanicSkill;
+  return total;
+}
 
-    for (final companion
-        in companions) {
-      total +=
-          companion.mechanicSkill;
-    }
+int get mechanicSkill {
+  int total = SkillService.getLevel(
+    leader,
+    Skill.mechanic,
+  );
 
-    return total;
+  for (final companion in companions) {
+    total += SkillService.getLevel(
+      companion,
+      Skill.mechanic,
+    );
   }
 
-  int get scoutSkill {
-    int total =
-        leader.scoutSkill;
+  return total;
+}
 
-    for (final companion
-        in companions) {
-      total +=
-          companion.scoutSkill;
-    }
+int get scoutSkill {
+  int total = SkillService.getLevel(
+    leader,
+    Skill.scout,
+  );
 
-    return total;
+  for (final companion in companions) {
+    total += SkillService.getLevel(
+      companion,
+      Skill.scout,
+    );
   }
 
-  int get combatSkill {
-    int total =
-        leader.combatSkill;
+  return total;
+}
 
-    for (final companion
-        in companions) {
-      total +=
-          companion.combatSkill;
-    }
+int get combatSkill {
+  int total = SkillService.getLevel(
+    leader,
+    Skill.combat,
+  );
 
-    return total;
+  for (final companion in companions) {
+    total += SkillService.getLevel(
+      companion,
+      Skill.combat,
+    );
   }
+
+  return total;
+}
 
   double get calorieRequirementPerDay {
     double total =

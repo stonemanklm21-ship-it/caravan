@@ -10,6 +10,17 @@ class QuestDefinition {
 
   final String giverId;
 
+  final String availableText;
+
+  final String activeText;
+
+  final String readyToTurnInText;
+
+  final String completedText;
+
+  final List<String>
+      requiredCompletedQuestIds;
+
   /// Whether the player must return to the
   /// quest giver before the quest is completed.
   final bool requiresTurnIn;
@@ -23,6 +34,12 @@ class QuestDefinition {
     required this.title,
     required this.description,
     required this.giverId,
+    required this.availableText,
+    required this.activeText,
+    required this.readyToTurnInText,
+    required this.completedText,
+    this.requiredCompletedQuestIds =
+        const [],
     required this.requiresTurnIn,
     required this.objectives,
     required this.rewards,

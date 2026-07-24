@@ -36,6 +36,39 @@ class QuestService {
     );
   }
 
+  bool isQuestAvailable({
+    required String questId,
+    required List<QuestInstance> activeQuests,
+  }) {
+    final definition =
+        questRegistry.get(questId);
+
+    if (definition == null) {
+      return false;
+    }
+
+    for (final requiredQuestId
+        in definition
+            .requiredCompletedQuestIds) {
+      final prerequisiteQuest =
+          activeQuests.cast<
+              QuestInstance?>().firstWhere(
+        (q) =>
+            q?.definitionId ==
+            requiredQuestId,
+        orElse: () => null,
+      );
+
+      if (prerequisiteQuest == null ||
+          prerequisiteQuest.status !=
+              QuestStatus.completed) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   NpcQuestState getNpcQuestState({
     required String npcId,
     required List<QuestInstance> activeQuests,
@@ -70,9 +103,17 @@ class QuestService {
     }
 
     final availableQuests =
-        questRegistry.getByGiver(
-      npcId,
-    );
+        questRegistry
+            .getByGiver(npcId)
+            .where(
+              (quest) =>
+                  isQuestAvailable(
+                questId: quest.id,
+                activeQuests:
+                    activeQuests,
+              ),
+            )
+            .toList();
 
     if (availableQuests.isNotEmpty) {
       return NpcQuestState.available;
@@ -89,6 +130,13 @@ class QuestService {
         questRegistry.get(questId);
 
     if (definition == null) {
+      return;
+    }
+
+    if (!isQuestAvailable(
+      questId: questId,
+      activeQuests: activeQuests,
+    )) {
       return;
     }
 

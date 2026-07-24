@@ -139,10 +139,38 @@ rewardsGranted = true;
             ),
             ...combatants.map(
               (character) =>
-                  Text(
-                '${character.name}: '
-                '${character.hp.toStringAsFixed(0)} HP',
-              ),
+Column(
+  crossAxisAlignment:
+      CrossAxisAlignment.start,
+  children: [
+    Text(
+      '${character.name}: '
+      '${character.hp.toStringAsFixed(0)} HP',
+    ),
+    Text(
+      '  Weapon: ${character.weapon?.name ?? "None"}',
+      style: const TextStyle(
+        fontSize: 12,
+        color: Colors.grey,
+      ),
+    ),
+    Text(
+      '  Armour: ${character.armour?.name ?? "None"}',
+      style: const TextStyle(
+        fontSize: 12,
+        color: Colors.grey,
+      ),
+    ),
+    Text(
+      '  Helmet: ${character.helmet?.name ?? "None"}',
+      style: const TextStyle(
+        fontSize: 12,
+        color: Colors.grey,
+      ),
+    ),
+    const SizedBox(height: 4),
+  ],
+),
             ),
             if (combatants.isEmpty)
               const Text(

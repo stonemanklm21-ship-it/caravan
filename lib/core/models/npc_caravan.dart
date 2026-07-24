@@ -1,10 +1,12 @@
 import '../../data/animal_data.dart';
 import '../../data/vehicle_data.dart';
+import '../../data/bandit_faction_data.dart';
 
 import '../bandits/bandit_target.dart';
 import '../economy/market_ledger.dart';
 import '../travel/active_journey.dart';
 import '../npc/npc_travel_service.dart';
+import 'bandit_faction.dart';
 
 import 'animal.dart';
 import 'caravan.dart';
@@ -40,6 +42,8 @@ class NpcCaravan
 
   CaravanFaction faction;
 
+  BanditFaction? banditFaction;
+
   ActiveJourney? activeJourney;
 
   MarketLedger ledger;
@@ -58,6 +62,7 @@ class NpcCaravan
     required this.currentCity,
     required this.caravan,
     required this.faction,
+    this.banditFaction,
     required this.ledger,
     this.homeRegion,
     this.idleHoursRemaining = 0,
@@ -97,6 +102,7 @@ class NpcCaravan
       'currentCity': currentCity?.id,
       'homeRegion': homeRegion?.id,
       'caravan': caravan.toJson(),
+      'banditFaction': banditFaction?.id,
       'faction': faction.name,
       'ledger': ledger.toJson(),
       'activeJourney': activeJourney?.toJson(),
@@ -178,6 +184,13 @@ class NpcCaravan
                       faction.name ==
                       json['faction'],
                 ),
+                banditFaction:
+    json['banditFaction'] == null
+        ? null
+        : banditFactionForId(
+            json['banditFaction']
+                as String,
+          ),
       ledger: MarketLedger.fromJson(
         json['ledger']
             as Map<String, dynamic>,

@@ -6,6 +6,8 @@ import '../data/weapon_data.dart';
 
 import '../core/models/caravan.dart';
 import '../core/models/character.dart';
+import '../core/models/skill.dart';
+import '../core/caravan/skill_service.dart';
 
 class CharacterScreen extends StatefulWidget {
   final Character character;
@@ -347,25 +349,25 @@ class _CharacterScreenState
             ),
           ),
 
-          Text(
-            'Doctor: ${character.doctorSkill}',
-          ),
+Text(
+  'Doctor: ${SkillService.getLevel(character, Skill.doctor)}',
+),
 
-          Text(
-            'Vet: ${character.vetSkill}',
-          ),
+Text(
+  'Vet: ${SkillService.getLevel(character, Skill.vet)}',
+),
 
-          Text(
-            'Mechanic: ${character.mechanicSkill}',
-          ),
+Text(
+  'Mechanic: ${SkillService.getLevel(character, Skill.mechanic)}',
+),
 
-          Text(
-            'Scout: ${character.scoutSkill}',
-          ),
+Text(
+  'Scout: ${SkillService.getLevel(character, Skill.scout)}',
+),
 
-          Text(
-            'Combat: ${character.combatSkill}',
-          ),
+Text(
+  'Combat: ${SkillService.getLevel(character, Skill.combat)}',
+),
 
           const SizedBox(
             height: 16,

@@ -1,10 +1,10 @@
 import '../economy/animal_market_service.dart';
 import '../economy/equipment_market_service.dart';
 import '../economy/vehicle_market_service.dart';
+import '../city/recruitment_service.dart';
 
 import 'animal.dart';
 import 'armour.dart';
-import 'character.dart';
 import 'good.dart';
 import 'helmet.dart';
 import 'industry.dart';
@@ -40,6 +40,9 @@ class City {
   final EquipmentMarketTier?
       equipmentMarketTier;
 
+  final RecruitmentMarketTier
+    recruitmentMarketTier;    
+
   final bool hasVet;
 
   final bool hasCartwright;
@@ -47,8 +50,6 @@ class City {
   final bool hasDoctor;
 
   List<Recruit> recruits;
-
-  List<Character> residents;
 
   List<Animal> animalMarketStock;
 
@@ -80,11 +81,11 @@ class City {
     this.animalMarketTier,
     this.vehicleMarketTier,
     this.equipmentMarketTier,
+    required this.recruitmentMarketTier,
     this.hasVet = false,
     this.hasCartwright = false,
     this.hasDoctor = false,
     this.recruits = const [],
-    this.residents = const [],
     this.animalMarketStock =
         const [],
     this.vehicleMarketStock =
@@ -148,6 +149,9 @@ class City {
           vehicleMarketTier?.name,
       'equipmentMarketTier':
           equipmentMarketTier?.name,
+          'recruitmentMarketTier':
+    recruitmentMarketTier.name,
+
       'hasVet': hasVet,
       'hasCartwright':
           hasCartwright,
@@ -157,12 +161,6 @@ class City {
           .map(
             (recruit) =>
                 recruit.toJson(),
-          )
-          .toList(),
-      'residents': residents
-          .map(
-            (character) =>
-                character.toJson(),
           )
           .toList(),
       'animalMarketStock':
@@ -234,10 +232,6 @@ class City {
       Map<String, dynamic> json,
     )
     recruitFromJson,
-    required Character Function(
-      Map<String, dynamic> json,
-    )
-    characterFromJson,
     required Animal Function(
       Map<String, dynamic> json,
     )
@@ -331,6 +325,13 @@ class City {
                           tier.name ==
                           json['equipmentMarketTier'],
                     ),
+      recruitmentMarketTier:
+    RecruitmentMarketTier.values
+        .firstWhere(
+          (tier) =>
+              tier.name ==
+              json['recruitmentMarketTier'],
+        ),
       hasVet:
           json['hasVet']
                   as bool? ??
@@ -350,19 +351,6 @@ class City {
                     (recruitJson) =>
                         recruitFromJson(
                       recruitJson
-                          as Map<String,
-                              dynamic>,
-                    ),
-                  )
-                  .toList() ??
-              [],
-      residents:
-          (json['residents']
-                      as List?)
-                  ?.map(
-                    (characterJson) =>
-                        characterFromJson(
-                      characterJson
                           as Map<String,
                               dynamic>,
                     ),

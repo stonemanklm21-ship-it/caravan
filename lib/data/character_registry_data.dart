@@ -6,4 +6,5 @@ final characterRegistry =
   defaultPlayer.id: defaultPlayer,
   defaultNpc.id: defaultNpc,
   miningMerchant.id: miningMerchant,
+  forestForeman.id: forestForeman,
 });

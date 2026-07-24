@@ -3,6 +3,7 @@ import 'dart:math';
 import '../../data/animal_data.dart';
 import '../../data/caravan_templates.dart';
 import '../../data/vehicle_data.dart';
+import '../../data/game_balance.dart';
 import '../city/recruitment_service.dart';
 import '../caravan/animal_service.dart';
 import '../economy/market_ledger.dart';
@@ -25,7 +26,8 @@ class NpcCaravanGenerator {
     for (final city in cities) {
       final traderCount = max(
         1,
-        city.population ~/ 1000,
+        city.population ~/
+    GameBalance.peoplePerMerchant
       );
 
       for (
@@ -54,6 +56,9 @@ class NpcCaravanGenerator {
         );
       }
     }
+print(
+  'NpcCaravanGenerator: ${caravans.length}',
+);
 
     return caravans;
   }

@@ -1,59 +1,53 @@
+import 'package:flutter/material.dart';
+
 import '../../data/armour_data.dart';
 import '../../data/helmet_data.dart';
 import '../../data/weapon_data.dart';
-
 import 'animal.dart';
 import 'armour.dart';
 import 'helmet.dart';
+import 'portrait_dna.dart';
 import 'vehicle.dart';
 import 'weapon.dart';
 
 class Character {
   final String id;
-
   String name;
+  String? cityId;
+
+  /// Optional fixed portrait for story NPCs.
+  /// If null, portrait can be generated procedurally.
+  PortraitDna? portrait;
 
   int ageYears;
-
   final double weightKg;
-
   final double cargoCapacityKg;
-
   final double caloriesPerDay;
-
   final double waterPerDay;
-
   final double wagePerDay;
 
   double hp;
-
   final double maxHp;
-
   final double speed;
 
   Animal? mountedAnimal;
-
   Vehicle? mountedVehicle;
 
   Weapon? weapon;
-
   Armour? armour;
-
   Helmet? helmet;
 
-  int doctorSkill;
-
-  int vetSkill;
-
-  int mechanicSkill;
-
-  int scoutSkill;
-
-  int combatSkill;
+  double doctorXp;
+  double vetXp;
+  double mechanicXp;
+  double scoutXp;
+  double combatXp;
 
   Character({
     required this.id,
     required this.name,
+    this.cityId,
+    this.portrait,
     required this.ageYears,
     required this.weightKg,
     required this.cargoCapacityKg,
@@ -68,11 +62,11 @@ class Character {
     this.weapon,
     this.armour,
     this.helmet,
-    this.doctorSkill = 0,
-    this.vetSkill = 0,
-    this.mechanicSkill = 0,
-    this.scoutSkill = 0,
-    this.combatSkill = 0,
+    this.doctorXp = 0,
+    this.vetXp = 0,
+    this.mechanicXp = 0,
+    this.scoutXp = 0,
+    this.combatXp = 0,
   });
 
   bool get alive => hp > 0;
@@ -84,8 +78,7 @@ class Character {
   }
 
   double get availableCargoCapacityKg {
-    return cargoCapacityKg -
-        equipmentWeightKg;
+    return cargoCapacityKg - equipmentWeightKg;
   }
 
   int get accuracy {
@@ -126,6 +119,7 @@ class Character {
     return {
       'id': id,
       'name': name,
+      'cityId': cityId,
       'ageYears': ageYears,
       'weightKg': weightKg,
       'cargoCapacityKg': cargoCapacityKg,
@@ -142,11 +136,30 @@ class Character {
       'weapon': weapon?.id,
       'armour': armour?.id,
       'helmet': helmet?.id,
-      'doctorSkill': doctorSkill,
-      'vetSkill': vetSkill,
-      'mechanicSkill': mechanicSkill,
-      'scoutSkill': scoutSkill,
-      'combatSkill': combatSkill,
+  'doctorXp': doctorXp,
+  'vetXp': vetXp,
+  'mechanicXp': mechanicXp,
+  'scoutXp': scoutXp,
+  'combatXp': combatXp,
+
+      'portrait': portrait == null
+          ? null
+          : {
+              'headStyle':
+                  portrait!.headStyle,
+              'hairStyle':
+                  portrait!.hairStyle,
+              'eyeStyle':
+                  portrait!.eyeStyle,
+              'mouthStyle':
+                  portrait!.mouthStyle,
+              'skinColor':
+                  portrait!.skinColor.toARGB32(),
+              'hairColor':
+                  portrait!.hairColor.toARGB32(),
+              'mouthColor':
+                  portrait!.mouthColor.toARGB32(),
+            },
     };
   }
 
@@ -164,90 +177,133 @@ class Character {
     return Character(
       id: json['id'] as String,
       name: json['name'] as String,
+      cityId: json['cityId'] as String?,
+
+      portrait: json['portrait'] == null
+          ? null
+          : PortraitDna(
+              headStyle:
+                  json['portrait']['headStyle']
+                      as int,
+              hairStyle:
+                  json['portrait']['hairStyle']
+                      as int,
+              eyeStyle:
+                  json['portrait']['eyeStyle']
+                      as int,
+              mouthStyle:
+                  json['portrait']['mouthStyle']
+                      as int,
+              skinColor: Color(
+                json['portrait']['skinColor']
+                    as int,
+              ),
+              hairColor: Color(
+                json['portrait']['hairColor']
+                    as int,
+              ),
+              mouthColor: Color(
+                json['portrait']['mouthColor']
+                    as int,
+              ),
+            ),
+
       ageYears: json['ageYears'] as int,
+
       weightKg:
           (json['weightKg'] as num)
               .toDouble(),
+
       cargoCapacityKg:
           (json['cargoCapacityKg']
                   as num)
               .toDouble(),
+
       caloriesPerDay:
           (json['caloriesPerDay']
                   as num)
               .toDouble(),
+
       waterPerDay:
           (json['waterPerDay']
                   as num)
               .toDouble(),
+
       wagePerDay:
           (json['wagePerDay']
                   as num)
               .toDouble(),
+
       hp:
           (json['hp'] as num)
               .toDouble(),
+
       maxHp:
           (json['maxHp'] as num)
               .toDouble(),
+
       speed:
           (json['speed'] as num)
               .toDouble(),
+
       mountedAnimal:
           json['mountedAnimal'] == null
               ? null
               : animalFromJson(
                   json['mountedAnimal']
-                      as Map<String,
-                          dynamic>,
+                      as Map<String, dynamic>,
                 ),
+
       mountedVehicle:
           json['mountedVehicle'] == null
               ? null
               : vehicleFromJson(
                   json['mountedVehicle']
-                      as Map<String,
-                          dynamic>,
+                      as Map<String, dynamic>,
                 ),
-      weapon:
-          json['weapon'] == null
-              ? null
-              : weaponForId(
-                  json['weapon']
-                      as String,
-                ),
-      armour:
-          json['armour'] == null
-              ? null
-              : armourForId(
-                  json['armour']
-                      as String,
-                ),
-      helmet:
-          json['helmet'] == null
-              ? null
-              : helmetForId(
-                  json['helmet']
-                      as String,
-                ),
-      doctorSkill:
-          json['doctorSkill']
-                  as int? ??
-              0,
-      vetSkill:
-          json['vetSkill'] as int? ??
-              0,
-      mechanicSkill:
-          json['mechanicSkill']
-                  as int? ??
-              0,
-      scoutSkill:
-          json['scoutSkill'] as int? ??
-              0,
-      combatSkill:
-          json['combatSkill']
-                  as int? ??
-              0,
+
+      weapon: json['weapon'] == null
+          ? null
+          : weaponForId(
+              json['weapon'] as String,
+            ),
+
+      armour: json['armour'] == null
+          ? null
+          : armourForId(
+              json['armour'] as String,
+            ),
+
+      helmet: json['helmet'] == null
+          ? null
+          : helmetForId(
+              json['helmet'] as String,
+            ),
+
+doctorXp:
+    (json['doctorXp'] as num?)
+            ?.toDouble() ??
+        0,
+
+vetXp:
+    (json['vetXp'] as num?)
+            ?.toDouble() ??
+        0,
+
+mechanicXp:
+    (json['mechanicXp'] as num?)
+            ?.toDouble() ??
+        0,
+
+scoutXp:
+    (json['scoutXp'] as num?)
+            ?.toDouble() ??
+        0,
+
+combatXp:
+    (json['combatXp'] as num?)
+            ?.toDouble() ??
+        0,
     );
   }
 }

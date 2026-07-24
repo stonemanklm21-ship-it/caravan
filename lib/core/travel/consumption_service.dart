@@ -1,5 +1,6 @@
 import '../../data/goods_data.dart';
 import '../models/caravan.dart';
+import '../models/skill.dart';
 import '../caravan/skill_service.dart';
 
 class ConsumptionService {
@@ -178,11 +179,25 @@ class ConsumptionService {
               waterRequired);
     }
 
+    final unmitigatedDamage = damage;
+
     damage *= SkillService.asymptoticValue(
       skill:
           caravan.doctorSkill.toDouble(),
       start: 1.0,
       end: 1.0 / 3.0,
+    );
+
+    final preventedDamage =
+        unmitigatedDamage - damage;
+
+    SkillService.addSharedXp(
+      characters: [
+        caravan.leader,
+        ...caravan.companions,
+      ],
+      skill: Skill.doctor,
+      amount: preventedDamage * 500,
     );
 
     caravan.leader.hp =
@@ -229,11 +244,25 @@ class ConsumptionService {
               waterRequired);
     }
 
+    final unmitigatedDamage = damage;
+
     damage *= SkillService.asymptoticValue(
       skill:
           caravan.vetSkill.toDouble(),
       start: 1.0,
       end: 1.0 / 3.0,
+    );
+
+    final preventedDamage =
+        unmitigatedDamage - damage;
+
+    SkillService.addSharedXp(
+      characters: [
+        caravan.leader,
+        ...caravan.companions,
+      ],
+      skill: Skill.vet,
+      amount: preventedDamage * 500,
     );
 
     for (final animal

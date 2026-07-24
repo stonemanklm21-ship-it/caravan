@@ -8,7 +8,6 @@ import '../../data/vehicle_data.dart';
 import '../../data/weapon_data.dart';
 
 import 'animal.dart';
-import 'character.dart';
 import 'city.dart';
 import 'industry.dart';
 import 'market_good.dart';
@@ -23,10 +22,13 @@ class World {
 
   final List<NpcCaravan> caravansToRemove;
 
+  int lastPopulationMaintenanceHour;
+
   World({
     required this.cities,
     required this.npcCaravans,
     List<NpcCaravan>? caravansToRemove,
+    this.lastPopulationMaintenanceHour = 0,
   }) : caravansToRemove =
            caravansToRemove ?? [];
 
@@ -42,6 +44,8 @@ class World {
             (npc) => npc.toJson(),
           )
           .toList(),
+      'lastPopulationMaintenanceHour':
+          lastPopulationMaintenanceHour,
     };
   }
 
@@ -103,32 +107,6 @@ class World {
                     ),
                   ),
                 ),
-                characterFromJson:
-                    (characterJson) =>
-                        Character.fromJson(
-                  characterJson,
-                  animalFromJson:
-                      (animalJson) =>
-                          Animal.fromJson(
-                    json: animalJson,
-                    animalTypeForId:
-                        animalTypeForId,
-                  ),
-                  vehicleFromJson:
-                      (vehicleJson) =>
-                          Vehicle.fromJson(
-                    json: vehicleJson,
-                    vehicleTypeForId:
-                        vehicleTypeForId,
-                    animalFromJson:
-                        (animalJson) =>
-                            Animal.fromJson(
-                      json: animalJson,
-                      animalTypeForId:
-                          animalTypeForId,
-                    ),
-                  ),
-                ),
                 animalFromJson:
                     (animalJson) =>
                         Animal.fromJson(
@@ -164,6 +142,11 @@ class World {
       cities: cities,
       npcCaravans: [],
       caravansToRemove: [],
+      lastPopulationMaintenanceHour:
+          (json['lastPopulationMaintenanceHour']
+                  as num?)
+              ?.toInt() ??
+          0,
     );
 
     final npcCaravans =
@@ -182,6 +165,11 @@ class World {
       cities: cities,
       npcCaravans: npcCaravans,
       caravansToRemove: [],
+      lastPopulationMaintenanceHour:
+          (json['lastPopulationMaintenanceHour']
+                  as num?)
+              ?.toInt() ??
+          0,
     );
   }
 }

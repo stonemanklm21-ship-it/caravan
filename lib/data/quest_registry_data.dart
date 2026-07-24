@@ -4,4 +4,7 @@ import 'quest_data.dart';
 final questRegistry = QuestRegistry({
   visitMiningTownQuest.id:
       visitMiningTownQuest,
+
+  talkToForestForemanQuest.id:
+      talkToForestForemanQuest,
 });

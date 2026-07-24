@@ -4,6 +4,8 @@ import '../core/city/recruitment_service.dart';
 import '../core/models/character_portrait.dart';
 import '../core/models/player_state.dart';
 import '../core/models/recruit.dart';
+import '../core/models/skill.dart';
+import '../core/caravan/skill_service.dart';
 
 class RecruitmentScreen extends StatefulWidget {
   final PlayerState playerState;
@@ -71,11 +73,11 @@ class _RecruitmentScreenState
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
                 children: [
-                  CharacterPortrait(
-                    seed:
-                        character.id.hashCode,
-                    size: 96,
-                  ),
+                 CharacterPortrait(
+  seed: character.id.hashCode,
+  dna: character.portrait,
+  size: 96,
+),
 
                   const SizedBox(
                     width: 12,
@@ -99,13 +101,13 @@ class _RecruitmentScreenState
                           height: 4,
                         ),
 
-                        Text(
-                          '🩺${character.doctorSkill}  '
-                          '🐴${character.vetSkill}  '
-                          '🔧${character.mechanicSkill}  '
-                          '👁️${character.scoutSkill}  '
-                          '⚔️${character.combatSkill}',
-                        ),
+Text(
+  '🩺${SkillService.getLevel(character, Skill.doctor)}  '
+  '🐴${SkillService.getLevel(character, Skill.vet)}  '
+  '🔧${SkillService.getLevel(character, Skill.mechanic)}  '
+  '👁️${SkillService.getLevel(character, Skill.scout)}  '
+  '⚔️${SkillService.getLevel(character, Skill.combat)}',
+),
 
                         Text(
                           '🏃 ${character.speed.toStringAsFixed(1)} km/h',
