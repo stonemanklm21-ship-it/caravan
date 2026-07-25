@@ -3,15 +3,14 @@ import 'dart:math';
 import '../caravan/skill_service.dart';
 
 class VisibilityService {
-  static const double banditVisionRange = 100.0;
 
   static double caravanVisionRange(
     int scoutSkill,
   ) {
     return SkillService.asymptoticValue(
       skill: scoutSkill.toDouble(),
-      start: 40.0,
-      end: 200.0,
+      start: 4000.0,
+      end: 20000.0,
     );
   }
 

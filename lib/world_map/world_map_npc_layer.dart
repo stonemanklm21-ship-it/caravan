@@ -4,6 +4,8 @@ import '../core/models/npc_caravan.dart';
 import '../core/models/caravan_faction.dart';
 import '../core/world/visibility_service.dart';
 
+import '../data/game_balance.dart';
+
 import 'world_map_camera.dart';
 import 'world_map_npc_marker.dart';
 
@@ -88,22 +90,64 @@ class WorldMapNpcLayer
                 28.0,
               );
 
+              final visionRange =
+                  npc.faction ==
+                          CaravanFaction
+                              .bandit
+                      ? GameBalance
+                          .banditVisionRange
+                      : GameBalance
+                          .merchantVisionRange;
+
               return Positioned(
                 left:
                     screenPosition.dx -
-                    (markerSize + 8) / 2,
+                    (visionRange *
+                        camera.zoom),
                 top:
                     screenPosition.dy -
-                    (markerSize + 8) / 2,
+                    (visionRange *
+                        camera.zoom),
                 child: SizedBox(
                   width:
-                      markerSize + 8,
+                      visionRange *
+                          camera.zoom *
+                          2,
                   height:
-                      markerSize + 8,
+                      visionRange *
+                          camera.zoom *
+                          2,
                   child: Stack(
                     alignment:
                         Alignment.center,
                     children: [
+                      Container(
+                        width:
+                            visionRange *
+                                camera.zoom *
+                                2,
+                        height:
+                            visionRange *
+                                camera.zoom *
+                                2,
+                        decoration:
+                            BoxDecoration(
+                          shape:
+                              BoxShape
+                                  .circle,
+                          color: npc.faction ==
+                                  CaravanFaction
+                                      .bandit
+                              ? Colors.red
+                                  .withOpacity(
+                                  0.15,
+                                )
+                              : Colors.blue
+                                  .withOpacity(
+                                  0.15,
+                                ),
+                        ),
+                      ),
                       if (npc ==
                           selectedNpcCaravan)
                         Container(

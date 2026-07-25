@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/combat/combat_encounter.dart';
 import '../core/combat/combat_round_result.dart';
 import '../core/combat/combat_service.dart';
+import '../core/combat/combat_strength_service.dart';
 
 class CombatScreen extends StatefulWidget {
   final CombatEncounter encounter;
@@ -195,7 +196,23 @@ Column(
         CombatService.combatants(
       widget.encounter.attackers,
     );
+final playerStrength =
+    CombatStrengthService
+        .caravanStrength(
+  widget.encounter.defenders,
+);
 
+final enemyStrength =
+    CombatStrengthService
+        .caravanStrength(
+  widget.encounter.attackers,
+);
+
+final strengthRatio =
+    enemyStrength <= 0
+        ? 0
+        : playerStrength /
+            enemyStrength;
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -233,7 +250,26 @@ Column(
                 ),
               ),
             ),
-
+Padding(
+  padding:
+      const EdgeInsets.all(8),
+  child: Column(
+    children: [
+      Text(
+        'Player Strength: '
+        '${playerStrength.toStringAsFixed(1)}',
+      ),
+      Text(
+        'Enemy Strength: '
+        '${enemyStrength.toStringAsFixed(1)}',
+      ),
+      Text(
+        'Strength Ratio: '
+        '${strengthRatio.toStringAsFixed(2)}',
+      ),
+    ],
+  ),
+),
           _buildSide(
             title: 'Player Caravan',
             combatants:

@@ -95,9 +95,12 @@ class BanditCaravanGenerator {
       leader: true,
     );
 
-    final companionCount =
-        _random.nextInt(
-      faction.maxCompanions + 1,
+final companionCount =
+    faction.minCompanions +
+    _random.nextInt(
+      faction.maxCompanions -
+          faction.minCompanions +
+          1,
     );
 
     final companions =

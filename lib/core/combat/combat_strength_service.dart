@@ -1,3 +1,5 @@
+import '../../data/game_balance.dart';
+
 import '../caravan/skill_service.dart';
 import '../models/caravan.dart';
 import '../models/character.dart';
@@ -21,10 +23,18 @@ class CombatStrengthService {
         character.hp / character.maxHp;
 
     return
-        (combatLevel * 5) +
-        (character.damageDie * 3) +
-        (character.protection * 2) +
-        (hpFraction * 20);
+        (combatLevel *
+            GameBalance
+                .combatStrengthCombatLevelWeight) +
+        (character.damageDie *
+            GameBalance
+                .combatStrengthDamageWeight) +
+        (character.protection *
+            GameBalance
+                .combatStrengthProtectionWeight) +
+        (hpFraction *
+            GameBalance
+                .combatStrengthHpWeight);
   }
 
   static double caravanStrength(
@@ -44,5 +54,58 @@ class CombatStrengthService {
     }
 
     return total;
+  }
+
+  static void debugCaravan({
+    required String name,
+    required Caravan caravan,
+  }) {
+    print('=== $name ===');
+
+    final leaderStrength =
+        characterStrength(
+      caravan.leader,
+    );
+
+    print(
+      'Leader '
+      '${caravan.leader.name}: '
+      '$leaderStrength',
+    );
+
+    for (int i = 0;
+        i < caravan.companions.length;
+        i++) {
+      final companion =
+          caravan.companions[i];
+
+      print(
+        'Companion ${i + 1}: '
+        '${characterStrength(companion)}',
+      );
+    }
+
+    print(
+      'Total: '
+      '${caravanStrength(caravan)}',
+    );
+  }
+
+  static double strengthRatio({
+    required Caravan attacker,
+    required Caravan defender,
+  }) {
+    final attackerStrength =
+        caravanStrength(attacker);
+
+    final defenderStrength =
+        caravanStrength(defender);
+
+    if (defenderStrength <= 0) {
+      return double.infinity;
+    }
+
+    return attackerStrength /
+        defenderStrength;
   }
 }

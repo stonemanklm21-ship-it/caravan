@@ -317,9 +317,21 @@ class NpcCaravanService {
 
         break;
 
-        case CaravanState.roaming:
-case CaravanState.pursuing:
-  break;
+      case CaravanState.recovering:
+        npc.idleHoursRemaining -=
+            hours;
+
+        if (npc.idleHoursRemaining <=
+            0) {
+          npc.state =
+              CaravanState.idle;
+        }
+
+        break;
+
+      case CaravanState.roaming:
+      case CaravanState.pursuing:
+        break;
     }
   }
 
@@ -328,27 +340,37 @@ static void advanceAll({
   required PlayerState playerState,
   required double hours,
 }){
-    for (final npc
-        in world.npcCaravans) {
-      if (npc.faction ==
-          CaravanFaction.bandit) {
-BanditCaravanService
-    .advanceTime(
-  npc: npc,
-  world: world,
-  playerState: playerState,
-  hours: hours,
-);
+for (final npc
+    in world.npcCaravans) {
 
-        continue;
-      }
+  npc.surrenderProtectionHours -=
+      hours;
 
-      advanceTime(
-        npc: npc,
-        world: world,
-        hours: hours,
-      );
-    }
+  if (npc.surrenderProtectionHours <
+      0) {
+    npc.surrenderProtectionHours =
+        0;
+  }
+
+  if (npc.faction ==
+      CaravanFaction.bandit) {
+    BanditCaravanService
+        .advanceTime(
+      npc: npc,
+      world: world,
+      playerState: playerState,
+      hours: hours,
+    );
+
+    continue;
+  }
+
+  advanceTime(
+    npc: npc,
+    world: world,
+    hours: hours,
+  );
+}
 
     for (final npc
         in world.caravansToRemove) {

@@ -2,7 +2,6 @@ import '../models/npc_caravan.dart';
 import '../models/player_state.dart';
 import '../models/world.dart';
 import '../npc/npc_travel_service.dart';
-import '../world/visibility_service.dart';
 
 import 'bandit_pursuit_service.dart';
 import 'bandit_roaming_service.dart';
@@ -42,6 +41,18 @@ class BanditCaravanService {
         if (target != null) {
           npc.followTarget = target;
 
+          npc.worldX =
+              NpcTravelService.currentX(
+            npc,
+          );
+
+          npc.worldY =
+              NpcTravelService.currentY(
+            npc,
+          );
+
+          npc.activeJourney = null;
+
           npc.state =
               CaravanState.pursuing;
 
@@ -67,48 +78,6 @@ class BanditCaravanService {
         break;
 
       case CaravanState.pursuing:
-        final currentTarget =
-            npc.followTarget;
-
-        final betterTarget =
-            BanditTargetService
-                .findTarget(
-          bandit: npc,
-          world: world,
-          playerState: playerState,
-        );
-
-        if (currentTarget != null &&
-            betterTarget != null &&
-            betterTarget !=
-                currentTarget) {
-          final currentDistance =
-              VisibilityService.distance(
-            x1: NpcTravelService
-                .currentX(npc),
-            y1: NpcTravelService
-                .currentY(npc),
-            x2: currentTarget.x,
-            y2: currentTarget.y,
-          );
-
-          final newDistance =
-              VisibilityService.distance(
-            x1: NpcTravelService
-                .currentX(npc),
-            y1: NpcTravelService
-                .currentY(npc),
-            x2: betterTarget.x,
-            y2: betterTarget.y,
-          );
-
-          if (newDistance <
-              currentDistance * 0.5) {
-            npc.followTarget =
-                betterTarget;
-          }
-        }
-
         final pursuing =
             BanditPursuitService
                 .handlePursuit(
@@ -120,8 +89,26 @@ class BanditCaravanService {
         if (!pursuing) {
           npc.followTarget = null;
 
+          npc.worldX =
+              NpcTravelService.currentX(
+            npc,
+          );
+
+          npc.worldY =
+              NpcTravelService.currentY(
+            npc,
+          );
+
+          npc.activeJourney = null;
+
           npc.state =
               CaravanState.roaming;
+
+          BanditRoamingService
+              .startRoaming(
+            npc: npc,
+            world: world,
+          );
         }
 
         break;

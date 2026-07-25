@@ -11,6 +11,7 @@ import '../travel/travel_service.dart';
 import '../world/location_service.dart';
 import '../world/npc_population_service.dart';
 import '../../data/game_balance.dart';
+import '../models/caravan_faction.dart';
 
 class TimeService {
   static void advanceTime({
@@ -49,10 +50,28 @@ class TimeService {
     }
 
     for (final npc in world.npcCaravans) {
-      ConsumptionService.consume(
-        caravan: npc.caravan,
-        days: hours / 24,
-      );
+      final days = hours / 24;
+
+      if (npc.faction ==
+          CaravanFaction.bandit) {
+        npc.caravan.gold *=
+            (1 -
+                (GameBalance
+                        .banditDailyGoldDecay *
+                    days));
+
+        if (npc.caravan.gold < 1) {
+          npc.caravan.gold = 0;
+        }
+      }
+
+      if (npc.faction !=
+          CaravanFaction.bandit) {
+        ConsumptionService.consume(
+          caravan: npc.caravan,
+          days: days,
+        );
+      }
 
       AnimalService.advanceTimeForAll(
         animals: npc.caravan.animals,
@@ -138,24 +157,27 @@ class TimeService {
       }
     }
 
-playerState.worldTimeHours += hours;
+    playerState.worldTimeHours +=
+        hours;
 
-final currentHour =
-    playerState.worldTimeHours.floor();
+    final currentHour =
+        playerState.worldTimeHours.floor();
 
-if (currentHour -
-        world.lastPopulationMaintenanceHour >=
-    GameBalance
-        .populationMaintenanceHours) {
-  NpcPopulationService.maintain(
-    world,
-  );
+    if (currentHour -
+            world
+                .lastPopulationMaintenanceHour >=
+        GameBalance
+            .populationMaintenanceHours) {
+      NpcPopulationService.maintain(
+        world,
+      );
 
-  world.lastPopulationMaintenanceHour =
-      currentHour;
-}
+      world.lastPopulationMaintenanceHour =
+          currentHour;
+    }
 
-    DiscoveryService.discoverNearbyCities(
+    DiscoveryService
+        .discoverNearbyCities(
       playerState: playerState,
       world: world,
     );

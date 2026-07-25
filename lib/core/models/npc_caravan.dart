@@ -21,9 +21,9 @@ enum CaravanState {
   idle,
   travelling,
   selling,
-
   roaming,
   pursuing,
+  recovering
 }
 
 class NpcCaravan
@@ -56,6 +56,8 @@ class NpcCaravan
 
   CaravanState state;
 
+  double surrenderProtectionHours;
+
   NpcCaravan({
     required this.worldX,
     required this.worldY,
@@ -71,6 +73,7 @@ class NpcCaravan
     this.activeMission,
     this.followTarget,
     this.state = CaravanState.idle,
+    this.surrenderProtectionHours = 0,
   });
 
   @override
@@ -108,6 +111,8 @@ class NpcCaravan
       'activeJourney': activeJourney?.toJson(),
       'lastDecision': lastDecision,
       'state': state.name,
+      'surrenderProtectionHours':
+          surrenderProtectionHours,
     };
   }
 
@@ -155,7 +160,8 @@ class NpcCaravan
             json['caravan']
                 as Map<String, dynamic>,
         animalFromJson:
-            (animalJson) => Animal.fromJson(
+            (animalJson) =>
+                Animal.fromJson(
           json: animalJson,
           animalTypeForId:
               animalTypeForId,
@@ -184,13 +190,14 @@ class NpcCaravan
                       faction.name ==
                       json['faction'],
                 ),
-                banditFaction:
-    json['banditFaction'] == null
-        ? null
-        : banditFactionForId(
-            json['banditFaction']
-                as String,
-          ),
+      banditFaction:
+          json['banditFaction'] ==
+                  null
+              ? null
+              : banditFactionForId(
+                  json['banditFaction']
+                      as String,
+                ),
       ledger: MarketLedger.fromJson(
         json['ledger']
             as Map<String, dynamic>,
@@ -217,6 +224,12 @@ class NpcCaravan
             CaravanState.idle,
       ),
       activeMission: null,
+      surrenderProtectionHours:
+          (json[
+                      'surrenderProtectionHours']
+                  as num?)
+              ?.toDouble() ??
+          0,
     );
   }
 }

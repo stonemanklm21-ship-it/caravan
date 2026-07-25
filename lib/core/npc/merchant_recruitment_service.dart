@@ -1,24 +1,17 @@
 import 'dart:math';
 
 import '../caravan/skill_service.dart';
-import '../models/bandit_faction.dart';
 import '../models/character.dart';
 
-class BanditRecruitmentService {
+class MerchantRecruitmentService {
   static final Random _random =
       Random();
 
-  static Character generateBandit({
-    required BanditFaction faction,
-  }) {
-    final combatXp = _randomCombatXp(
-      faction.maxCombatLevel,
-    );
-
+  static Character generateMerchant() {
     return Character(
       id:
-          'bandit_${DateTime.now().microsecondsSinceEpoch}_${_random.nextInt(10000)}',
-      name: faction.name,
+          'merchant_${DateTime.now().microsecondsSinceEpoch}_${_random.nextInt(10000)}',
+      name: 'Merchant',
       ageYears:
           18 + _random.nextInt(43),
       weightKg:
@@ -33,7 +26,7 @@ class BanditRecruitmentService {
       speed:
           3 +
           (_random.nextDouble() * 3),
-      combatXp: combatXp,
+      combatXp: _randomCombatXp(),
       doctorXp: 0,
       vetXp: 0,
       mechanicXp: 0,
@@ -41,15 +34,10 @@ class BanditRecruitmentService {
     );
   }
 
-static double _randomCombatXp(
-  int maxLevel,
-) {
-  return pow(
-        _random.nextDouble(),
-        0.5,
-      ) *
-      SkillService.xpForLevel(
-        maxLevel,
-      );
+  static double _randomCombatXp() {
+    return _random.nextDouble() *
+        SkillService.xpForLevel(
+          20,
+        );
   }
 }

@@ -1,3 +1,7 @@
+import '../../data/game_balance.dart';
+
+import '../combat/npc_encounter_service.dart';
+import '../models/caravan_faction.dart';
 import '../models/npc_caravan.dart';
 import '../models/world.dart';
 import '../npc/npc_travel_service.dart';
@@ -14,6 +18,42 @@ class BanditPursuitService {
     required World world,
     required double hours,
   }) {
+    // Opportunistic encounters:
+    // rob any merchant already in range.
+    for (final other
+        in world.npcCaravans) {
+      if (other == npc) {
+        continue;
+      }
+
+      if (other.faction !=
+          CaravanFaction.merchant) {
+        continue;
+      }
+
+      final nearbyDistance =
+          VisibilityService.distance(
+        x1: npc.x,
+        y1: npc.y,
+        x2: other.x,
+        y2: other.y,
+      );
+
+      if (nearbyDistance <=
+          captureRange) {
+        NpcEncounterService
+            .resolveBanditVsMerchant(
+          bandit: npc,
+          merchant: other,
+          world: world,
+        );
+
+        npc.followTarget = null;
+
+        return false;
+      }
+    }
+
     final target =
         npc.followTarget;
 
@@ -21,11 +61,11 @@ class BanditPursuitService {
       return false;
     }
 
-final targetX =
-    target.smoothX;
+    final targetX =
+        target.smoothX;
 
-final targetY =
-    target.smoothY;
+    final targetY =
+        target.smoothY;
 
     if (BanditCityService
         .isInsideSafeZone(
@@ -53,7 +93,7 @@ final targetY =
     );
 
     if (distance >
-        VisibilityService
+        GameBalance
                 .banditVisionRange *
             1.2) {
       npc.followTarget = null;
@@ -64,8 +104,11 @@ final targetY =
     if (distance <=
         captureRange) {
       if (target is NpcCaravan) {
-        world.caravansToRemove.add(
-          target,
+        NpcEncounterService
+            .resolveBanditVsMerchant(
+          bandit: npc,
+          merchant: target,
+          world: world,
         );
       }
 
@@ -74,20 +117,20 @@ final targetY =
       return false;
     }
 
-    NpcTravelService
-        .startJourneyToCoordinates(
-      npc: npc,
-      destinationX: targetX,
-      destinationY: targetY,
-      originX:
-          NpcTravelService.currentX(
-        npc,
-      ),
-      originY:
-          NpcTravelService.currentY(
-        npc,
-      ),
-    );
+NpcTravelService
+    .startJourneyToCoordinates(
+  npc: npc,
+  destinationX: targetX,
+  destinationY: targetY,
+  originX:
+      NpcTravelService.currentX(
+    npc,
+  ),
+  originY:
+      NpcTravelService.currentY(
+    npc,
+  ),
+);
 
     return true;
   }

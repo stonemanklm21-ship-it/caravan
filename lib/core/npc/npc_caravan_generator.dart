@@ -4,7 +4,6 @@ import '../../data/animal_data.dart';
 import '../../data/caravan_templates.dart';
 import '../../data/vehicle_data.dart';
 import '../../data/game_balance.dart';
-import '../city/recruitment_service.dart';
 import '../caravan/animal_service.dart';
 import '../economy/market_ledger.dart';
 import '../models/animal.dart';
@@ -13,6 +12,8 @@ import '../models/city.dart';
 import '../models/npc_caravan.dart';
 import '../models/vehicle.dart';
 import '../models/caravan_faction.dart';
+import 'merchant_equipment_service.dart';
+import 'merchant_recruitment_service.dart';
 
 class NpcCaravanGenerator {
   static final Random _random =
@@ -56,9 +57,6 @@ class NpcCaravanGenerator {
         );
       }
     }
-print(
-  'NpcCaravanGenerator: ${caravans.length}',
-);
 
     return caravans;
   }
@@ -92,21 +90,31 @@ print(
   ) {
 
 final leader =
-    RecruitmentService
-        .generateRecruit(
-          tier:
-              RecruitmentMarketTier.major,
-        )
-        .character;
+MerchantRecruitmentService
+    .generateMerchant();
+
+MerchantEquipmentService
+    .equipMerchant(
+  character: leader,
+  leader: true,
+);
 
 final companions =
     List.generate(
   template.companions,
-  (_) => RecruitmentService
-      .generateRecruit(
-        tier:
-            RecruitmentMarketTier.major,
-      ).character,
+  (_) {
+    final character =
+MerchantRecruitmentService
+    .generateMerchant();
+
+    MerchantEquipmentService
+        .equipMerchant(
+      character: character,
+      leader: false,
+    );
+
+    return character;
+  },
 );
 
     final animals = <Animal>[];

@@ -15,15 +15,17 @@ const marauders = BanditFaction(
   id: 'marauders',
   name: 'Marauders',
   preferredWeapon: club,
-  maxCombatLevel: 20,
-  maxCompanions: 2,
+  maxCombatLevel: 40,
+  minCompanions: 2,
+  maxCompanions: 3,
 );
 
 const raiders = BanditFaction(
   id: 'raiders',
   name: 'Raiders',
   preferredWeapon: knife,
-  maxCombatLevel: 30,
+  maxCombatLevel: 50,
+  minCompanions: 1,
   maxCompanions: 3,
 );
 
@@ -31,7 +33,8 @@ const brigands = BanditFaction(
   id: 'brigands',
   name: 'Brigands',
   preferredWeapon: spear,
-  maxCombatLevel: 40,
+  maxCombatLevel: 60,
+  minCompanions: 2,
   maxCompanions: 4,
 );
 
@@ -39,7 +42,8 @@ const outlaws = BanditFaction(
   id: 'outlaws',
   name: 'Outlaws',
   preferredWeapon: sword,
-  maxCombatLevel: 50,
+  maxCombatLevel: 70,
+  minCompanions: 3,
   maxCompanions: 5,
 );
 
@@ -47,7 +51,8 @@ const reavers = BanditFaction(
   id: 'reavers',
   name: 'Reavers',
   preferredWeapon: battleAxe,
-  maxCombatLevel: 60,
+  maxCombatLevel: 80,
+  minCompanions: 4,
   maxCompanions: 6,
 );
 

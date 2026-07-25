@@ -2,10 +2,15 @@ import 'weapon.dart';
 
 class BanditFaction {
   final String id;
+
   final String name;
+
   final Weapon preferredWeapon;
 
   final int maxCombatLevel;
+
+  final int minCompanions;
+
   final int maxCompanions;
 
   const BanditFaction({
@@ -13,6 +18,7 @@ class BanditFaction {
     required this.name,
     required this.preferredWeapon,
     required this.maxCombatLevel,
+    required this.minCompanions,
     required this.maxCompanions,
   });
 }
