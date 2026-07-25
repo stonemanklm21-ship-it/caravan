@@ -30,10 +30,6 @@ class BanditTargetService {
       if (other
               .surrenderProtectionHours >
           0) {
-        print(
-          'Skip merchant: protection '
-          '${other.surrenderProtectionHours}',
-        );
         continue;
       }
 
@@ -75,25 +71,15 @@ class BanditTargetService {
         defender: other.caravan,
       );
 
-      print(
-        'Bandit vs merchant ratio '
-        '${ratio.toStringAsFixed(2)}',
-      );
 
       if (ratio <
           GameBalance
               .banditAttackRatio) {
-        print(
-          'Skip merchant: ratio too low',
-        );
         continue;
       }
 
       if (distance <
           nearestDistance) {
-        print(
-          'TARGET ACQUIRED',
-        );
 
         nearestDistance =
             distance;
@@ -128,9 +114,6 @@ class BanditTargetService {
           ratio >=
               GameBalance
                   .banditAttackRatio) {
-        print(
-          'PLAYER TARGET ACQUIRED',
-        );
 
         nearestDistance =
             playerDistance;

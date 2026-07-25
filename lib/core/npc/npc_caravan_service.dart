@@ -317,17 +317,42 @@ class NpcCaravanService {
 
         break;
 
-      case CaravanState.recovering:
-        npc.idleHoursRemaining -=
-            hours;
+case CaravanState.recovering:
+  npc.idleHoursRemaining -= hours;
 
-        if (npc.idleHoursRemaining <=
-            0) {
-          npc.state =
-              CaravanState.idle;
-        }
+  if (npc.idleHoursRemaining <= 0) {
+    final nearestCity =
+        world.cities.reduce(
+      (a, b) {
+        final da =
+            sqrt(
+          pow(a.x - npc.worldX, 2) +
+              pow(a.y - npc.worldY, 2),
+        );
 
-        break;
+        final db =
+            sqrt(
+          pow(b.x - npc.worldX, 2) +
+              pow(b.y - npc.worldY, 2),
+        );
+
+        return da < db ? a : b;
+      },
+    );
+
+    npc.lastDecision =
+        'Returning to ${nearestCity.name}';
+
+    npc.state =
+        CaravanState.travelling;
+
+    NpcTravelService.startJourney(
+      npc: npc,
+      destination: nearestCity,
+    );
+  }
+
+  break;
 
       case CaravanState.roaming:
       case CaravanState.pursuing:

@@ -60,18 +60,12 @@ class CombatStrengthService {
     required String name,
     required Caravan caravan,
   }) {
-    print('=== $name ===');
 
     final leaderStrength =
         characterStrength(
       caravan.leader,
     );
 
-    print(
-      'Leader '
-      '${caravan.leader.name}: '
-      '$leaderStrength',
-    );
 
     for (int i = 0;
         i < caravan.companions.length;
@@ -79,16 +73,7 @@ class CombatStrengthService {
       final companion =
           caravan.companions[i];
 
-      print(
-        'Companion ${i + 1}: '
-        '${characterStrength(companion)}',
-      );
     }
-
-    print(
-      'Total: '
-      '${caravanStrength(caravan)}',
-    );
   }
 
   static double strengthRatio({

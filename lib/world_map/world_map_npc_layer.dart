@@ -54,11 +54,11 @@ class WorldMapNpcLayer
       children: npcCaravans
           .where(
             (npc) {
-              if (npc.activeJourney == null &&
-                  npc.faction !=
-                      CaravanFaction.bandit) {
-                return false;
-              }
+if (npc.currentCity != null &&
+    npc.faction !=
+        CaravanFaction.bandit) {
+  return false;
+}
 
               return VisibilityService
                   .canSee(

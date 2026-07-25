@@ -89,9 +89,6 @@ const $id = CaravanTemplate(
     buffer.toString(),
   );
 
-  print(
-    'Generated ${rows.length} caravan templates.',
-  );
 }
 
 List<Map<String, dynamic>> readCsv(
