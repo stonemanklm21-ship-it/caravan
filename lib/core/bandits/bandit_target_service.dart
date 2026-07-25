@@ -7,6 +7,7 @@ import '../models/player_state.dart';
 import '../models/world.dart';
 import '../world/visibility_service.dart';
 
+import 'bandit_city_service.dart';
 import 'bandit_target.dart';
 
 class BanditTargetService {
@@ -35,6 +36,15 @@ class BanditTargetService {
 
       if (other.faction !=
           CaravanFaction.merchant) {
+        continue;
+      }
+
+      if (BanditCityService
+          .isInsideSafeZone(
+        x: other.smoothX,
+        y: other.smoothY,
+        world: world,
+      )) {
         continue;
       }
 
@@ -71,7 +81,6 @@ class BanditTargetService {
         defender: other.caravan,
       );
 
-
       if (ratio <
           GameBalance
               .banditAttackRatio) {
@@ -80,6 +89,13 @@ class BanditTargetService {
 
       if (distance <
           nearestDistance) {
+        print(
+          '${bandit.hashCode} '
+          'TARGET MERCHANT '
+          '${other.hashCode} '
+          'distance=$distance '
+          'ratio=$ratio',
+        );
 
         nearestDistance =
             distance;
@@ -114,6 +130,12 @@ class BanditTargetService {
           ratio >=
               GameBalance
                   .banditAttackRatio) {
+        print(
+          '${bandit.hashCode} '
+          'TARGET PLAYER '
+          'distance=$playerDistance '
+          'ratio=$ratio',
+        );
 
         nearestDistance =
             playerDistance;

@@ -1,8 +1,8 @@
 class GameBalance {
   // Population
 
-  static const int peoplePerMerchant = 1000;
-  static const int merchantsPerBandit = 5;
+  static const int peoplePerMerchant = 500;
+  static const int merchantsPerBandit = 3;
 
   // Visibility service
 

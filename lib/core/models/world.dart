@@ -7,6 +7,7 @@ import '../../data/region_data.dart';
 import '../../data/vehicle_data.dart';
 import '../../data/weapon_data.dart';
 
+import 'active_encounter.dart';
 import 'animal.dart';
 import 'city.dart';
 import 'industry.dart';
@@ -22,15 +23,24 @@ class World {
 
   final List<NpcCaravan> caravansToRemove;
 
+  final List<ActiveEncounter>
+      activeEncounters;
+
   int lastPopulationMaintenanceHour;
 
   World({
     required this.cities,
     required this.npcCaravans,
-    List<NpcCaravan>? caravansToRemove,
-    this.lastPopulationMaintenanceHour = 0,
-  }) : caravansToRemove =
-           caravansToRemove ?? [];
+    List<NpcCaravan>?
+        caravansToRemove,
+    List<ActiveEncounter>?
+        activeEncounters,
+    this.lastPopulationMaintenanceHour =
+        0,
+  })  : caravansToRemove =
+            caravansToRemove ?? [],
+        activeEncounters =
+            activeEncounters ?? [];
 
   Map<String, dynamic> toJson() {
     return {
@@ -142,6 +152,7 @@ class World {
       cities: cities,
       npcCaravans: [],
       caravansToRemove: [],
+      activeEncounters: [],
       lastPopulationMaintenanceHour:
           (json['lastPopulationMaintenanceHour']
                   as num?)
@@ -165,6 +176,7 @@ class World {
       cities: cities,
       npcCaravans: npcCaravans,
       caravansToRemove: [],
+      activeEncounters: [],
       lastPopulationMaintenanceHour:
           (json['lastPopulationMaintenanceHour']
                   as num?)

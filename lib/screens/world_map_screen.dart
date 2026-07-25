@@ -26,6 +26,7 @@ import '../core/models/caravan_faction.dart';
 import '../core/combat/combat_encounter.dart';
 import '../screens/combat_screen.dart';
 import '../core/world/visibility_service.dart';
+import '../core/combat/encounter_service.dart';
 
 class WorldMapScreen extends StatefulWidget {
   const WorldMapScreen({
@@ -660,18 +661,46 @@ WorldMapNpcLayer(
   ),
   scoutSkill:
       game.player.caravan.scoutSkill,
-  getX: (npc) =>
-      NpcTravelService
-          .currentXSmooth(
+getX: (npc) {
+  final encounter =
+      EncounterService
+          .encounterForNpc(
+    npc: npc,
+    world: game.world,
+  );
+
+  if (encounter != null) {
+    return encounter.bandit == npc
+        ? encounter.banditX
+        : encounter.merchantX;
+  }
+
+  return NpcTravelService
+      .currentXSmooth(
     npc,
     tickFraction,
-  ),
-  getY: (npc) =>
-      NpcTravelService
-          .currentYSmooth(
+  );
+},
+getY: (npc) {
+  final encounter =
+      EncounterService
+          .encounterForNpc(
+    npc: npc,
+    world: game.world,
+  );
+
+  if (encounter != null) {
+    return encounter.bandit == npc
+        ? encounter.banditY
+        : encounter.merchantY;
+  }
+
+  return NpcTravelService
+      .currentYSmooth(
     npc,
     tickFraction,
-  ),
+  );
+},
 ),
 
 WorldMapPlayerLayer(

@@ -115,7 +115,7 @@ class NpcTravelService {
     npc.currentCity = null;
   }
 
-static void moveTowardsCoordinates({
+  static void moveTowardsCoordinates({
     required NpcCaravan npc,
     required double destinationX,
     required double destinationY,

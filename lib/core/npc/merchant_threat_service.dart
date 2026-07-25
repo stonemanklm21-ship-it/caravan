@@ -1,5 +1,5 @@
 import '../../data/game_balance.dart';
-  
+
 import '../combat/combat_strength_service.dart';
 import '../models/caravan_faction.dart';
 import '../models/city.dart';
@@ -16,6 +16,12 @@ class MerchantThreatService {
   }) {
     if (merchant.faction !=
         CaravanFaction.merchant) {
+      return false;
+    }
+
+    // Already fleeing/travelling.
+    if (merchant.activeJourney !=
+        null) {
       return false;
     }
 
@@ -98,6 +104,19 @@ class MerchantThreatService {
     required NpcCaravan merchant,
     required City city,
   }) {
+    final currentX =
+        NpcTravelService.currentX(
+      merchant,
+    );
+
+    final currentY =
+        NpcTravelService.currentY(
+      merchant,
+    );
+
+    merchant.worldX = currentX;
+    merchant.worldY = currentY;
+
     merchant.currentCity = null;
 
     merchant.activeMission = null;
@@ -110,6 +129,8 @@ class MerchantThreatService {
     NpcTravelService.startJourney(
       npc: merchant,
       destination: city,
+      originX: currentX,
+      originY: currentY,
     );
   }
-} 
+}

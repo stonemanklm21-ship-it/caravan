@@ -39,7 +39,7 @@ class BanditRoamingService {
       world: world,
     );
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 50; i++) {
       final angle =
           _random.nextDouble() *
               pi *
@@ -80,14 +80,26 @@ startY: NpcTravelService.currentY(npc),
         continue;
       }
 
-      NpcTravelService
-          .startJourneyToCoordinates(
-        npc: npc,
-        destinationX:
-            destinationX,
-        destinationY:
-            destinationY,
-      );
+final currentX =
+    NpcTravelService.currentX(
+  npc,
+);
+
+final currentY =
+    NpcTravelService.currentY(
+  npc,
+);
+
+NpcTravelService
+    .startJourneyToCoordinates(
+  npc: npc,
+  destinationX:
+      destinationX,
+  destinationY:
+      destinationY,
+  originX: currentX,
+  originY: currentY,
+);
 
       return;
     }

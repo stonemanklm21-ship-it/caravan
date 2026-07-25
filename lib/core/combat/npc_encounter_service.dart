@@ -61,6 +61,11 @@ class NpcEncounterService {
       bandit.lastDecision =
           'Robbed merchant';
 
+      bandit.followTarget = null;
+
+      bandit.state =
+          CaravanState.roaming;
+
       return;
     }
 

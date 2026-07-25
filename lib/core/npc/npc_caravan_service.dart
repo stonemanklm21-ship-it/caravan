@@ -13,6 +13,8 @@ import 'npc_travel_service.dart';
 import '../bandits/bandit_caravan_service.dart';
 import '../models/caravan_faction.dart';
 import '../models/player_state.dart';
+import '../combat/encounter_service.dart';
+import 'merchant_threat_service.dart';
 
 class NpcCaravanService {
   static void clearMission(
@@ -241,12 +243,30 @@ class NpcCaravanService {
     );
   }
 
-  static void advanceTime({
-    required NpcCaravan npc,
-    required World world,
-    required double hours,
-  }) {
-    switch (npc.state) {
+static void advanceTime({
+  required NpcCaravan npc,
+  required World world,
+  required double hours,
+}) {
+
+  if (EncounterService.isInEncounter(
+    npc: npc,
+    world: world,
+  )) {
+    return;
+  }
+  
+if (npc.faction ==
+    CaravanFaction.merchant) {
+  if (MerchantThreatService
+      .handleThreats(
+    merchant: npc,
+    world: world,
+  )) {
+    return;
+  }
+}
+  switch (npc.state) {
       case CaravanState.idle:
         npc.idleHoursRemaining -=
             hours;
@@ -364,46 +384,52 @@ static void advanceAll({
   required World world,
   required PlayerState playerState,
   required double hours,
-}){
-for (final npc
-    in world.npcCaravans) {
+}) {
 
-  npc.surrenderProtectionHours -=
-      hours;
-
-  if (npc.surrenderProtectionHours <
-      0) {
-    npc.surrenderProtectionHours =
-        0;
-  }
-
-  if (npc.faction ==
-      CaravanFaction.bandit) {
-    BanditCaravanService
-        .advanceTime(
-      npc: npc,
-      world: world,
-      playerState: playerState,
-      hours: hours,
-    );
-
-    continue;
-  }
-
-  advanceTime(
-    npc: npc,
+  EncounterService.advance(
     world: world,
     hours: hours,
   );
-}
 
-    for (final npc
-        in world.caravansToRemove) {
-      world.npcCaravans.remove(
-        npc,
-      );
+  for (final npc
+      in world.npcCaravans) {
+
+    npc.surrenderProtectionHours -=
+        hours;
+
+    if (npc.surrenderProtectionHours <
+        0) {
+      npc.surrenderProtectionHours =
+          0;
     }
 
-    world.caravansToRemove.clear();
+    if (npc.faction ==
+        CaravanFaction.bandit) {
+      BanditCaravanService
+          .advanceTime(
+        npc: npc,
+        world: world,
+        playerState: playerState,
+        hours: hours,
+      );
+
+      continue;
+    }
+
+    advanceTime(
+      npc: npc,
+      world: world,
+      hours: hours,
+    );
   }
+
+  for (final npc
+      in world.caravansToRemove) {
+    world.npcCaravans.remove(
+      npc,
+    );
+  }
+
+  world.caravansToRemove.clear();
+}
 }
