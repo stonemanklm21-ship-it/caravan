@@ -8,7 +8,6 @@ import '../../core/caravan/vehicle_service.dart';
 import '../../core/models/city.dart';
 import '../../core/models/player_state.dart';
 import '../../core/travel/journey_service.dart';
-import '../../core/travel/journey_factory.dart';
 import '../../data/goods_data.dart';
 
 class TravelConfirmationDialog

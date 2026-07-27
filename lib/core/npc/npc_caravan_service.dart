@@ -268,20 +268,22 @@ final travelDays =
       return;
     }
 
-    if (npc.faction ==
-        CaravanFaction.merchant) {
-      if (MerchantThreatService
-          .handleThreats(
-        merchant: npc,
-        world: world,
-        worldTimeHours:
-            worldTimeHours,
-        tickFraction:
-            tickFraction,
-      )) {
-        return;
-      }
-    }
+
+if (npc.faction ==
+    CaravanFaction.merchant) {
+  if (MerchantThreatService
+      .handleThreats(
+    merchant: npc,
+    world: world,
+    worldTimeHours:
+        worldTimeHours,
+    tickFraction:
+        tickFraction,
+  )) {
+    return;
+  }
+}
+
 
     switch (npc.state) {
       case CaravanState.idle:

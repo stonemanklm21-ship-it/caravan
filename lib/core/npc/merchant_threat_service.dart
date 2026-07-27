@@ -35,6 +35,20 @@ class MerchantThreatService {
       return false;
     }
 
+    final merchantX =
+        NpcTravelService.currentX(
+      npc: merchant,
+      worldTimeHours:
+          worldTimeHours,
+    );
+
+    final merchantY =
+        NpcTravelService.currentY(
+      npc: merchant,
+      worldTimeHours:
+          worldTimeHours,
+    );
+
     NpcCaravan? nearestBandit;
 
     double nearestDistance =
@@ -51,12 +65,26 @@ class MerchantThreatService {
         continue;
       }
 
+      final banditX =
+          NpcTravelService.currentX(
+        npc: npc,
+        worldTimeHours:
+            worldTimeHours,
+      );
+
+      final banditY =
+          NpcTravelService.currentY(
+        npc: npc,
+        worldTimeHours:
+            worldTimeHours,
+      );
+
       final distance =
           VisibilityService.distance(
-        x1: merchant.x,
-        y1: merchant.y,
-        x2: npc.x,
-        y2: npc.y,
+        x1: merchantX,
+        y1: merchantY,
+        x2: banditX,
+        y2: banditY,
       );
 
       if (distance >
@@ -95,8 +123,8 @@ class MerchantThreatService {
     final safeCity =
         LocationService.nearestCity(
       world: world,
-      x: merchant.x,
-      y: merchant.y,
+      x: merchantX,
+      y: merchantY,
     );
 
     _fleeToCity(
@@ -120,6 +148,26 @@ class MerchantThreatService {
     required double worldTimeHours,
     required double tickFraction,
   }) {
+    final fleeX =
+        NpcTravelService
+            .currentXSmooth(
+      npc: merchant,
+      worldTimeHours:
+          worldTimeHours,
+      tickFraction:
+          tickFraction,
+    );
+
+    final fleeY =
+        NpcTravelService
+            .currentYSmooth(
+      npc: merchant,
+      worldTimeHours:
+          worldTimeHours,
+      tickFraction:
+          tickFraction,
+    );
+
     merchant.activeJourney = null;
 
     merchant.currentCity = null;
@@ -136,24 +184,8 @@ class MerchantThreatService {
       destination: city,
       worldTimeHours:
           worldTimeHours,
-      originX:
-          NpcTravelService
-              .currentXSmooth(
-        npc: merchant,
-        worldTimeHours:
-            worldTimeHours,
-        tickFraction:
-            tickFraction,
-      ),
-      originY:
-          NpcTravelService
-              .currentYSmooth(
-        npc: merchant,
-        worldTimeHours:
-            worldTimeHours,
-        tickFraction:
-            tickFraction,
-      ),
+      originX: fleeX,
+      originY: fleeY,
     );
   }
 }

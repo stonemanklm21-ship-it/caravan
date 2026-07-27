@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import '../models/world.dart';
+import '../../data/game_balance.dart';
 
 class BanditCityService {
-  static const double cityExclusionRadius =
-      50;
+
 
 static bool isInsideSafeZone({
   required double x,
@@ -20,8 +20,8 @@ static bool isInsideSafeZone({
       (dy * dy),
     );
 
-    if (distance <=
-        cityExclusionRadius) {
+  if (distance <=
+    GameBalance.citySafeZoneRadius) {
 
       return true;
     }

@@ -1,9 +1,19 @@
 class GameBalance {
+  
+  // City
+
+  static const double citySafeZoneRadius = 50;
+  
   // Population
 
   static const int peoplePerMerchant = 500;
   static const int merchantsPerBandit = 3;
 
+    // Population maintenance
+
+  static const int populationMaintenanceHours = 24;
+
+  
   // Visibility service
 
   static const double banditVisionRange = 100.0;
@@ -34,7 +44,4 @@ class GameBalance {
 
   static const double surrenderRatio = 2.0;
 
-  // Population maintenance
-
-  static const int populationMaintenanceHours = 24;
 }

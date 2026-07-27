@@ -24,8 +24,18 @@ class PlayerFollowService {
       departureHour:
           player.worldTimeHours +
           tickFraction,
-      destinationX: target.x,
-      destinationY: target.y,
+      destinationX:
+          NpcTravelService.currentX(
+        npc: target,
+        worldTimeHours:
+            player.worldTimeHours,
+      ),
+      destinationY:
+          NpcTravelService.currentY(
+        npc: target,
+        worldTimeHours:
+            player.worldTimeHours,
+      ),
       originX:
           JourneyService.currentXSmooth(
         player,

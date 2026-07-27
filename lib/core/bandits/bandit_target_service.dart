@@ -5,6 +5,7 @@ import '../models/caravan_faction.dart';
 import '../models/npc_caravan.dart';
 import '../models/player_state.dart';
 import '../models/world.dart';
+import '../npc/npc_travel_service.dart';
 import '../world/visibility_service.dart';
 
 import 'bandit_city_service.dart';
@@ -20,6 +21,20 @@ class BanditTargetService {
 
     double nearestDistance =
         double.infinity;
+
+    final banditX =
+        NpcTravelService.currentX(
+      npc: bandit,
+      worldTimeHours:
+          playerState.worldTimeHours,
+    );
+
+    final banditY =
+        NpcTravelService.currentY(
+      npc: bandit,
+      worldTimeHours:
+          playerState.worldTimeHours,
+    );
 
     // Merchants
     for (final other
@@ -39,10 +54,24 @@ class BanditTargetService {
         continue;
       }
 
+      final merchantX =
+          NpcTravelService.currentX(
+        npc: other,
+        worldTimeHours:
+            playerState.worldTimeHours,
+      );
+
+      final merchantY =
+          NpcTravelService.currentY(
+        npc: other,
+        worldTimeHours:
+            playerState.worldTimeHours,
+      );
+
       if (BanditCityService
           .isInsideSafeZone(
-        x: other.smoothX,
-        y: other.smoothY,
+        x: merchantX,
+        y: merchantY,
         world: world,
       )) {
         continue;
@@ -50,10 +79,10 @@ class BanditTargetService {
 
       final distance =
           VisibilityService.distance(
-        x1: bandit.x,
-        y1: bandit.y,
-        x2: other.x,
-        y2: other.y,
+        x1: banditX,
+        y1: banditY,
+        x2: merchantX,
+        y2: merchantY,
       );
 
       if (distance >
@@ -89,8 +118,8 @@ class BanditTargetService {
     if (!playerState.isInSafeZone) {
       final playerDistance =
           VisibilityService.distance(
-        x1: bandit.x,
-        y1: bandit.y,
+        x1: banditX,
+        y1: banditY,
         x2: playerState.x,
         y2: playerState.y,
       );

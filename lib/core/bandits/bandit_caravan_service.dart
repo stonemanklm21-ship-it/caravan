@@ -1,10 +1,11 @@
+import '../bandits/bandit_target_service.dart';
+import '../combat/encounter_service.dart';
 import '../models/npc_caravan.dart';
 import '../models/player_state.dart';
 import '../models/world.dart';
-import '../models/debug_npc_tracker.dart';
 import '../npc/npc_travel_service.dart';
-import '../combat/encounter_service.dart';
 
+import 'bandit_pursuit_service.dart';
 import 'bandit_roaming_service.dart';
 
 class BanditCaravanService {
@@ -30,18 +31,6 @@ class BanditCaravanService {
       return;
     }
 
-    if (npc.hashCode ==
-        DebugNpcTracker.trackedNpcHashCode) {
-      final complete =
-          NpcTravelService.isComplete(
-        npc: npc,
-        worldTimeHours:
-            playerState.worldTimeHours +
-            tickFraction,
-      );
-
-    }
-
     if (npc.activeJourney != null &&
         NpcTravelService.isComplete(
           npc: npc,
@@ -54,14 +43,31 @@ class BanditCaravanService {
       );
     }
 
+npc.followTarget =
+    BanditTargetService.findTarget(
+  bandit: npc,
+  world: world,
+  playerState: playerState,
+);
+
+    if (BanditPursuitService.update(
+      bandit: npc,
+      world: world,
+      worldTimeHours:
+          playerState.worldTimeHours,
+      tickFraction:
+          tickFraction,
+    )) {
+      return;
+    }
+
     if (npc.activeJourney == null) {
       BanditRoamingService
           .startRoaming(
         npc: npc,
         world: world,
         worldTimeHours:
-            playerState
-                .worldTimeHours,
+            playerState.worldTimeHours,
         tickFraction:
             tickFraction,
       );
