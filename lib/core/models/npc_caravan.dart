@@ -5,7 +5,6 @@ import '../../data/bandit_faction_data.dart';
 import '../bandits/bandit_target.dart';
 import '../economy/market_ledger.dart';
 import '../travel/active_journey.dart';
-import '../npc/npc_travel_service.dart';
 import 'bandit_faction.dart';
 
 import 'animal.dart';
@@ -23,7 +22,8 @@ enum CaravanState {
   selling,
   roaming,
   pursuing,
-  recovering
+  recovering,
+  fleeing,
 }
 
 class NpcCaravan
@@ -77,16 +77,10 @@ class NpcCaravan
   });
 
   @override
-  double get x =>
-      NpcTravelService.currentX(
-        this,
-      );
+  double get x => worldX;
 
   @override
-  double get y =>
-      NpcTravelService.currentY(
-        this,
-      );
+  double get y => worldY;
 
   @override
   double get smoothX => x;

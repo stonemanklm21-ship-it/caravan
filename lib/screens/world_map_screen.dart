@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
-import '../core/npc/npc_travel_service.dart';
 import '../core/travel/journey_service.dart';
-import '../core/travel/travel_service.dart';
-import '../core/travel/player_follow_service.dart';
 import '../core/world/time_controller.dart';
-import '../core/world/location_service.dart';
 import '../data/cities_data.dart';
 import '../data/game_data.dart';
 import '../world_map/world_map_background_layer.dart';
@@ -25,8 +21,13 @@ import '../screens/npc_trade_screen.dart';
 import '../core/models/caravan_faction.dart';
 import '../core/combat/combat_encounter.dart';
 import '../screens/combat_screen.dart';
-import '../core/world/visibility_service.dart';
-import '../core/combat/encounter_service.dart';
+import '../core/world/map_runtime_service.dart';
+import '../core/world/map_interaction_service.dart';
+import '../core/world/map_encounter_interaction_service.dart';
+import '../core/world/map_combat_interaction_service.dart';
+import '../core/world/map_snapshot_service.dart';
+import '../core/world/map_snapshot.dart';
+
 
 class WorldMapScreen extends StatefulWidget {
   const WorldMapScreen({
@@ -105,11 +106,7 @@ _renderController.addListener(() {
   if (!mounted) {
     return;
   }
-PlayerFollowService.update(
-  player: game.player,
-  tickFraction:
-      _timeController.tickFraction,
-);
+
 if (game.player.encounteredNpc != null 
 &&
     !_encounterActive
@@ -142,8 +139,10 @@ if (npc.faction ==
           actions: [
             TextButton(
               onPressed: () {
-                game.player.encounteredNpc =
-                    null;
+                MapEncounterInteractionService
+    .dismissEncounter(
+  player: game.player,
+);
 
                 _encounterActive = false;
 
@@ -155,8 +154,7 @@ if (npc.faction ==
             ),
             TextButton(
               onPressed: () {
-                game.player.encounteredNpc =
-                    null;
+                MapEncounterInteractionService.prepareCombat(player: game.player,);
 
                 _encounterActive = false;
 
@@ -178,11 +176,13 @@ Navigator.push<bool>(
 ).then(
   (playerWon) {
     if (playerWon == true) {
-      setState(() {
-        game.world.npcCaravans.remove(
-          npc,
-        );
-      });
+setState(() {
+  MapCombatInteractionService
+      .removeDefeatedNpc(
+    world: game.world,
+    npc: npc,
+  );
+});
     }
   },
 );
@@ -214,12 +214,15 @@ Navigator.push<bool>(
             ),
             content: const Text(
               'You have encountered a merchant caravan.',
-            ),
+            ),  
             actions: [
               TextButton(
 onPressed: () {
-game.player.ignoredNpcs.add(npc);
-  game.player.encounteredNpc = null;
+MapEncounterInteractionService
+    .ignoreEncounter(
+  player: game.player,
+  npc: npc,
+);
 
   _encounterActive = false;
 
@@ -231,7 +234,10 @@ game.player.ignoredNpcs.add(npc);
               ),
               TextButton(
 onPressed: () {
-  game.player.encounteredNpc = null;
+MapEncounterInteractionService
+    .dismissEncounter(
+  player: game.player,
+);
 
   _encounterActive = false;
 
@@ -258,91 +264,32 @@ onPressed: () {
 
     return;
   }
-  final renderedX =
-      JourneyService.currentXSmooth(
-    game.player,
-    _timeController.tickFraction,
-  );
 
-  final renderedY =
-            JourneyService.currentYSmooth(game.player,
-    _timeController.tickFraction,
-  );
+final snapshot =  _currentSnapshot();
 
-if (game.player.encounteredNpc == null &&
-    game.player.currentCity == null) {
-  for (final npc in game.world.npcCaravans) {
+final renderedX = snapshot.playerX;
 
-if (game.player.ignoredNpcs.contains(npc)) {
-  continue;
-}
-    if (npc.activeJourney == null) {
-      continue;
-    }
+final renderedY = snapshot.playerY;
 
-    final npcX =
-        NpcTravelService.currentXSmooth(
-      npc,
+final mapEvent =
+    MapRuntimeService.update(
+  player: game.player,
+  world: game.world,
+  tickFraction:
       _timeController.tickFraction,
-    );
-
-    final npcY =
-        NpcTravelService.currentYSmooth(
-      npc,
-      _timeController.tickFraction,
-    );
-
-    final dx = renderedX - npcX;
-    final dy = renderedY - npcY;
-
-    final distance = sqrt(
-      (dx * dx) + (dy * dy),
-    );
-
-if (distance < 25) {
-  game.player.encounteredNpc = npc;
-  game.player.ignoredNpcs.add(npc);
-  break;
-}
-  }
-}
-
-
-  if (game.player.activeJourney != null &&
-      _lastRenderedX != null &&
-      _lastRenderedY != null) {
-    for (final city in game.world.cities) {
-      if (city ==
-          game.player.activeJourney!.originCity) {
-        continue;
-      }
-
-      if (LocationService.segmentIntersectsCity(
-        startX: _lastRenderedX!,
-        startY: _lastRenderedY!,
-        endX: renderedX,
-        endY: renderedY,
-        city: city,
-      )) {
-
-  TravelService.enterCity(
-    playerState: game.player,
-    city: city,
-  );
-
-
-game.player.followTarget = null;
-
-game.player.ignoredNpcs.clear();
-
-JourneyService.clearJourney(
-  game.player,
+  worldTimeHours:
+      game.player.worldTimeHours,
+  renderedX: renderedX,
+  renderedY: renderedY,
+  lastRenderedX:
+      _lastRenderedX,
+  lastRenderedY:
+      _lastRenderedY,
 );
 
-        break;
-      }
-    }
-  }
+if (mapEvent != null) {
+  // handled later
+}
 
   _lastRenderedX = renderedX;
   _lastRenderedY = renderedY;
@@ -369,48 +316,37 @@ if (!_playerWasInCity &&
   _playerWasInCity =
       currentlyInCity;
 
-  final playerTravelling =
-      game.player.activeJourney !=
-          null;
-
-      final npcTravelling = game
-          .world.npcCaravans
-          .any(
-            (npc) =>
-                npc.activeJourney !=
-                null,
-          );
-
-      if (_followPlayer &&
-          playerTravelling) {
+if (_followPlayer &&
+    snapshot.playerTravelling)
+{
         final viewportSize =
             MediaQuery.sizeOf(
           context,
         );
 
-        camera.x =
-            JourneyService.currentXSmooth(
-          game.player,
-          _timeController.tickFraction,
-        );
-
-        camera.y =
-            JourneyService.currentYSmooth(
-          game.player,
-          _timeController.tickFraction,
-        );
+camera.x = renderedX;
+camera.y = renderedY;
 
         camera.clampToWorld(
           viewportSize: viewportSize,
         );
       }
 
-      if (playerTravelling ||
-          npcTravelling) {
+if (snapshot.playerTravelling ||
+    snapshot.npcTravelling) {
         setState(() {});
       }
     });
   }
+
+MapSnapshot _currentSnapshot() {
+  return MapSnapshotService.build(
+    player: game.player,
+    world: game.world,
+    tickFraction:
+        _timeController.tickFraction,
+  );
+}
 
   @override
   void dispose() {
@@ -479,17 +415,11 @@ if (!_playerWasInCity &&
 
       camera.zoom = 1.5;
 
-      camera.x =
-          JourneyService.currentXSmooth(
-        game.player,
-        _timeController.tickFraction,
-      );
+final snapshot =
+    _currentSnapshot();
 
-      camera.y =
-          JourneyService.currentYSmooth(
-        game.player,
-        _timeController.tickFraction,
-      );
+camera.x = snapshot.playerX;
+camera.y = snapshot.playerY;
 
       camera.clampToWorld(
         viewportSize: viewportSize,
@@ -497,10 +427,12 @@ if (!_playerWasInCity &&
     });
   }
 
-  Future<void> _handleTap({
-    required TapUpDetails details,
-    required Size viewportSize,
-  }) async {
+Future<void> _handleTap({
+  required TapUpDetails details,
+  required Size viewportSize,
+  required MapSnapshot snapshot,
+}) async {
+
     final worldPosition =
         camera.screenToWorld(
       screenX:
@@ -510,33 +442,19 @@ if (!_playerWasInCity &&
       viewportSize: viewportSize,
     );
 
-    final newSelection =
-        WorldMapSelectionController
-            .selectionFromWorldPosition(
-
-              
-      worldX: worldPosition.dx,
-      worldY: worldPosition.dy,
-      cities: cities,
-      npcCaravans:
-          game.world.npcCaravans,
-      getNpcX: (npc) =>
-          NpcTravelService
-              .currentXSmooth(
-        npc,
-        _timeController
-            .tickFraction,
-      ),
-      getNpcY: (npc) =>
-          NpcTravelService
-              .currentYSmooth(
-        npc,
-        _timeController
-            .tickFraction,
-      ),
+    final newSelection = WorldMapSelectionController.selectionFromWorldPosition(
+        
+      worldX:             worldPosition.dx,
+      worldY:             worldPosition.dy,
+      cities:             cities,
+      npcCaravans:        game.world.npcCaravans,
+      npcPositions:       snapshot.npcPositions,
     );
 if (!newSelection.isNpcCaravan) {
-  game.player.followTarget = null;
+MapInteractionService
+    .clearFollowTarget(
+  player: game.player,
+);
 }
 if (newSelection.isCity &&
     game.player.currentCity == null) {
@@ -589,6 +507,14 @@ if (newSelection.isCity &&
     final tickFraction =
         _timeController.tickFraction;
 
+final snapshot =
+    MapSnapshotService.build(
+  player: game.player,
+  world: game.world,
+  tickFraction:
+      tickFraction,
+);
+
     return Scaffold(
       body: LayoutBuilder(
         builder: (
@@ -604,11 +530,12 @@ if (newSelection.isCity &&
             behavior:
                 HitTestBehavior.opaque,
             onTapUp: (details) async {
-              await _handleTap(
-                details: details,
-                viewportSize:
-                    viewportSize,
-              );
+await _handleTap(
+  details: details,
+  viewportSize:
+      viewportSize,
+  snapshot: snapshot,
+);
             },
             child: WorldMapGestureLayer(
               camera: camera,
@@ -633,113 +560,30 @@ if (newSelection.isCity &&
                           viewportSize,
                     ),
 
-                    WorldMapCityLayer(
+ WorldMapCityLayer(
                       cities: cities,
-                      selectedCity:
-                          selection.city,
+                      selectedCity:  selection.city,
                       camera: camera,
-                      viewportSize:
-                          viewportSize,
-                    ),
+                      viewportSize:                          viewportSize,                    ),
+
 WorldMapNpcLayer(
-  npcCaravans:
-      game.world.npcCaravans,
-  selectedNpcCaravan:
-      selection.npcCaravan,
-  camera: camera,
-  viewportSize:
-      viewportSize,
-  playerX:
-      JourneyService.currentXSmooth(
-    game.player,
-    tickFraction,
-  ),
-  playerY:
-      JourneyService.currentYSmooth(
-    game.player,
-    tickFraction,
-  ),
-  scoutSkill:
-      game.player.caravan.scoutSkill,
-getX: (npc) {
-  final encounter =
-      EncounterService
-          .encounterForNpc(
-    npc: npc,
-    world: game.world,
-  );
-
-  if (encounter != null) {
-    return encounter.bandit == npc
-        ? encounter.banditX
-        : encounter.merchantX;
-  }
-
-  return NpcTravelService
-      .currentXSmooth(
-    npc,
-    tickFraction,
-  );
-},
-getY: (npc) {
-  final encounter =
-      EncounterService
-          .encounterForNpc(
-    npc: npc,
-    world: game.world,
-  );
-
-  if (encounter != null) {
-    return encounter.bandit == npc
-        ? encounter.banditY
-        : encounter.merchantY;
-  }
-
-  return NpcTravelService
-      .currentYSmooth(
-    npc,
-    tickFraction,
-  );
-},
-),
+  npcCaravans:           snapshot.visibleNpcs,
+  selectedNpcCaravan:    selection.npcCaravan,
+  camera:                camera,
+  viewportSize:          viewportSize,
+  npcPositions:          snapshot.npcPositions,),
 
 WorldMapPlayerLayer(
-  playerX:
-      JourneyService.currentXSmooth(
-    game.player,
-    tickFraction,
-  ),
-  playerY:
-      JourneyService.currentYSmooth(
-    game.player,
-    tickFraction,
-  ),
-  headingDegrees:
-      game.player.activeJourney ==
-              null
+  playerX: snapshot.playerX,
+  playerY: snapshot.playerY,
+  headingDegrees: game.player.activeJourney ==  null
           ? 0
           : WorldMapNavigation
               .headingDegrees(
-              fromX:
-                  JourneyService
-                      .currentXSmooth(
-                game.player,
-                tickFraction,
-              ),
-              fromY:
-                  JourneyService
-                      .currentYSmooth(
-                game.player,
-                tickFraction,
-              ),
-              toX: game
-                  .player
-                  .activeJourney!
-                  .destinationX,
-              toY: game
-                  .player
-                  .activeJourney!
-                  .destinationY,
+                  fromX: snapshot.playerX,
+                  fromY: snapshot.playerY,
+                  toX: game.player.activeJourney!.destinationX,
+                  toY: game.player.activeJourney!.destinationY,
             ),
   camera: camera,
   viewportSize:
@@ -767,8 +611,11 @@ WorldMapPlayerLayer(
                             'Follow',
                         
 onAction: () {
-  game.player.followTarget =
-      selection.npcCaravan;
+MapInteractionService
+    .followNpc(
+  player: game.player,
+  npc: selection.npcCaravan!,
+);
 }
 ,
                       ),

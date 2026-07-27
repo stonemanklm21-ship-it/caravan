@@ -3,13 +3,13 @@ import '../../data/game_balance.dart';
 import '../combat/combat_strength_service.dart';
 import '../models/npc_caravan.dart';
 import '../models/world.dart';
-import '../npc/npc_travel_service.dart';
 
 class NpcEncounterService {
   static void resolveBanditVsMerchant({
     required NpcCaravan bandit,
     required NpcCaravan merchant,
     required World world,
+    required double worldTimeHours,
   }) {
     final ratio =
         CombatStrengthService
@@ -28,18 +28,6 @@ class NpcEncounterService {
 
       bandit.caravan.gold +=
           tribute;
-
-      // Preserve current position
-      // before cancelling travel.
-      merchant.worldX =
-          NpcTravelService.currentX(
-        merchant,
-      );
-
-      merchant.worldY =
-          NpcTravelService.currentY(
-        merchant,
-      );
 
       merchant.activeJourney = null;
 

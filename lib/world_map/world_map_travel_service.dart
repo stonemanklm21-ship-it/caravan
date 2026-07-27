@@ -35,6 +35,10 @@ class WorldMapTravelService {
     final tickFraction =
         timeController.tickFraction;
 
+    final departureHour =
+        playerState.worldTimeHours +
+        tickFraction;
+
     final originX =
         JourneyService.currentXSmooth(
       playerState,
@@ -52,8 +56,8 @@ class WorldMapTravelService {
       destination: city,
       originX: originX,
       originY: originY,
-      tickFractionOffset:
-          tickFraction,
+      departureHour:
+          departureHour,
     );
 
     if (timeController.currentSpeed ==
@@ -102,6 +106,10 @@ class WorldMapTravelService {
     final tickFraction =
         timeController.tickFraction;
 
+    final departureHour =
+        playerState.worldTimeHours +
+        tickFraction;
+
     final originX =
         JourneyService.currentXSmooth(
       playerState,
@@ -121,8 +129,8 @@ class WorldMapTravelService {
       destinationY: destinationY,
       originX: originX,
       originY: originY,
-      tickFractionOffset:
-          tickFraction,
+      departureHour:
+          departureHour,
     );
 
     if (timeController.currentSpeed ==

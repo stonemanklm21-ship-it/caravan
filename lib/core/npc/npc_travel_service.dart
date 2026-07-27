@@ -1,35 +1,37 @@
-import 'dart:math';
-
+import '../models/caravan_faction.dart';
 import '../models/city.dart';
 import '../models/npc_caravan.dart';
-import '../models/caravan_faction.dart';
-import '../travel/active_journey.dart';
+import '../travel/journey_factory.dart';
+import '../travel/travel_interpolator.dart';
 
 class NpcTravelService {
-  static const double mapUnitsPerDay =
-      250;
-
   static void startJourney({
     required NpcCaravan npc,
     required City destination,
+    required double worldTimeHours,
     double? originX,
     double? originY,
+    double? departureHour,
   }) {
-    final startX =
-        originX ?? npc.worldX;
-
-    final startY =
-        originY ?? npc.worldY;
-
-    final dx =
-        destination.x - startX;
-
-    final dy =
-        destination.y - startY;
-
-    final distance = sqrt(
-      (dx * dx) + (dy * dy),
+final startX =
+    originX ??
+    currentX(
+      npc: npc,
+      worldTimeHours:
+          worldTimeHours,
     );
+
+final startY =
+    originY ??
+    currentY(
+      npc: npc,
+      worldTimeHours:
+          worldTimeHours,
+    );
+
+    final startHour =
+        departureHour ??
+        worldTimeHours;
 
     double speed =
         npc.caravan.speed;
@@ -39,24 +41,15 @@ class NpcTravelService {
       speed *= 0.95;
     }
 
-    final travelDays =
-        distance /
-        (mapUnitsPerDay * speed);
-
-    final travelHours =
-        travelDays * 24;
-
-    npc.activeJourney = ActiveJourney(
+    npc.activeJourney =
+        JourneyFactory.create(
       originX: startX,
       originY: startY,
-      destinationX:
-          destination.x,
-      destinationY:
-          destination.y,
-      destinationCity:
-          destination,
-      totalHours:
-          travelHours,
+      destinationX: destination.x,
+      destinationY: destination.y,
+      destinationCity: destination,
+      speed: speed,
+      departureHour: startHour,
     );
 
     npc.currentCity = null;
@@ -66,24 +59,30 @@ class NpcTravelService {
     required NpcCaravan npc,
     required double destinationX,
     required double destinationY,
+    required double worldTimeHours,
     double? originX,
     double? originY,
+    double? departureHour,
   }) {
-    final startX =
-        originX ?? npc.worldX;
-
-    final startY =
-        originY ?? npc.worldY;
-
-    final dx =
-        destinationX - startX;
-
-    final dy =
-        destinationY - startY;
-
-    final distance = sqrt(
-      (dx * dx) + (dy * dy),
+final startX =
+    originX ??
+    currentX(
+      npc: npc,
+      worldTimeHours:
+          worldTimeHours,
     );
+
+final startY =
+    originY ??
+    currentY(
+      npc: npc,
+      worldTimeHours:
+          worldTimeHours,
+    );
+
+    final startHour =
+        departureHour ??
+        worldTimeHours;
 
     double speed =
         npc.caravan.speed;
@@ -93,105 +92,17 @@ class NpcTravelService {
       speed *= 0.8;
     }
 
-    final travelDays =
-        distance /
-        (mapUnitsPerDay * speed);
-
-    final travelHours =
-        travelDays * 24;
-
-    npc.activeJourney = ActiveJourney(
+    npc.activeJourney =
+        JourneyFactory.create(
       originX: startX,
       originY: startY,
-      destinationX:
-          destinationX,
-      destinationY:
-          destinationY,
-      destinationCity: null,
-      totalHours:
-          travelHours,
+      destinationX: destinationX,
+      destinationY: destinationY,
+      speed: speed,
+      departureHour: startHour,
     );
 
     npc.currentCity = null;
-  }
-
-  static void moveTowardsCoordinates({
-    required NpcCaravan npc,
-    required double destinationX,
-    required double destinationY,
-    required double hours,
-  }) {
-    final currentX =
-        NpcTravelService.currentX(
-      npc,
-    );
-
-    final currentY =
-        NpcTravelService.currentY(
-      npc,
-    );
-
-    final dx =
-        destinationX - currentX;
-
-    final dy =
-        destinationY - currentY;
-
-    final distance = sqrt(
-      (dx * dx) + (dy * dy),
-    );
-
-    if (distance <= 0) {
-      return;
-    }
-
-    double speed =
-        npc.caravan.speed;
-
-    if (npc.faction ==
-        CaravanFaction.bandit) {
-      speed *= 0.8;
-    }
-
-    final movementDistance =
-        mapUnitsPerDay *
-        speed *
-        (hours / 24);
-
-    final ratio =
-        (movementDistance /
-                distance)
-            .clamp(0.0, 1.0);
-
-    npc.worldX =
-        currentX + (dx * ratio);
-
-    npc.worldY =
-        currentY + (dy * ratio);
-
-    npc.activeJourney = null;
-    npc.currentCity = null;
-  }
-
-  static void advanceJourney({
-    required NpcCaravan npc,
-    required double hours,
-  }) {
-    final journey =
-        npc.activeJourney;
-
-    if (journey == null) {
-      return;
-    }
-
-    journey.elapsedHours +=
-        hours;
-
-    if (journey.elapsedHours >
-        journey.totalHours) {
-      journey.elapsedHours =
-          journey.totalHours;
-    }
   }
 
   static void arrive({
@@ -216,9 +127,10 @@ class NpcTravelService {
     npc.activeJourney = null;
   }
 
-  static double currentX(
-    NpcCaravan npc,
-  ) {
+  static double currentX({
+    required NpcCaravan npc,
+    required double worldTimeHours,
+  }) {
     final journey =
         npc.activeJourney;
 
@@ -226,15 +138,16 @@ class NpcTravelService {
       return npc.worldX;
     }
 
-    return journey.originX +
-        ((journey.destinationX -
-                journey.originX) *
-            journey.progress);
+    return TravelInterpolator.x(
+      journey,
+      worldTimeHours,
+    );
   }
 
-  static double currentY(
-    NpcCaravan npc,
-  ) {
+  static double currentY({
+    required NpcCaravan npc,
+    required double worldTimeHours,
+  }) {
     final journey =
         npc.activeJourney;
 
@@ -242,16 +155,17 @@ class NpcTravelService {
       return npc.worldY;
     }
 
-    return journey.originY +
-        ((journey.destinationY -
-                journey.originY) *
-            journey.progress);
+    return TravelInterpolator.y(
+      journey,
+      worldTimeHours,
+    );
   }
 
-  static double currentXSmooth(
-    NpcCaravan npc,
-    double tickFraction,
-  ) {
+  static double currentXSmooth({
+    required NpcCaravan npc,
+    required double worldTimeHours,
+    required double tickFraction,
+  }) {
     final journey =
         npc.activeJourney;
 
@@ -259,22 +173,18 @@ class NpcTravelService {
       return npc.worldX;
     }
 
-    final progress =
-        ((journey.elapsedHours +
-                    tickFraction) /
-                journey.totalHours)
-            .clamp(0.0, 1.0);
-
-    return journey.originX +
-        ((journey.destinationX -
-                journey.originX) *
-            progress);
+    return TravelInterpolator.x(
+      journey,
+      worldTimeHours +
+          tickFraction,
+    );
   }
 
-  static double currentYSmooth(
-    NpcCaravan npc,
-    double tickFraction,
-  ) {
+  static double currentYSmooth({
+    required NpcCaravan npc,
+    required double worldTimeHours,
+    required double tickFraction,
+  }) {
     final journey =
         npc.activeJourney;
 
@@ -282,16 +192,11 @@ class NpcTravelService {
       return npc.worldY;
     }
 
-    final progress =
-        ((journey.elapsedHours +
-                    tickFraction) /
-                journey.totalHours)
-            .clamp(0.0, 1.0);
-
-    return journey.originY +
-        ((journey.destinationY -
-                journey.originY) *
-            progress);
+    return TravelInterpolator.y(
+      journey,
+      worldTimeHours +
+          tickFraction,
+    );
   }
 
   static bool hasActiveJourney(
@@ -301,9 +206,10 @@ class NpcTravelService {
         null;
   }
 
-  static bool isComplete(
-    NpcCaravan npc,
-  ) {
+  static bool isComplete({
+    required NpcCaravan npc,
+    required double worldTimeHours,
+  }) {
     final journey =
         npc.activeJourney;
 
@@ -311,6 +217,8 @@ class NpcTravelService {
       return false;
     }
 
-    return journey.completed;
+    return journey.completedAt(
+      worldTimeHours,
+    );
   }
 }

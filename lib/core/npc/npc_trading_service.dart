@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:merchantcaravan/core/travel/journey_calculator.dart';
+
 import '../economy/pricing_service.dart';
 import '../models/city.dart';
 import '../models/market_good.dart';
@@ -201,31 +203,31 @@ class NpcTradingService {
       final mission =
           missions.first;
 
-      final dx =
-          destination.x -
-          origin.x;
+final distance =
+    JourneyCalculator.distance(
+  originX: origin.x,
+  originY: origin.y,
+  destinationX:
+      destination.x,
+  destinationY:
+      destination.y,
+);
 
-      final dy =
-          destination.y -
-          origin.y;
+final travelHours =
+    JourneyCalculator.travelHours(
+  distance: distance,
+  speed: npc.caravan.speed,
+);
 
-      final distance =
-          sqrt(
-            (dx * dx) +
-                (dy * dy),
-          );
+final travelDays =
+    travelHours / 24;
 
-      final travelDays =
-          distance /
-          (500 *
-              npc.caravan.speed);
-
-      final score =
-          mission.expectedProfit /
-          max(
-            1.0,
-            travelDays,
-          );
+final score =
+    mission.expectedProfit /
+    max(
+      1.0,
+      travelDays,
+    );
 
       if (score > bestScore) {
         bestScore = score;

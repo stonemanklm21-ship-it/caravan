@@ -108,6 +108,8 @@ class TimeController {
           SimulationService.tick(
             playerState: playerState,
             world: world,
+            tickFraction:
+                tickFraction,
           );
         }
 

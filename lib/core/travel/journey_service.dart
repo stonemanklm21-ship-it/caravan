@@ -4,18 +4,17 @@ import '../caravan/caravan_service.dart';
 import '../models/city.dart';
 import '../models/player_state.dart';
 import '../travel/active_journey.dart';
+import '../travel/journey_factory.dart';
+import '../travel/travel_interpolator.dart';
 
 class JourneyService {
-  static const double mapUnitsPerDay =
-      250;
-
   static ActiveJourney startJourney({
     required PlayerState playerState,
     required City destination,
+    required double departureHour,
     City? originCity,
     double? originX,
     double? originY,
-    double tickFractionOffset = 0,
   }) {
     if (!CaravanService.canTravel(
       playerState.caravan,
@@ -33,37 +32,17 @@ class JourneyService {
         originY ??
         currentY(playerState);
 
-    final dx =
-        destination.x - startX;
-
-    final dy =
-        destination.y - startY;
-
-    final distance = sqrt(
-      (dx * dx) + (dy * dy),
-    );
-
-    final travelDays =
-        distance /
-        (mapUnitsPerDay *
-            playerState.caravan.speed);
-
-    final travelHours =
-        travelDays * 24;
-
-    final journey = ActiveJourney(
+    final journey =
+        JourneyFactory.create(
       originX: startX,
       originY: startY,
+      destinationX: destination.x,
+      destinationY: destination.y,
       originCity: originCity,
-      destinationX:
-          destination.x,
-      destinationY:
-          destination.y,
-      destinationCity:
-          destination,
-      totalHours: travelHours,
-      tickFractionOffset:
-          tickFractionOffset,
+      destinationCity: destination,
+      speed:
+          playerState.caravan.speed,
+      departureHour: departureHour,
     );
 
     playerState.activeJourney =
@@ -75,12 +54,12 @@ class JourneyService {
   static ActiveJourney
       startJourneyToCoordinates({
     required PlayerState playerState,
+    required double departureHour,
     City? originCity,
     required double destinationX,
     required double destinationY,
     double? originX,
     double? originY,
-    double tickFractionOffset = 0,
   }) {
     if (!CaravanService.canTravel(
       playerState.caravan,
@@ -98,72 +77,22 @@ class JourneyService {
         originY ??
         currentY(playerState);
 
-    final dx =
-        destinationX - startX;
-
-    final dy =
-        destinationY - startY;
-
-    final distance = sqrt(
-      (dx * dx) + (dy * dy),
-    );
-
-    final travelDays =
-        distance /
-        (mapUnitsPerDay *
-            playerState.caravan.speed);
-
-    final travelHours =
-        travelDays * 24;
-
-    final journey = ActiveJourney(
+    final journey =
+        JourneyFactory.create(
       originX: startX,
       originY: startY,
+      destinationX: destinationX,
+      destinationY: destinationY,
       originCity: originCity,
-      destinationX:
-          destinationX,
-      destinationY:
-          destinationY,
-      totalHours: travelHours,
-      tickFractionOffset:
-          tickFractionOffset,
+      speed:
+          playerState.caravan.speed,
+      departureHour: departureHour,
     );
 
     playerState.activeJourney =
         journey;
 
     return journey;
-  }
-
-  static void advanceJourney({
-    required PlayerState playerState,
-    required double hours,
-  }) {
-    final journey =
-        playerState.activeJourney;
-
-    if (journey == null) {
-      return;
-    }
-
-    if (journey.tickFractionOffset >
-        0) {
-      journey.elapsedHours +=
-          hours -
-          journey.tickFractionOffset;
-
-      journey.tickFractionOffset =
-          0.0;
-    } else {
-      journey.elapsedHours +=
-          hours;
-    }
-
-    if (journey.elapsedHours >
-        journey.totalHours) {
-      journey.elapsedHours =
-          journey.totalHours;
-    }
   }
 
   static double currentX(
@@ -176,10 +105,10 @@ class JourneyService {
       return playerState.worldX;
     }
 
-    return journey.originX +
-        ((journey.destinationX -
-                journey.originX) *
-            journey.progress);
+    return TravelInterpolator.x(
+      journey,
+      playerState.worldTimeHours,
+    );
   }
 
   static double currentY(
@@ -192,10 +121,10 @@ class JourneyService {
       return playerState.worldY;
     }
 
-    return journey.originY +
-        ((journey.destinationY -
-                journey.originY) *
-            journey.progress);
+    return TravelInterpolator.y(
+      journey,
+      playerState.worldTimeHours,
+    );
   }
 
   static double currentXSmooth(
@@ -209,22 +138,11 @@ class JourneyService {
       return playerState.worldX;
     }
 
-    final effectiveFraction =
-        (tickFraction -
-                journey
-                    .tickFractionOffset)
-            .clamp(0.0, 1.0);
-
-    final progress =
-        ((journey.elapsedHours +
-                    effectiveFraction) /
-                journey.totalHours)
-            .clamp(0.0, 1.0);
-
-    return journey.originX +
-        ((journey.destinationX -
-                journey.originX) *
-            progress);
+    return TravelInterpolator.x(
+      journey,
+      playerState.worldTimeHours +
+          tickFraction,
+    );
   }
 
   static double currentYSmooth(
@@ -238,22 +156,11 @@ class JourneyService {
       return playerState.worldY;
     }
 
-    final effectiveFraction =
-        (tickFraction -
-                journey
-                    .tickFractionOffset)
-            .clamp(0.0, 1.0);
-
-    final progress =
-        ((journey.elapsedHours +
-                    effectiveFraction) /
-                journey.totalHours)
-            .clamp(0.0, 1.0);
-
-    return journey.originY +
-        ((journey.destinationY -
-                journey.originY) *
-            progress);
+    return TravelInterpolator.y(
+      journey,
+      playerState.worldTimeHours +
+          tickFraction,
+    );
   }
 
   static bool hasActiveJourney(
@@ -273,7 +180,9 @@ class JourneyService {
       return false;
     }
 
-    return journey.completed;
+    return journey.completedAt(
+      playerState.worldTimeHours,
+    );
   }
 
   static void completeJourney(
@@ -286,14 +195,17 @@ class JourneyService {
       return;
     }
 
-    journey.elapsedHours =
-        journey.totalHours;
+    playerState.worldTimeHours =
+        max(
+      playerState.worldTimeHours,
+      journey.arrivalHour,
+    );
   }
 
-static void clearJourney(
-  PlayerState playerState,
-) {
-  playerState.activeJourney =
-      null;
-}
+  static void clearJourney(
+    PlayerState playerState,
+  ) {
+    playerState.activeJourney =
+        null;
+  }
 }

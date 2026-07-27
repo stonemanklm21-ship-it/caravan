@@ -62,18 +62,6 @@ class BanditTargetService {
         continue;
       }
 
-      CombatStrengthService
-          .debugCaravan(
-        name: 'Bandit',
-        caravan: bandit.caravan,
-      );
-
-      CombatStrengthService
-          .debugCaravan(
-        name: 'Merchant',
-        caravan: other.caravan,
-      );
-
       final ratio =
           CombatStrengthService
               .strengthRatio(
@@ -89,14 +77,6 @@ class BanditTargetService {
 
       if (distance <
           nearestDistance) {
-        print(
-          '${bandit.hashCode} '
-          'TARGET MERCHANT '
-          '${other.hashCode} '
-          'distance=$distance '
-          'ratio=$ratio',
-        );
-
         nearestDistance =
             distance;
 
@@ -130,13 +110,6 @@ class BanditTargetService {
           ratio >=
               GameBalance
                   .banditAttackRatio) {
-        print(
-          '${bandit.hashCode} '
-          'TARGET PLAYER '
-          'distance=$playerDistance '
-          'ratio=$ratio',
-        );
-
         nearestDistance =
             playerDistance;
 

@@ -83,6 +83,9 @@ class _MapScreenState
       playerState: game.player,
       destinationX: tapX,
       destinationY: tapY,
+      departureHour:
+          game.player.worldTimeHours +
+          _timeController.tickFraction,
     );
 
     setState(() {});
@@ -159,13 +162,19 @@ class _MapScreenState
               left:
                   NpcTravelService
                           .currentX(
-                        npc,
+                        npc: npc,
+                        worldTimeHours:
+                            game.player
+                                .worldTimeHours,
                       ) -
                       12,
               top:
                   NpcTravelService
                           .currentY(
-                        npc,
+                        npc: npc,
+                        worldTimeHours:
+                            game.player
+                                .worldTimeHours,
                       ) -
                       12,
               child:
@@ -244,11 +253,11 @@ class _MapScreenState
                     ),
                     Text(
                       'Progress: '
-                      '${(game.player.activeJourney!.progress * 100).toStringAsFixed(0)}%',
+                      '${(game.player.activeJourney!.progressAt(game.player.worldTimeHours) * 100).toStringAsFixed(0)}%',
                     ),
                     Text(
                       'Remaining: '
-                      '${game.player.activeJourney!.remainingHours.toStringAsFixed(1)}h',
+                      '${game.player.activeJourney!.remainingHoursAt(game.player.worldTimeHours).toStringAsFixed(1)}h',
                     ),
                     const SizedBox(
                       height: 8,
@@ -395,6 +404,9 @@ class _MapScreenState
     TravelService.startTravel(
       playerState: game.player,
       destination: city,
+      departureHour:
+          game.player.worldTimeHours +
+          _timeController.tickFraction,
     );
 
     setState(() {});

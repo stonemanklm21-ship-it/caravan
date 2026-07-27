@@ -4,8 +4,8 @@ import '../combat/encounter_service.dart';
 import '../models/caravan_faction.dart';
 import '../models/npc_caravan.dart';
 import '../models/world.dart';
-import '../npc/npc_travel_service.dart';
 import '../world/visibility_service.dart';
+import '../npc/npc_travel_service.dart';
 
 import 'bandit_city_service.dart';
 
@@ -16,10 +16,10 @@ class BanditPursuitService {
   static bool handlePursuit({
     required NpcCaravan npc,
     required World world,
+    required double worldTimeHours,
     required double hours,
+    required double tickFraction,
   }) {
-    // Opportunistic encounters:
-    // rob any merchant already in range.
     for (final other
         in world.npcCaravans) {
       if (other == npc) {
@@ -47,16 +47,13 @@ class BanditPursuitService {
 
       if (nearbyDistance <=
           captureRange) {
-        print(
-          '${npc.hashCode} '
-          'PURSUIT SUCCESS: encounter',
-        );
-
         EncounterService
             .tryStartEncounter(
           bandit: npc,
           merchant: other,
           world: world,
+          worldTimeHours:
+              worldTimeHours,
         );
 
         npc.followTarget = null;
@@ -69,11 +66,6 @@ class BanditPursuitService {
         npc.followTarget;
 
     if (target == null) {
-      print(
-        '${npc.hashCode} '
-        'PURSUIT FAIL: target null',
-      );
-
       return false;
     }
 
@@ -89,11 +81,6 @@ class BanditPursuitService {
       y: targetY,
       world: world,
     )) {
-      print(
-        '${npc.hashCode} '
-        'PURSUIT FAIL: safe zone',
-      );
-
       npc.followTarget = null;
 
       return false;
@@ -101,14 +88,8 @@ class BanditPursuitService {
 
     final distance =
         VisibilityService.distance(
-      x1:
-          NpcTravelService.currentX(
-        npc,
-      ),
-      y1:
-          NpcTravelService.currentY(
-        npc,
-      ),
+      x1: npc.x,
+      y1: npc.y,
       x2: targetX,
       y2: targetY,
     );
@@ -117,11 +98,6 @@ class BanditPursuitService {
         GameBalance
                 .banditVisionRange *
             1.2) {
-      print(
-        '${npc.hashCode} '
-        'PURSUIT FAIL: out of range',
-      );
-
       npc.followTarget = null;
 
       return false;
@@ -133,26 +109,18 @@ class BanditPursuitService {
         if (target
                 .surrenderProtectionHours >
             0) {
-          print(
-            '${npc.hashCode} '
-            'PURSUIT FAIL: surrender protection',
-          );
-
           npc.followTarget = null;
 
           return false;
         }
-
-        print(
-          '${npc.hashCode} '
-          'PURSUIT SUCCESS: encounter',
-        );
 
         EncounterService
             .tryStartEncounter(
           bandit: npc,
           merchant: target,
           world: world,
+          worldTimeHours:
+              worldTimeHours,
         );
       }
 
@@ -161,20 +129,36 @@ class BanditPursuitService {
       return false;
     }
 
-    NpcTravelService
-        .startJourneyToCoordinates(
-      npc: npc,
-      destinationX: targetX,
-      destinationY: targetY,
-      originX:
-          NpcTravelService.currentX(
-        npc,
-      ),
-      originY:
-          NpcTravelService.currentY(
-        npc,
-      ),
-    );
+    if (npc.activeJourney == null) {
+      NpcTravelService
+          .startJourneyToCoordinates(
+        npc: npc,
+        worldTimeHours:
+            worldTimeHours,
+        destinationX:
+            targetX,
+        destinationY:
+            targetY,
+        originX:
+            NpcTravelService
+                .currentXSmooth(
+          npc: npc,
+          worldTimeHours:
+              worldTimeHours,
+          tickFraction:
+              tickFraction,
+        ),
+        originY:
+            NpcTravelService
+                .currentYSmooth(
+          npc: npc,
+          worldTimeHours:
+              worldTimeHours,
+          tickFraction:
+              tickFraction,
+        ),
+      );
+    }
 
     return true;
   }

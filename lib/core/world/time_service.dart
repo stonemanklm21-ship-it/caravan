@@ -18,16 +18,21 @@ class TimeService {
     required PlayerState playerState,
     required World world,
     required double hours,
+    required double tickFraction,
   }) {
     EconomyService.advanceTime(
       world: world,
       hours: hours,
     );
 
+    playerState.worldTimeHours +=
+        hours;
+
     NpcCaravanService.advanceAll(
       world: world,
       hours: hours,
       playerState: playerState,
+      tickFraction: tickFraction,
     );
 
     ConsumptionService.consume(
@@ -91,37 +96,53 @@ class TimeService {
     bool enteredCity = false;
 
     if (playerState.activeJourney != null) {
-      final startX =
-          JourneyService.currentX(
-        playerState,
-      );
+      final startHour =
+          playerState.worldTimeHours -
+              hours;
 
-      final startY =
-          JourneyService.currentY(
-        playerState,
-      );
-
-      JourneyService.advanceJourney(
-        playerState: playerState,
-        hours: hours,
-      );
-
-      final endX =
-          JourneyService.currentX(
-        playerState,
-      );
-
-      final endY =
-          JourneyService.currentY(
-        playerState,
-      );
+      final endHour =
+          playerState.worldTimeHours;
 
       final journey =
           playerState.activeJourney;
 
+      final startProgress =
+          journey!.progressAt(
+        startHour,
+      );
+
+      final endProgress =
+          journey.progressAt(
+        endHour,
+      );
+
+      final startX =
+          journey.originX +
+              ((journey.destinationX -
+                      journey.originX) *
+                  startProgress);
+
+      final startY =
+          journey.originY +
+              ((journey.destinationY -
+                      journey.originY) *
+                  startProgress);
+
+      final endX =
+          journey.originX +
+              ((journey.destinationX -
+                      journey.originX) *
+                  endProgress);
+
+      final endY =
+          journey.originY +
+              ((journey.destinationY -
+                      journey.originY) *
+                  endProgress);
+
       for (final city in world.cities) {
         if (city ==
-            journey?.originCity) {
+            journey.originCity) {
           continue;
         }
 
@@ -143,22 +164,16 @@ class TimeService {
         }
       }
 
-      if (!enteredCity) {
-        final activeJourney =
-            playerState.activeJourney;
-
-        if (activeJourney != null &&
-            activeJourney.completed) {
-          TravelService.arrive(
-            world: world,
-            playerState: playerState,
-          );
-        }
+      if (!enteredCity &&
+          JourneyService.isComplete(
+            playerState,
+          )) {
+        TravelService.arrive(
+          world: world,
+          playerState: playerState,
+        );
       }
     }
-
-    playerState.worldTimeHours +=
-        hours;
 
     final currentHour =
         playerState.worldTimeHours.floor();

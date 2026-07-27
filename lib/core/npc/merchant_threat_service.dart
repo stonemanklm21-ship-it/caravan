@@ -13,15 +13,25 @@ class MerchantThreatService {
   static bool handleThreats({
     required NpcCaravan merchant,
     required World world,
+    required double worldTimeHours,
+    required double tickFraction,
   }) {
     if (merchant.faction !=
         CaravanFaction.merchant) {
       return false;
     }
 
-    // Already fleeing/travelling.
-    if (merchant.activeJourney !=
-        null) {
+    if (merchant.currentCity != null) {
+      return false;
+    }
+
+    if (merchant.state ==
+        CaravanState.fleeing) {
+      return false;
+    }
+
+    if (merchant.state ==
+        CaravanState.recovering) {
       return false;
     }
 
@@ -92,6 +102,10 @@ class MerchantThreatService {
     _fleeToCity(
       merchant: merchant,
       city: safeCity,
+      worldTimeHours:
+          worldTimeHours,
+      tickFraction:
+          tickFraction,
     );
 
     merchant.lastDecision =
@@ -103,19 +117,10 @@ class MerchantThreatService {
   static void _fleeToCity({
     required NpcCaravan merchant,
     required City city,
+    required double worldTimeHours,
+    required double tickFraction,
   }) {
-    final currentX =
-        NpcTravelService.currentX(
-      merchant,
-    );
-
-    final currentY =
-        NpcTravelService.currentY(
-      merchant,
-    );
-
-    merchant.worldX = currentX;
-    merchant.worldY = currentY;
+    merchant.activeJourney = null;
 
     merchant.currentCity = null;
 
@@ -124,13 +129,31 @@ class MerchantThreatService {
     merchant.followTarget = null;
 
     merchant.state =
-        CaravanState.travelling;
+        CaravanState.fleeing;
 
     NpcTravelService.startJourney(
       npc: merchant,
       destination: city,
-      originX: currentX,
-      originY: currentY,
+      worldTimeHours:
+          worldTimeHours,
+      originX:
+          NpcTravelService
+              .currentXSmooth(
+        npc: merchant,
+        worldTimeHours:
+            worldTimeHours,
+        tickFraction:
+            tickFraction,
+      ),
+      originY:
+          NpcTravelService
+              .currentYSmooth(
+        npc: merchant,
+        worldTimeHours:
+            worldTimeHours,
+        tickFraction:
+            tickFraction,
+      ),
     );
   }
 }

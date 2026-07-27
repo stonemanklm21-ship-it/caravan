@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import '../models/debug_npc_tracker.dart';
 import '../models/npc_caravan.dart';
 import '../models/world.dart';
 import '../npc/npc_travel_service.dart';
@@ -13,6 +14,8 @@ class BanditRoamingService {
   static void startRoaming({
     required NpcCaravan npc,
     required World world,
+    required double worldTimeHours,
+    required double tickFraction,
   }) {
     final region =
         npc.homeRegion;
@@ -39,6 +42,10 @@ class BanditRoamingService {
       world: world,
     );
 
+    final departureHour =
+        worldTimeHours +
+        tickFraction;
+
     for (int i = 0; i < 50; i++) {
       final angle =
           _random.nextDouble() *
@@ -60,12 +67,32 @@ class BanditRoamingService {
       bool routeIntersectsCity =
           false;
 
+      final currentX =
+          NpcTravelService
+              .currentXSmooth(
+        npc: npc,
+        worldTimeHours:
+            worldTimeHours,
+        tickFraction:
+            tickFraction,
+      );
+
+      final currentY =
+          NpcTravelService
+              .currentYSmooth(
+        npc: npc,
+        worldTimeHours:
+            worldTimeHours,
+        tickFraction:
+            tickFraction,
+      );
+
       for (final city
           in world.cities) {
         if (LocationService
             .segmentIntersectsCity(
-startX: NpcTravelService.currentX(npc),
-startY: NpcTravelService.currentY(npc),
+          startX: currentX,
+          startY: currentY,
           endX: destinationX,
           endY: destinationY,
           city: city,
@@ -80,27 +107,24 @@ startY: NpcTravelService.currentY(npc),
         continue;
       }
 
-final currentX =
-    NpcTravelService.currentX(
-  npc,
-);
+      DebugNpcTracker
+              .trackedNpcHashCode =
+          npc.hashCode;
 
-final currentY =
-    NpcTravelService.currentY(
-  npc,
-);
-
-NpcTravelService
-    .startJourneyToCoordinates(
-  npc: npc,
-  destinationX:
-      destinationX,
-  destinationY:
-      destinationY,
-  originX: currentX,
-  originY: currentY,
-);
-
+      NpcTravelService
+          .startJourneyToCoordinates(
+        npc: npc,
+        worldTimeHours:
+            worldTimeHours,
+        departureHour:
+            departureHour,
+        destinationX:
+            destinationX,
+        destinationY:
+            destinationY,
+        originX: currentX,
+        originY: currentY,
+      );
       return;
     }
   }

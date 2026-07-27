@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:merchantcaravan/core/travel/journey_calculator.dart';
+
 import '../economy/trading_service.dart';
 import '../models/cargo_manifest_entry.dart';
 import '../models/npc_caravan.dart';
@@ -87,6 +89,7 @@ class NpcCaravanService {
   static void startMission({
     required NpcCaravan npc,
     required World world,
+    required double worldTimeHours,
   }) {
     final city = npc.currentCity;
 
@@ -123,6 +126,8 @@ class NpcCaravanService {
       NpcTravelService.startJourney(
         npc: npc,
         destination: destination,
+        worldTimeHours:
+            worldTimeHours,
       );
 
       return;
@@ -134,22 +139,26 @@ class NpcCaravanService {
     final destination =
         primaryMission.destination;
 
-    final dx =
-        destination.x - city.x;
+final distance =
+    JourneyCalculator.distance(
+  originX: city.x,
+  originY: city.y,
+  destinationX:
+      destination.x,
+  destinationY:
+      destination.y,
+);
 
-    final dy =
-        destination.y - city.y;
+final travelHours =
+    JourneyCalculator
+        .travelHours(
+  distance: distance,
+  speed:
+      npc.caravan.speed,
+);
 
-    final distance =
-        sqrt(
-          (dx * dx) +
-              (dy * dy),
-        );
-
-    final travelDays =
-        distance /
-        (500 *
-            npc.caravan.speed);
+final travelDays =
+    travelHours / 24;
 
     NpcCaravanSupplyService
         .resupplyForJourney(
@@ -240,33 +249,41 @@ class NpcCaravanService {
     NpcTravelService.startJourney(
       npc: npc,
       destination: destination,
+      worldTimeHours:
+          worldTimeHours,
     );
   }
 
-static void advanceTime({
-  required NpcCaravan npc,
-  required World world,
-  required double hours,
-}) {
+  static void advanceTime({
+    required NpcCaravan npc,
+    required World world,
+    required double worldTimeHours,
+    required double hours,
+    required double tickFraction,
+  }) {
+    if (EncounterService.isInEncounter(
+      npc: npc,
+      world: world,
+    )) {
+      return;
+    }
 
-  if (EncounterService.isInEncounter(
-    npc: npc,
-    world: world,
-  )) {
-    return;
-  }
-  
-if (npc.faction ==
-    CaravanFaction.merchant) {
-  if (MerchantThreatService
-      .handleThreats(
-    merchant: npc,
-    world: world,
-  )) {
-    return;
-  }
-}
-  switch (npc.state) {
+    if (npc.faction ==
+        CaravanFaction.merchant) {
+      if (MerchantThreatService
+          .handleThreats(
+        merchant: npc,
+        world: world,
+        worldTimeHours:
+            worldTimeHours,
+        tickFraction:
+            tickFraction,
+      )) {
+        return;
+      }
+    }
+
+    switch (npc.state) {
       case CaravanState.idle:
         npc.idleHoursRemaining -=
             hours;
@@ -279,19 +296,46 @@ if (npc.faction ==
         startMission(
           npc: npc,
           world: world,
+          worldTimeHours:
+              worldTimeHours,
         );
 
         break;
 
-      case CaravanState.travelling:
-        NpcTravelService.advanceJourney(
-          npc: npc,
-          hours: hours,
-        );
+      case CaravanState.fleeing:
+        if (npc.activeJourney !=
+                null &&
+            NpcTravelService
+                .isComplete(
+              npc: npc,
+              worldTimeHours:
+                  worldTimeHours,
+            )) {
+          NpcTravelService.arrive(
+            npc: npc,
+          );
 
-        if (npc.activeJourney != null &&
-            npc.activeJourney!
-                .completed) {
+          npc.state =
+              CaravanState.recovering;
+
+          npc.idleHoursRemaining =
+              12;
+
+          npc.lastDecision =
+              'Recovered after fleeing';
+        }
+
+        break;
+
+      case CaravanState.travelling:
+        if (npc.activeJourney !=
+                null &&
+            NpcTravelService
+                .isComplete(
+              npc: npc,
+              worldTimeHours:
+                  worldTimeHours,
+            )) {
           NpcTravelService.arrive(
             npc: npc,
           );
@@ -337,42 +381,65 @@ if (npc.faction ==
 
         break;
 
-case CaravanState.recovering:
-  npc.idleHoursRemaining -= hours;
+      case CaravanState.recovering:
+        npc.idleHoursRemaining -=
+            hours;
 
-  if (npc.idleHoursRemaining <= 0) {
-    final nearestCity =
-        world.cities.reduce(
-      (a, b) {
-        final da =
-            sqrt(
-          pow(a.x - npc.worldX, 2) +
-              pow(a.y - npc.worldY, 2),
-        );
+        if (npc.idleHoursRemaining <=
+            0) {
+          final nearestCity =
+              world.cities.reduce(
+            (a, b) {
+              final da =
+                  sqrt(
+                pow(
+                      a.x -
+                          npc.worldX,
+                      2,
+                    ) +
+                    pow(
+                      a.y -
+                          npc.worldY,
+                      2,
+                    ),
+              );
 
-        final db =
-            sqrt(
-          pow(b.x - npc.worldX, 2) +
-              pow(b.y - npc.worldY, 2),
-        );
+              final db =
+                  sqrt(
+                pow(
+                      b.x -
+                          npc.worldX,
+                      2,
+                    ) +
+                    pow(
+                      b.y -
+                          npc.worldY,
+                      2,
+                    ),
+              );
 
-        return da < db ? a : b;
-      },
-    );
+              return da < db
+                  ? a
+                  : b;
+            },
+          );
 
-    npc.lastDecision =
-        'Returning to ${nearestCity.name}';
+          npc.lastDecision =
+              'Returning to ${nearestCity.name}';
 
-    npc.state =
-        CaravanState.travelling;
+          npc.state =
+              CaravanState.travelling;
 
-    NpcTravelService.startJourney(
-      npc: npc,
-      destination: nearestCity,
-    );
-  }
+          NpcTravelService.startJourney(
+            npc: npc,
+            destination:
+                nearestCity,
+            worldTimeHours:
+                worldTimeHours,
+          );
+        }
 
-  break;
+        break;
 
       case CaravanState.roaming:
       case CaravanState.pursuing:
@@ -380,56 +447,67 @@ case CaravanState.recovering:
     }
   }
 
-static void advanceAll({
-  required World world,
-  required PlayerState playerState,
-  required double hours,
-}) {
-
-  EncounterService.advance(
-    world: world,
-    hours: hours,
-  );
-
-  for (final npc
-      in world.npcCaravans) {
-
-    npc.surrenderProtectionHours -=
-        hours;
-
-    if (npc.surrenderProtectionHours <
-        0) {
-      npc.surrenderProtectionHours =
-          0;
-    }
-
-    if (npc.faction ==
-        CaravanFaction.bandit) {
-      BanditCaravanService
-          .advanceTime(
-        npc: npc,
-        world: world,
-        playerState: playerState,
-        hours: hours,
-      );
-
-      continue;
-    }
-
-    advanceTime(
-      npc: npc,
+  static void advanceAll({
+    required World world,
+    required PlayerState playerState,
+    required double hours,
+    required double tickFraction,
+  }) {
+    EncounterService.advance(
       world: world,
+      worldTimeHours:
+          playerState.worldTimeHours,
       hours: hours,
     );
-  }
 
-  for (final npc
-      in world.caravansToRemove) {
-    world.npcCaravans.remove(
-      npc,
-    );
-  }
+    for (final npc
+        in world.npcCaravans) {
 
-  world.caravansToRemove.clear();
-}
+      npc.surrenderProtectionHours -=
+          hours;
+
+      if (npc
+              .surrenderProtectionHours <
+          0) {
+        npc.surrenderProtectionHours =
+            0;
+      }
+
+      if (npc.faction ==
+          CaravanFaction.bandit) {
+        BanditCaravanService
+            .advanceTime(
+          npc: npc,
+          world: world,
+          playerState:
+              playerState,
+          hours: hours,
+          tickFraction:
+              tickFraction,
+        );
+
+        continue;
+      }
+
+      advanceTime(
+        npc: npc,
+        world: world,
+        worldTimeHours:
+            playerState
+                .worldTimeHours,
+        hours: hours,
+        tickFraction:
+            tickFraction,
+      );
+    }
+
+    for (final npc
+        in world.caravansToRemove) {
+      world.npcCaravans.remove(
+        npc,
+      );
+    }
+
+    world.caravansToRemove.clear();
+  }
 }

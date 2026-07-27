@@ -20,6 +20,7 @@ class EncounterService {
     required NpcCaravan bandit,
     required NpcCaravan merchant,
     required World world,
+    required double worldTimeHours,
   }) {
     final alreadyInEncounter =
         world.activeEncounters.any(
@@ -33,30 +34,36 @@ class EncounterService {
       return false;
     }
 
-    // Freeze both caravans at their
-    // current rendered position.
     final banditX =
         NpcTravelService.currentXSmooth(
-      bandit,
-      0,
+      npc: bandit,
+      worldTimeHours:
+          worldTimeHours,
+      tickFraction: 0,
     );
 
     final banditY =
         NpcTravelService.currentYSmooth(
-      bandit,
-      0,
+      npc: bandit,
+      worldTimeHours:
+          worldTimeHours,
+      tickFraction: 0,
     );
 
     final merchantX =
         NpcTravelService.currentXSmooth(
-      merchant,
-      0,
+      npc: merchant,
+      worldTimeHours:
+          worldTimeHours,
+      tickFraction: 0,
     );
 
     final merchantY =
         NpcTravelService.currentYSmooth(
-      merchant,
-      0,
+      npc: merchant,
+      worldTimeHours:
+          worldTimeHours,
+      tickFraction: 0,
     );
 
     bandit.worldX = banditX;
@@ -100,6 +107,7 @@ class EncounterService {
 
   static void advance({
     required World world,
+    required double worldTimeHours,
     required double hours,
   }) {
     final completed =
@@ -133,6 +141,8 @@ class EncounterService {
         merchant:
             encounter.merchant,
         world: world,
+        worldTimeHours:
+            worldTimeHours,
       );
 
       completed.add(encounter);

@@ -21,14 +21,11 @@ class PlayerFollowService {
 
     JourneyService.startJourneyToCoordinates(
       playerState: player,
-      destinationX:
-          NpcTravelService.currentX(
-        target,
-      ),
-      destinationY:
-          NpcTravelService.currentY(
-        target,
-      ),
+      departureHour:
+          player.worldTimeHours +
+          tickFraction,
+      destinationX: target.x,
+      destinationY: target.y,
       originX:
           JourneyService.currentXSmooth(
         player,
@@ -39,8 +36,6 @@ class PlayerFollowService {
         player,
         tickFraction,
       ),
-      tickFractionOffset:
-          tickFraction,
     );
   }
 

@@ -11,9 +11,9 @@ class TravelService {
   static void startTravel({
     required PlayerState playerState,
     required City destination,
+    required double departureHour,
     double? originX,
     double? originY,
-    double tickFractionOffset = 0,
   }) {
     final originCity =
         playerState.currentCity;
@@ -26,8 +26,8 @@ class TravelService {
       originCity: originCity,
       originX: originX,
       originY: originY,
-      tickFractionOffset:
-          tickFractionOffset,
+      departureHour:
+          departureHour,
     );
   }
 
@@ -35,9 +35,9 @@ class TravelService {
     required PlayerState playerState,
     required double destinationX,
     required double destinationY,
+    required double departureHour,
     double? originX,
     double? originY,
-    double tickFractionOffset = 0,
   }) {
     final originCity =
         playerState.currentCity;
@@ -52,8 +52,8 @@ class TravelService {
       destinationY: destinationY,
       originX: originX,
       originY: originY,
-      tickFractionOffset:
-          tickFractionOffset,
+      departureHour:
+          departureHour,
     );
   }
 

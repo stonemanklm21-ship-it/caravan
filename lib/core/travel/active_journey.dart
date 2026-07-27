@@ -2,8 +2,8 @@ import '../models/city.dart';
 import '../models/world.dart';
 
 class ActiveJourney {
-  double originX;
-  double originY;
+  final double originX;
+  final double originY;
 
   final City? originCity;
 
@@ -12,11 +12,11 @@ class ActiveJourney {
 
   final City? destinationCity;
 
-  final double totalHours;
+  /// Absolute world time when the journey began.
+  final double departureHour;
 
-  double elapsedHours;
-
-  double tickFractionOffset;
+  /// Absolute world time when the journey will end.
+  final double arrivalHour;
 
   ActiveJourney({
     required this.originX,
@@ -25,25 +25,40 @@ class ActiveJourney {
     required this.destinationX,
     required this.destinationY,
     this.destinationCity,
-    required this.totalHours,
-    this.elapsedHours = 0,
-    this.tickFractionOffset = 0,
+    required this.departureHour,
+    required this.arrivalHour,
   });
 
-  double get progress {
-    if (totalHours <= 0) {
-      return 1;
+  double progressAt(
+    double worldHour,
+  ) {
+    final duration =
+        arrivalHour - departureHour;
+
+    if (duration <= 0) {
+      return 1.0;
     }
 
-    return elapsedHours / totalHours;
+    return ((worldHour - departureHour) /
+            duration)
+        .clamp(0.0, 1.0);
   }
 
-  bool get completed {
-    return elapsedHours >= totalHours;
+  bool completedAt(
+    double worldHour,
+  ) {
+    return worldHour >= arrivalHour;
   }
 
-  double get remainingHours {
-    return totalHours - elapsedHours;
+  double remainingHoursAt(
+    double worldHour,
+  ) {
+    final remaining =
+        arrivalHour - worldHour;
+
+    return remaining < 0
+        ? 0
+        : remaining;
   }
 
   Map<String, dynamic> toJson() {
@@ -55,10 +70,10 @@ class ActiveJourney {
       'destinationY': destinationY,
       'destinationCity':
           destinationCity?.id,
-      'totalHours': totalHours,
-      'elapsedHours': elapsedHours,
-      'tickFractionOffset':
-          tickFractionOffset,
+      'departureHour':
+          departureHour,
+      'arrivalHour':
+          arrivalHour,
     };
   }
 
@@ -112,19 +127,14 @@ class ActiveJourney {
               .toDouble(),
       destinationCity:
           destinationCity,
-      totalHours:
-          (json['totalHours']
+      departureHour:
+          (json['departureHour']
                   as num)
               .toDouble(),
-      elapsedHours:
-          (json['elapsedHours']
+      arrivalHour:
+          (json['arrivalHour']
                   as num)
               .toDouble(),
-      tickFractionOffset:
-          (json['tickFractionOffset']
-                      as num?)
-                  ?.toDouble() ??
-              0.0,
     );
   }
 }

@@ -8,11 +8,13 @@ class SimulationService {
   static void tick({
     required PlayerState playerState,
     required World world,
+    required double tickFraction,
   }) {
     TimeService.advanceTime(
       playerState: playerState,
       world: world,
       hours: tickHours,
+      tickFraction: tickFraction,
     );
   }
 }

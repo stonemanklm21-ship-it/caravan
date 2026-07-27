@@ -67,11 +67,11 @@ class WorldMapTimeControls
               ),
               Text(
                 'Progress: '
-                '${(playerState.activeJourney!.progress * 100).toStringAsFixed(0)}%',
+                '${(playerState.activeJourney!.progressAt(playerState.worldTimeHours) * 100).toStringAsFixed(0)}%',
               ),
               Text(
                 'Remaining: '
-                '${playerState.activeJourney!.remainingHours.toStringAsFixed(1)}h',
+                '${playerState.activeJourney!.remainingHoursAt(playerState.worldTimeHours).toStringAsFixed(1)}h',
               ),
               const SizedBox(
                 height: 8,

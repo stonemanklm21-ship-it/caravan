@@ -1,12 +1,11 @@
 import '../models/npc_caravan.dart';
 import '../models/player_state.dart';
 import '../models/world.dart';
+import '../models/debug_npc_tracker.dart';
 import '../npc/npc_travel_service.dart';
 import '../combat/encounter_service.dart';
 
-import 'bandit_pursuit_service.dart';
 import 'bandit_roaming_service.dart';
-import 'bandit_target_service.dart';
 
 class BanditCaravanService {
   static void changeState(
@@ -14,12 +13,6 @@ class BanditCaravanService {
     CaravanState newState,
     String reason,
   ) {
-    print(
-      '${npc.hashCode} '
-      '${npc.state} -> $newState '
-      '($reason)',
-    );
-
     npc.state = newState;
   }
 
@@ -28,6 +21,7 @@ class BanditCaravanService {
     required World world,
     required PlayerState playerState,
     required double hours,
+    required double tickFraction,
   }) {
     if (EncounterService.isInEncounter(
       npc: npc,
@@ -36,95 +30,41 @@ class BanditCaravanService {
       return;
     }
 
-    if (npc.activeJourney != null) {
-      NpcTravelService.advanceJourney(
+    if (npc.hashCode ==
+        DebugNpcTracker.trackedNpcHashCode) {
+      final complete =
+          NpcTravelService.isComplete(
         npc: npc,
-        hours: hours,
+        worldTimeHours:
+            playerState.worldTimeHours +
+            tickFraction,
       );
 
-      if (npc.activeJourney!
-          .completed) {
-        NpcTravelService.arrive(
-          npc: npc,
-        );
-      }
     }
 
-    switch (npc.state) {
-      case CaravanState.roaming:
-        final target =
-            BanditTargetService
-                .findTarget(
-          bandit: npc,
-          world: world,
-          playerState: playerState,
-        );
-
-        if (target != null) {
-          npc.followTarget = target;
-
-          npc.worldX =
-              NpcTravelService.currentX(
-            npc,
-          );
-
-          npc.worldY =
-              NpcTravelService.currentY(
-            npc,
-          );
-
-          npc.activeJourney = null;
-
-          changeState(
-            npc,
-            CaravanState.pursuing,
-            'Target found',
-          );
-
-          BanditPursuitService
-              .handlePursuit(
-            npc: npc,
-            world: world,
-            hours: hours,
-          );
-
-          break;
-        }
-
-        if (npc.activeJourney ==
-            null) {
-          BanditRoamingService
-              .startRoaming(
-            npc: npc,
-            world: world,
-          );
-        }
-
-        break;
-
-      case CaravanState.pursuing:
-        final pursuing =
-            BanditPursuitService
-                .handlePursuit(
+    if (npc.activeJourney != null &&
+        NpcTravelService.isComplete(
           npc: npc,
-          world: world,
-          hours: hours,
-        );
+          worldTimeHours:
+              playerState.worldTimeHours +
+              tickFraction,
+        )) {
+      NpcTravelService.arrive(
+        npc: npc,
+      );
+    }
 
-        if (!pursuing) {
-          npc.followTarget = null;
-
-          changeState(
-            npc,
-            CaravanState.roaming,
-            'Pursuit ended',
-          );
-        }
-
-        break;
-
-      default:
-        break;
+    if (npc.activeJourney == null) {
+      BanditRoamingService
+          .startRoaming(
+        npc: npc,
+        world: world,
+        worldTimeHours:
+            playerState
+                .worldTimeHours,
+        tickFraction:
+            tickFraction,
+      );
     }
   }
 }

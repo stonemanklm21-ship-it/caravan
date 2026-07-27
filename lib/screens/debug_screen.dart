@@ -131,12 +131,12 @@ double totalConsumedPerDay(
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    TimeService.advanceTime(
-                      playerState:
-                          game.player,
-                      world: game.world,
-                      hours: 1,
-                    );
+TimeService.advanceTime(
+  playerState: game.player,
+  world: game.world,
+  hours: 1,
+  tickFraction: 0,
+);
                   });
                 },
                 child: const Text(
@@ -146,12 +146,12 @@ double totalConsumedPerDay(
               ElevatedButton(
                 onPressed: () {
                   setState(() {
-                    TimeService.advanceTime(
-                      playerState:
-                          game.player,
-                      world: game.world,
-                      hours: 24,
-                    );
+TimeService.advanceTime(
+  playerState: game.player,
+  world: game.world,
+  hours: 24,
+  tickFraction: 0,
+);
                   });
                 },
                 child: const Text(

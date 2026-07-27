@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import '../core/models/city.dart';
 import '../core/models/npc_caravan.dart';
 import '../world_map/world_map_entity_selection_service.dart';
@@ -11,12 +13,8 @@ class WorldMapSelectionController {
     required List<City> cities,
     required List<NpcCaravan>
         npcCaravans,
-    required double Function(
-      NpcCaravan npc,
-    ) getNpcX,
-    required double Function(
-      NpcCaravan npc,
-    ) getNpcY,
+    required Map<NpcCaravan, Offset>
+        npcPositions,
   }) {
     final npc =
         WorldMapEntitySelectionService
@@ -24,8 +22,10 @@ class WorldMapSelectionController {
       worldX: worldX,
       worldY: worldY,
       npcCaravans: npcCaravans,
-      getX: getNpcX,
-      getY: getNpcY,
+      getX: (npc) =>
+          npcPositions[npc]!.dx,
+      getY: (npc) =>
+          npcPositions[npc]!.dy,
     );
 
     if (npc != null) {
@@ -49,9 +49,9 @@ class WorldMapSelectionController {
       );
     }
 
-return WorldMapSelection.location(
-  worldX: worldX,
-  worldY: worldY,
-);
+    return WorldMapSelection.location(
+      worldX: worldX,
+      worldY: worldY,
+    );
   }
 }
