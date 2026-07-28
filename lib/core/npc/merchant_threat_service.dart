@@ -1,16 +1,17 @@
-import '../../data/game_balance.dart';
+import 'dart:math';
 
+import 'package:merchantcaravan/core/world/location_service.dart';
+
+import '../../data/game_balance.dart';
 import '../combat/combat_strength_service.dart';
 import '../models/caravan_faction.dart';
-import '../models/city.dart';
 import '../models/npc_caravan.dart';
 import '../models/world.dart';
-import '../world/location_service.dart';
 import '../world/visibility_service.dart';
 import 'npc_travel_service.dart';
 
 class MerchantThreatService {
-  static bool handleThreats({
+  static void handleThreats({
     required NpcCaravan merchant,
     required World world,
     required double worldTimeHours,
@@ -18,37 +19,55 @@ class MerchantThreatService {
   }) {
     if (merchant.faction !=
         CaravanFaction.merchant) {
-      return false;
+      return;
     }
 
     if (merchant.currentCity != null) {
-      return false;
+      return;
     }
 
-    if (merchant.state ==
-        CaravanState.fleeing) {
-      return false;
+    final journey =
+        merchant.activeJourney;
+
+    if (journey == null) {
+      return;
     }
 
-    if (merchant.state ==
-        CaravanState.recovering) {
-      return false;
+    final destination =
+        journey.destinationCity;
+
+    if (destination == null) {
+      return;
     }
 
     final merchantX =
-        NpcTravelService.currentX(
+        NpcTravelService.currentXSmooth(
       npc: merchant,
       worldTimeHours:
           worldTimeHours,
+      tickFraction:
+          tickFraction,
     );
 
     final merchantY =
-        NpcTravelService.currentY(
+        NpcTravelService.currentYSmooth(
       npc: merchant,
       worldTimeHours:
           worldTimeHours,
+      tickFraction:
+          tickFraction,
     );
 
+final city =
+    LocationService.cityAtPosition(
+  world: world,
+  x: merchantX,
+  y: merchantY,
+);
+
+if (city != null) {
+  return;
+}
     NpcCaravan? nearestBandit;
 
     double nearestDistance =
@@ -102,9 +121,23 @@ class MerchantThreatService {
       }
     }
 
-    if (nearestBandit == null) {
-      return false;
-    }
+if (nearestBandit == null) {
+  NpcTravelService.startJourney(
+    npc: merchant,
+    destination: destination,
+    worldTimeHours: worldTimeHours,
+    originX: merchantX,
+    originY: merchantY,
+    departureHour:
+        worldTimeHours +
+        tickFraction,
+  );
+
+  merchant.lastDecision =
+      'Travelling to ${destination.name}';
+
+  return;
+}
 
     final ratio =
         CombatStrengthService
@@ -114,78 +147,96 @@ class MerchantThreatService {
       defender: merchant.caravan,
     );
 
-    if (ratio <
-        GameBalance
-            .merchantFleeRatio) {
-      return false;
-    }
+if (ratio <
+    GameBalance
+        .merchantFleeRatio) {
 
-    final safeCity =
-        LocationService.nearestCity(
-      world: world,
-      x: merchantX,
-      y: merchantY,
-    );
+  NpcTravelService.startJourney(
+    npc: merchant,
+    destination: destination,
+    worldTimeHours:
+        worldTimeHours,
+    originX: merchantX,
+    originY: merchantY,
+    departureHour:
+        worldTimeHours +
+        tickFraction,
+  );
 
-    _fleeToCity(
-      merchant: merchant,
-      city: safeCity,
+  return;
+}
+
+    final banditX =
+        NpcTravelService.currentX(
+      npc: nearestBandit,
       worldTimeHours:
           worldTimeHours,
-      tickFraction:
+    );
+
+    final banditY =
+        NpcTravelService.currentY(
+      npc: nearestBandit,
+      worldTimeHours:
+          worldTimeHours,
+    );
+
+    double steerX =
+        destination.x - merchantX;
+
+    double steerY =
+        destination.y - merchantY;
+
+    final avoidX =
+        merchantX - banditX;
+
+    final avoidY =
+        merchantY - banditY;
+
+    steerX += avoidX * 2.0;
+    steerY += avoidY * 2.0;
+
+    final length = sqrt(
+      steerX * steerX +
+          steerY * steerY,
+    );
+
+    if (length < 0.001) {
+      return;
+    }
+
+    steerX /= length;
+    steerY /= length;
+
+const steeringDistance =
+    100.0;
+
+final targetX =
+    merchantX +
+    steerX *
+        steeringDistance;
+
+final targetY =
+    merchantY +
+    steerY *
+        steeringDistance;
+
+    NpcTravelService
+        .startJourneyToCoordinates(
+      npc: merchant,
+      destinationX: targetX,
+      destinationY: targetY,
+      destinationCity:
+          destination,
+      worldTimeHours:
+          worldTimeHours,
+      originX: merchantX,
+      originY: merchantY,
+      departureHour:
+          worldTimeHours +
           tickFraction,
     );
 
     merchant.lastDecision =
-        'Fleeing to ${safeCity.name}';
-
-    return true;
-  }
-
-  static void _fleeToCity({
-    required NpcCaravan merchant,
-    required City city,
-    required double worldTimeHours,
-    required double tickFraction,
-  }) {
-    final fleeX =
-        NpcTravelService
-            .currentXSmooth(
-      npc: merchant,
-      worldTimeHours:
-          worldTimeHours,
-      tickFraction:
-          tickFraction,
-    );
-
-    final fleeY =
-        NpcTravelService
-            .currentYSmooth(
-      npc: merchant,
-      worldTimeHours:
-          worldTimeHours,
-      tickFraction:
-          tickFraction,
-    );
-
-    merchant.activeJourney = null;
-
-    merchant.currentCity = null;
-
-    merchant.activeMission = null;
-
-    merchant.followTarget = null;
-
-    merchant.state =
-        CaravanState.fleeing;
-
-    NpcTravelService.startJourney(
-      npc: merchant,
-      destination: city,
-      worldTimeHours:
-          worldTimeHours,
-      originX: fleeX,
-      originY: fleeY,
-    );
+        'Avoiding bandit';
   }
 }

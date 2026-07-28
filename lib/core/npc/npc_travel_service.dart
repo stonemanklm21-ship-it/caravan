@@ -60,6 +60,7 @@ final startY =
     required double destinationX,
     required double destinationY,
     required double worldTimeHours,
+    City? destinationCity,
     double? originX,
     double? originY,
     double? departureHour,
@@ -98,6 +99,7 @@ final startY =
       originY: startY,
       destinationX: destinationX,
       destinationY: destinationY,
+      destinationCity: destinationCity,
       speed: speed,
       departureHour: startHour,
     );
