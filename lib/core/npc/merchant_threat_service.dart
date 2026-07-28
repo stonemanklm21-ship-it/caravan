@@ -139,6 +139,18 @@ if (nearestBandit == null) {
   return;
 }
 
+final distanceToCity =
+    VisibilityService.distance(
+  x1: merchantX,
+  y1: merchantY,
+  x2: destination.x,
+  y2: destination.y,
+);
+
+if (distanceToCity <
+    nearestDistance) {
+  return;
+}
     final ratio =
         CombatStrengthService
             .strengthRatio(

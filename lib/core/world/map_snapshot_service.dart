@@ -89,19 +89,19 @@ class MapSnapshotService {
         );
       }
 
-      if (npc == selectedNpcCaravan) {
-        print(
-          'SNAPSHOT_POS '
-          '${npcPositions[npc]!.dx},'
-          '${npcPositions[npc]!.dy}',
-        );
-      }
+if (npc.currentCity != null &&
+    npc.faction !=
+        CaravanFaction.bandit) {
 
-      if (npc.currentCity != null &&
-          npc.faction !=
-              CaravanFaction.bandit) {
-        continue;
-      }
+  print(
+    'HIDDEN '
+    '${npc.currentCity!.name} '
+    'world=(${npc.worldX}, ${npc.worldY}) '
+    'journey=${npc.activeJourney != null}',
+  );
+
+  continue;
+}
 
       if (VisibilityService.canSee(
         observerX: playerX,
