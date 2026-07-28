@@ -93,12 +93,6 @@ if (npc.currentCity != null &&
     npc.faction !=
         CaravanFaction.bandit) {
 
-  print(
-    'HIDDEN '
-    '${npc.currentCity!.name} '
-    'world=(${npc.worldX}, ${npc.worldY}) '
-    'journey=${npc.activeJourney != null}',
-  );
 
   continue;
 }

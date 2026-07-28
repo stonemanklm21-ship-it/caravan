@@ -93,10 +93,19 @@ class NpcCaravanService {
   }) {
     final city = npc.currentCity;
 
-    if (city == null) {
-      npc.lastDecision = 'No city';
-      return;
-    }
+if (city == null) {
+  print(
+    'NO CITY '
+    'state=${npc.state} '
+    'decision=${npc.lastDecision} '
+    'x=${npc.worldX} '
+    'y=${npc.worldY} '
+    'journey=${npc.activeJourney != null}',
+  );
+
+  npc.lastDecision = 'No city';
+  return;
+}
 
     final primaryMission =
         NpcTradingService.generateMission(
@@ -340,6 +349,25 @@ MerchantThreatService
           NpcTravelService.arrive(
             npc: npc,
           );
+
+if (npc.currentCity == null) {
+  final destination =
+      npc.activeMission?.destination;
+
+  if (destination != null) {
+    NpcTravelService.startJourney(
+      npc: npc,
+      destination: destination,
+      worldTimeHours:
+          worldTimeHours,
+    );
+
+    npc.lastDecision =
+        'Resuming route';
+  }
+
+  break;
+}
 
           NpcCaravanMaintenanceService
               .repairVehicles(
