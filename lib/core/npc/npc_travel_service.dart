@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:merchantcaravan/core/world/location_service.dart';
+
 import '../models/caravan_faction.dart';
 import '../models/city.dart';
 import '../models/npc_caravan.dart';
@@ -117,16 +121,39 @@ final startY =
       return;
     }
 
-    npc.worldX =
-        journey.destinationX;
+npc.worldX =
+    journey.destinationX;
 
-    npc.worldY =
-        journey.destinationY;
+npc.worldY =
+    journey.destinationY;
 
-    npc.currentCity =
-        journey.destinationCity;
+if (journey.destinationCity != null) {
+  final city =
+      journey.destinationCity!;
 
-    npc.activeJourney = null;
+  final dx =
+      city.x - npc.worldX;
+
+  final dy =
+      city.y - npc.worldY;
+
+  final distance =
+      sqrt(
+        (dx * dx) +
+        (dy * dy),
+      );
+
+  npc.currentCity =
+      distance <=
+              LocationService
+                  .cityRadius
+          ? city
+          : null;
+} else {
+  npc.currentCity = null;
+}
+
+npc.activeJourney = null;
   }
 
   static double currentX({
