@@ -228,13 +228,26 @@ final score =
       1.0,
       travelDays,
     );
-
+print(
+  'MISSION '
+  '${mission.good.name} '
+  '${origin.name} -> ${destination.name} '
+  'qty=${mission.quantity} '
+  'profit=${mission.expectedProfit.toStringAsFixed(1)} '
+  'score=${score.toStringAsFixed(1)}',
+);
       if (score > bestScore) {
         bestScore = score;
         bestMission = mission;
       }
     }
-
+if (bestMission != null) {
+  print(
+    'SELECTED '
+    '${bestMission.good.name} '
+    'profit=${bestMission.expectedProfit.toStringAsFixed(1)}',
+  );
+}
     return bestMission;
   }
 

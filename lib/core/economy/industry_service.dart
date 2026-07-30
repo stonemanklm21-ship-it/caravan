@@ -1,6 +1,7 @@
 import '../models/world.dart';
 import 'labour_service.dart';
 import 'pricing_service.dart';
+import 'trade_analytics.dart';
 
 class IndustryService {
   static const double wagePerWorkerPerDay = 1;
@@ -33,6 +34,12 @@ class IndustryService {
 
           final purchased = shortfall > market.quantity ? market.quantity : shortfall;
 
+final unmetDemand =
+    shortfall - purchased;
+
+if (unmetDemand > 0) {
+  TradeAnalytics.recordUnmetDemand(    input.key,    unmetDemand,  );}
+
           if (purchased > 0) {
             final cost = PricingService.transactionCost(city: city, market: market, quantity: purchased.floor(),);
 
@@ -46,6 +53,19 @@ class IndustryService {
 
         double efficiency = labourEfficiency;
 
+for (final input
+    in industry.type.inputsPerSize.entries) {
+  final desiredConsumption =
+      input.value *
+      industry.size *
+      days;
+
+  TradeAnalytics
+      .recordDesiredConsumption(
+    input.key,
+    desiredConsumption,
+  );
+}
         // Check stored inputs.
         for (final input in industry.type.inputsPerSize.entries) {
           final required = input.value * industry.size * days;
@@ -63,15 +83,26 @@ class IndustryService {
         efficiency = efficiency.clamp(0.0, 1.0);
 
         // Consume inputs.
-        for (final input in industry.type.inputsPerSize.entries) {
-          industry.removeInventory(
-            good: input.key,
-            quantity: input.value * industry.size * days * efficiency,);}
+// Consume inputs.
+for (final input    in industry.type.inputsPerSize.entries) {
+
+  final quantityConsumed = input.value * industry.size *  days *  efficiency;
+
+  industry.removeInventory(    good: input.key,    quantity: quantityConsumed,  );
+
+  TradeAnalytics.recordConsumed(    input.key,    quantityConsumed,  );
+}
 
         // Produce outputs.
-        for (final output in industry.type.outputsPerSize.entries) {
-          industry.addInventory(good: output.key, quantity: output.value * industry.size * days * efficiency,);}
+// Produce outputs.
+for (final output    in industry.type.outputsPerSize.entries) {
 
+  final quantityProduced =      output.value *      industry.size *      days *      efficiency;
+
+  industry.addInventory(    good: output.key,    quantity: quantityProduced,  );
+
+  TradeAnalytics.recordProduced(    output.key,    quantityProduced,  );
+}
         // Sell all outputs to market.
         for (final output in industry.type.outputsPerSize.keys) {
           final quantity = industry.quantityOf(output);

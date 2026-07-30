@@ -9,6 +9,8 @@ import 'goods_data.dart';
 import 'industry_data.dart';
 import 'region_data.dart';
 
+// GENERATED FILE - DO NOT EDIT
+
 final farmingVillage = City(
   id: 'farmingVillage',
   name: 'Farming Village',
@@ -28,7 +30,7 @@ final farmingVillage = City(
 
     Industry(
       type: well,
-      size: 4,
+      size: 2,
       inputDaysTarget: 0,
       cash: 25000,
       inventory: [],
@@ -44,58 +46,60 @@ final farmingVillage = City(
 
     Industry(
       type: turnipFarm,
-      size: 4,
+      size: 2,
       inputDaysTarget: 5,
       cash: 25000,
       inventory: [],
     ),
+
   ],
 
   marketGoods: [
     MarketGood(
       good: grain,
-      quantity: 120,
+      quantity: 0,
     ),
 
     MarketGood(
       good: bread,
-      quantity: 250,
+      quantity: 180,
     ),
 
     MarketGood(
       good: water,
-      quantity: 3000,
+      quantity: 15,
     ),
 
     MarketGood(
       good: forage,
-      quantity: 150,
+      quantity: 0,
     ),
 
     MarketGood(
       good: wood,
-      quantity: 60,
+      quantity: 37,
     ),
 
     MarketGood(
       good: ironOre,
-      quantity: 20,
+      quantity: 0,
     ),
 
     MarketGood(
       good: tools,
-      quantity: 3,
+      quantity: 22,
     ),
 
     MarketGood(
       good: chair,
-      quantity: 1,
+      quantity: 18,
     ),
 
     MarketGood(
       good: turnips,
-      quantity: 100,
+      quantity: 184,
     ),
+
   ],
 
   animalMarketTier:
@@ -110,12 +114,14 @@ final farmingVillage = City(
   recruitmentMarketTier:
       RecruitmentMarketTier.major,
 
+  hasVet:
+      true,
 
-  hasVet: true,
+  hasCartwright:
+      true,
 
-  hasCartwright: true,
-
-  hasDoctor: true,
+  hasDoctor:
+      true,
 );
 
 final miningTown = City(
@@ -129,7 +135,7 @@ final miningTown = City(
   industries: [
     Industry(
       type: mine,
-      size: 4,
+      size: 2,
       inputDaysTarget: 14,
       cash: 25000,
       inventory: [],
@@ -145,7 +151,7 @@ final miningTown = City(
 
     Industry(
       type: gatheringCamp,
-      size: 8,
+      size: 1,
       inputDaysTarget: 5,
       cash: 25000,
       inventory: [],
@@ -153,7 +159,7 @@ final miningTown = City(
 
     Industry(
       type: toolmaker,
-      size: 4,
+      size: 2,
       inputDaysTarget: 5,
       cash: 25000,
       inventory: [],
@@ -169,58 +175,60 @@ final miningTown = City(
 
     Industry(
       type: chairmaker,
-      size: 4,
+      size: 2,
       inputDaysTarget: 3,
       cash: 25000,
       inventory: [],
     ),
+
   ],
 
   marketGoods: [
     MarketGood(
       good: grain,
-      quantity: 40,
+      quantity: 0,
     ),
 
     MarketGood(
       good: bread,
-      quantity: 300,
+      quantity: 345,
     ),
 
     MarketGood(
       good: water,
-      quantity: 1000,
+      quantity: 43,
     ),
 
     MarketGood(
       good: forage,
-      quantity: 600,
+      quantity: 0,
     ),
 
     MarketGood(
       good: wood,
-      quantity: 50,
+      quantity: 72,
     ),
 
     MarketGood(
       good: ironOre,
-      quantity: 150,
+      quantity: 0,
     ),
 
     MarketGood(
       good: tools,
-      quantity: 10,
+      quantity: 37,
     ),
 
     MarketGood(
       good: chair,
-      quantity: 1,
+      quantity: 42,
     ),
 
     MarketGood(
       good: turnips,
-      quantity: 100,
+      quantity: 447,
     ),
+
   ],
 
   animalMarketTier:
@@ -235,11 +243,14 @@ final miningTown = City(
   recruitmentMarketTier:
       RecruitmentMarketTier.major,
 
-  hasVet: true,
+  hasVet:
+      true,
 
-  hasCartwright: true,
+  hasCartwright:
+      true,
 
-  hasDoctor: true,
+  hasDoctor:
+      true,
 );
 
 final forestCamp = City(
@@ -253,7 +264,7 @@ final forestCamp = City(
   industries: [
     Industry(
       type: loggingCamp,
-      size: 4,
+      size: 2,
       inputDaysTarget: 7,
       cash: 25000,
       inventory: [],
@@ -261,7 +272,7 @@ final forestCamp = City(
 
     Industry(
       type: gatheringCamp,
-      size: 2,
+      size: 1,
       inputDaysTarget: 5,
       cash: 25000,
       inventory: [],
@@ -274,53 +285,55 @@ final forestCamp = City(
       cash: 25000,
       inventory: [],
     ),
+
   ],
 
   marketGoods: [
     MarketGood(
       good: grain,
-      quantity: 30,
+      quantity: 0,
     ),
 
     MarketGood(
       good: bread,
-      quantity: 250,
+      quantity: 110,
     ),
 
     MarketGood(
       good: water,
-      quantity: 1000,
+      quantity: 11,
     ),
 
     MarketGood(
       good: forage,
-      quantity: 180,
+      quantity: 0,
     ),
 
     MarketGood(
       good: wood,
-      quantity: 180,
+      quantity: 25,
     ),
 
     MarketGood(
       good: ironOre,
-      quantity: 10,
+      quantity: 0,
     ),
 
     MarketGood(
       good: tools,
-      quantity: 3,
+      quantity: 11,
     ),
 
     MarketGood(
       good: chair,
-      quantity: 1,
+      quantity: 12,
     ),
 
     MarketGood(
       good: turnips,
-      quantity: 100,
+      quantity: 110,
     ),
+
   ],
 
   animalMarketTier:
@@ -335,19 +348,22 @@ final forestCamp = City(
   recruitmentMarketTier:
       RecruitmentMarketTier.major,
 
-  hasVet: true,
+  hasVet:
+      true,
 
-  hasCartwright: true,
+  hasCartwright:
+      true,
 
-  hasDoctor: true,
+  hasDoctor:
+      true,
 );
 
 final cities = [
+
   farmingVillage,
   miningTown,
   forestCamp,
 ];
-
 final citiesById = {
   for (final city in cities)
     city.id: city,
@@ -358,3 +374,4 @@ City cityForId(
 ) {
   return citiesById[id]!;
 }
+

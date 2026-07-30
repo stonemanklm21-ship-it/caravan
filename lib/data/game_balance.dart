@@ -6,14 +6,33 @@ class GameBalance {
   
   // Population
 
-  static const int peoplePerMerchant = 500;
-  static const int merchantsPerBandit = 3;
+  static const int peoplePerMerchant = 300;
+  static const int merchantsPerBandit = 5;
 
     // Population maintenance
 
   static const int populationMaintenanceHours = 24;
 
-  
+  // Economy
+
+static const int supportedPopulationPerIndustrySize =
+    2000;
+
+static double outputForDemand(
+  double demandPerPersonPerDay,
+) {
+  return supportedPopulationPerIndustrySize *
+      demandPerPersonPerDay;
+}
+
+static const double breadDemandPerPersonPerDay =    0.1;
+static const double turnipDemandPerPersonPerDay =    0.1;
+static const double waterDemandPerPersonPerDay =    0.01;
+static const double toolsDemandPerPersonPerDay =    0.01;
+static const double woodDemandPerPersonPerDay =    0.02;
+static const double chairDemandPerPersonPerDay =    0.01;
+
+
   // Visibility service
 
   static const double banditVisionRange = 100.0;

@@ -1,10 +1,10 @@
-﻿id,name,inputGood1,inputQty1,inputGood2,inputQty2,outputGood,outputQty,operatingCost,workers,storage
-farm,Wheat Farm,water,100,,,grain,200,5,5,500
-well,Well,,,,,water,300,2,2,1000
-gatheringCamp,Gathering Camp,,,,,forage,20,3,4,300
-loggingCamp,Logging Camp,forage,5,,,wood,50,4,6,100
-mine,Mine,water,5,forage,5,ironOre,10,10,10,100
-bakery,Bakery,grain,200,water,100,bread,200,6,4,100
-toolmaker,Toolmaker,ironOre,10,wood,5,tools,10,8,5,100
-chairmaker,Chairmaker,wood,10,,,chair,10,10,6,100
-turnipFarm,Turnip Farm,water,100,,,turnips,200,5,5,500
+﻿id,variableName,name,outputGood,inputGood1,inputRatio1,inputGood2,inputRatio2,workers,storage,operatingCost,derivedFromDemand
+farm,farm,Wheat Farm,grain,water,0.5,,,5,1000,5,FALSE
+well,well,Well,water,,,,,2,1000,2,FALSE
+gathering_camp,gatheringCamp,Gathering Camp,forage,,,,,4,1000,3,FALSE
+logging_camp,loggingCamp,Logging Camp,wood,forage,0.25,,,6,1000,4,FALSE
+mine,mine,Mine,ironOre,water,0.25,forage,0.25,10,1000,10,FALSE
+bakery,bakery,Bakery,bread,grain,1,water,0.5,4,1000,6,TRUE
+toolmaker,toolmaker,Toolmaker,tools,ironOre,1,wood,0.5,5,1000,8,TRUE
+chairmaker,chairmaker,Chairmaker,chair,wood,1,,,6,1000,10,TRUE
+turnip_farm,turnipFarm,Turnip Farm,turnips,water,0.5,,,5,1000,5,TRUE

@@ -10,6 +10,8 @@ void main() {
   final buffer = StringBuffer();
 
   buffer.writeln(
+      "import 'game_balance.dart';");
+  buffer.writeln(
       "import '../core/models/industry_type.dart';");
   buffer.writeln(
       "import 'goods_data.dart';");
@@ -19,52 +21,73 @@ void main() {
       '// GENERATED FILE - DO NOT EDIT');
   buffer.writeln();
 
-  for (final row in rows) {
-    final id = row['id'];
-    final name = row['name'];
+  final demandDrivenRows = rows.where(
+    (row) =>
+        row['derivedFromDemand']
+                .toString()
+                .toLowerCase() ==
+            'true',
+  );
 
-    final inputGood1 =
-        row['inputGood1']?.toString() ?? '';
-    final inputQty1 =
-        row['inputQty1'];
+  for (final row in demandDrivenRows) {
+    writeIndustry(
+      buffer: buffer,
+      row: row,
+      demandDriven: true,
+    );
+  }
 
-    final inputGood2 =
-        row['inputGood2']?.toString() ?? '';
-    final inputQty2 =
-        row['inputQty2'];
+  final supplyDrivenRows = rows.where(
+    (row) =>
+        row['derivedFromDemand']
+                .toString()
+                .toLowerCase() ==
+            'false',
+  );
 
+  for (final row in supplyDrivenRows) {
     final outputGood =
-        row['outputGood'];
-    final outputQty =
-        row['outputQty'];
+        row['outputGood'].toString();
 
-    final inputsBuffer =
-        StringBuffer();
+    final consumers = rows.where(
+      (other) =>
+          other['inputGood1']
+                  .toString()
+                  .trim() ==
+              outputGood ||
+          other['inputGood2']
+                  .toString()
+                  .trim() ==
+              outputGood,
+    );
 
-    if (inputGood1.trim().isNotEmpty) {
-      inputsBuffer.writeln(
-          '    $inputGood1: $inputQty1,');
-    }
+    final outputExpression =
+        consumers.map((consumer) {
+      final consumerOutputGood =
+          consumer['outputGood'];
 
-    if (inputGood2.trim().isNotEmpty) {
-      inputsBuffer.writeln(
-          '    $inputGood2: $inputQty2,');
-    }
+      final outputExpr =
+          'GameBalance.outputForDemand($consumerOutputGood.populationDemandPerPersonPerDay)';
 
-    buffer.writeln('''
-final $id = IndustryType(
-  id: '$id',
-  name: '$name',
-  inputsPerSize: {
-${inputsBuffer.toString()}  },
-  outputsPerSize: {
-    $outputGood: $outputQty,
-  },
-  operatingCostPerSizePerDay: ${row['operatingCost']},
-  workersPerSize: ${row['workers']},
-  storagePerSize: ${row['storage']},
-);
-''');
+      if (consumer['inputGood1']
+              .toString()
+              .trim() ==
+          outputGood) {
+        return '($outputExpr * ${consumer['inputRatio1']})';
+      }
+
+      return '($outputExpr * ${consumer['inputRatio2']})';
+    }).join(' + ');
+
+    writeIndustry(
+      buffer: buffer,
+      row: row,
+      demandDriven: false,
+      outputExpression:
+          outputExpression.isEmpty
+              ? '0'
+              : outputExpression,
+    );
   }
 
   buffer.writeln('''
@@ -73,7 +96,7 @@ final industryTypes = [
 
   for (final row in rows) {
     buffer.writeln(
-      '  ${row['id']},',
+      '  ${row['variableName']},',
     );
   }
 
@@ -93,7 +116,7 @@ IndustryType industryTypeForId(
 ''');
 
   File(
-    'lib/data/industry_data.dart',
+    'lib/data/industry_data_test.dart',
   ).writeAsStringSync(
     buffer.toString(),
   );
@@ -101,6 +124,78 @@ IndustryType industryTypeForId(
   print(
     'Generated ${rows.length} industry types.',
   );
+}
+
+void writeIndustry({
+  required StringBuffer buffer,
+  required Map<String, dynamic> row,
+  required bool demandDriven,
+  String? outputExpression,
+}) {
+  final id =
+      row['id'].toString();
+
+  final variableName =
+      row['variableName'].toString();
+
+  final name =
+      row['name'].toString();
+
+  final outputGood =
+      row['outputGood'].toString();
+
+  final outputExpr = demandDriven
+      ? 'GameBalance.outputForDemand($outputGood.populationDemandPerPersonPerDay)'
+      : outputExpression!;
+
+  final inputsBuffer =
+      StringBuffer();
+
+  final inputGood1 =
+      row['inputGood1']
+              ?.toString()
+              .trim() ??
+          '';
+
+  if (inputGood1.isNotEmpty) {
+    inputsBuffer.writeln('''
+    $inputGood1:
+        ($outputExpr) *
+        ${row['inputRatio1']},
+''');
+  }
+
+  final inputGood2 =
+      row['inputGood2']
+              ?.toString()
+              .trim() ??
+          '';
+
+  if (inputGood2.isNotEmpty) {
+    inputsBuffer.writeln('''
+    $inputGood2:
+        ($outputExpr) *
+        ${row['inputRatio2']},
+''');
+  }
+
+  buffer.writeln('''
+final $variableName = IndustryType(
+  id: '$id',
+  name: '$name',
+  inputsPerSize: {
+${inputsBuffer.toString()}  },
+  outputsPerSize: {
+    $outputGood: $outputExpr,
+  },
+  operatingCostPerSizePerDay:
+      ${row['operatingCost']},
+  workersPerSize:
+      ${row['workers']},
+  storagePerSize:
+      ${row['storage']},
+);
+''');
 }
 
 List<Map<String, dynamic>> readCsv(

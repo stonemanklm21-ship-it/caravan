@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:csv/csv.dart';
+import 'package:merchantcaravan/data/goods_data.dart';
 
 void main() {
   final cityRows = readCsv(
@@ -9,10 +11,6 @@ void main() {
 
   final industryRows = readCsv(
     'lib/data/industries.csv',
-  );
-
-  final marketGoodRows = readCsv(
-    'lib/data/market_goods.csv',
   );
 
   final industriesByCity =
@@ -32,23 +30,6 @@ void main() {
     );
   }
 
-  final marketGoodsByCity =
-      <String, List<Map<String, dynamic>>>{};
-
-  for (final marketGood in marketGoodRows) {
-    final cityId =
-        marketGood['cityId'] as String;
-
-    marketGoodsByCity.putIfAbsent(
-      cityId,
-      () => [],
-    );
-
-    marketGoodsByCity[cityId]!.add(
-      marketGood,
-    );
-  }
-
   final buffer = StringBuffer();
 
   buffer.writeln(
@@ -57,6 +38,8 @@ void main() {
       "import '../core/economy/vehicle_market_service.dart';");
   buffer.writeln(
       "import '../core/economy/equipment_market_service.dart';");
+  buffer.writeln(
+      "import '../core/city/recruitment_service.dart';");
 
   buffer.writeln(
       "import '../core/models/city.dart';");
@@ -84,9 +67,6 @@ void main() {
     final industries =
         industriesByCity[cityId] ?? [];
 
-    final marketGoods =
-        marketGoodsByCity[cityId] ?? [];
-
     final industriesBuffer =
         StringBuffer();
 
@@ -106,12 +86,32 @@ void main() {
     final marketGoodsBuffer =
         StringBuffer();
 
-    for (final marketGood
-        in marketGoods) {
+    final random = Random(
+      cityId.hashCode,
+    );
+
+    final population =
+        city['population'] as int;
+
+    for (final good in goods) {
+      final demandPerDay =
+          population *
+          good.populationDemandPerPersonPerDay;
+
+      final randomFactor =
+          0.75 +
+          random.nextDouble() * 0.5;
+
+      final quantity =
+          (demandPerDay *
+                  2 *
+                  randomFactor)
+              .round();
+
       marketGoodsBuffer.writeln('''
     MarketGood(
-      good: ${marketGood['good']},
-      quantity: ${marketGood['quantity']},
+      good: ${good.variableName},
+      quantity: $quantity,
     ),
 ''');
     }
@@ -123,7 +123,7 @@ final $cityId = City(
   region: ${city['region']},
   x: ${city['x']},
   y: ${city['y']},
-  population: ${city['population']},
+  population: $population,
 
   industries: [
 ${industriesBuffer.toString()}  ],
@@ -139,6 +139,9 @@ ${marketGoodsBuffer.toString()}  ],
 
   equipmentMarketTier:
       EquipmentMarketTier.${city['equipmentMarketTier']},
+
+  recruitmentMarketTier:
+      RecruitmentMarketTier.${city['recruitmentMarketTier']},
 
   hasVet:
       ${csvBool(city['hasVet'])},

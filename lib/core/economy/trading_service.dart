@@ -3,6 +3,7 @@ import '../models/caravan.dart';
 import '../models/cargo_item.dart';
 import '../models/market_good.dart';
 import 'pricing_service.dart';
+import 'trade_analytics.dart';
 
 class TradingService {
   static bool buy({
@@ -107,6 +108,11 @@ class TradingService {
     }
 
     market.quantity += quantity;
+
+    TradeAnalytics.recordTransported(
+      market.good,
+      quantity.toDouble(),
+    );
 
     return true;
   }

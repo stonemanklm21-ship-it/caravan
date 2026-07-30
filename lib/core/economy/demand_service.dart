@@ -1,37 +1,13 @@
 import '../models/city.dart';
 import '../models/good.dart';
-import '../../data/goods_data.dart';
 
 class DemandService {
   static double populationDemandPerDay({
     required City city,
     required Good good,
   }) {
-    if (good == bread) {
-      return city.population * 0.1;
-    }
-
-    if (good == water) {
-      return city.population * 0.01;
-    }
-
-    if (good == tools) {
-      return city.population * 0.01;
-    }
-
-    if (good == wood) {
-      return city.population * 0.02;
-    }
-
-    if (good == chair) {
-      return city.population * 0.01;
-    }
-
-        if (good == turnips) {
-      return city.population * 0.1;
-    }
-
-    return 0;
+    return city.population *
+        good.populationDemandPerPersonPerDay;
   }
 
   static double industryDemandPerDay({
