@@ -12,6 +12,8 @@ import '../models/caravan.dart';
 import '../models/caravan_faction.dart';
 import '../models/city.dart';
 import '../models/npc_caravan.dart';
+import '../models/cargo_item.dart';
+import '../../data/goods_data.dart';
 
 class BanditCaravanGenerator {
   static final Random _random = Random();
@@ -124,20 +126,29 @@ final companionCount =
       },
     );
 
-    return Caravan(
-      leader: leader,
-      companions: companions,
-      gold:
-          50 +
-          (_random.nextDouble() *
-              200),
-      inventory: [],
-      weapons: [],
-      armours: [],
-      helmets: [],
-      animals: [],
-      vehicles: [],
-      manifest: [],
-    );
+return Caravan(
+  leader: leader,
+  companions: companions,
+  gold:
+      50 +
+      (_random.nextDouble() *
+          200),
+  inventory: [
+    CargoItem(
+      good: water,
+      quantity: 20 + _random.nextInt(31).toDouble(),
+    ),
+    CargoItem(
+      good: bread,
+      quantity: 10 + _random.nextInt(21).toDouble(),
+    ),
+  ],
+  weapons: [],
+  armours: [],
+  helmets: [],
+  animals: [],
+  vehicles: [],
+  manifest: [],
+);
   }
 }

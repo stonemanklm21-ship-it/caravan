@@ -1,3 +1,5 @@
+import 'package:merchantcaravan/data/game_balance.dart';
+
 import '../models/caravan.dart';
 import '../models/vehicle.dart';
 import 'animal_service.dart';
@@ -45,7 +47,7 @@ class VehicleService {
       ],
       skill: Skill.mechanic,
       amount:
-          preventedLoss * 10,
+          preventedLoss * GameBalance.mechanicPerTravelHour,
     );
   }
 

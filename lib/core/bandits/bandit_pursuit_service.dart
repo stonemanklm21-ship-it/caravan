@@ -2,6 +2,7 @@ import '../../data/game_balance.dart';
 
 import '../combat/encounter_service.dart';
 import '../models/npc_caravan.dart';
+import '../models/player_state.dart';
 import '../models/world.dart';
 import '../npc/npc_travel_service.dart';
 import '../world/visibility_service.dart';
@@ -15,31 +16,35 @@ class BanditPursuitService {
     required double worldTimeHours,
     required double tickFraction,
   }) {
-    final target =
-        bandit.followTarget;
+    final target = bandit.followTarget;
 
     if (target == null) {
       return false;
     }
 
-    if (target is! NpcCaravan) {
+    if (target is! NpcCaravan &&
+        target is! PlayerState) {
       bandit.followTarget = null;
       return false;
     }
 
     final targetX =
-        NpcTravelService.currentX(
-      npc: target,
-      worldTimeHours:
-          worldTimeHours,
-    );
+        target is NpcCaravan
+            ? NpcTravelService.currentX(
+                npc: target,
+                worldTimeHours:
+                    worldTimeHours,
+              )
+            : target.x;
 
     final targetY =
-        NpcTravelService.currentY(
-      npc: target,
-      worldTimeHours:
-          worldTimeHours,
-    );
+        target is NpcCaravan
+            ? NpcTravelService.currentY(
+                npc: target,
+                worldTimeHours:
+                    worldTimeHours,
+              )
+            : target.y;
 
     final banditX =
         NpcTravelService.currentX(
@@ -71,14 +76,23 @@ class BanditPursuitService {
     }
 
     if (distance <= captureRange) {
-      EncounterService
-          .tryStartEncounter(
-        bandit: bandit,
-        merchant: target,
-        world: world,
-        worldTimeHours:
-            worldTimeHours,
-      );
+      if (target is NpcCaravan) {
+        EncounterService
+            .tryStartEncounter(
+          bandit: bandit,
+          merchant: target,
+          world: world,
+          worldTimeHours:
+              worldTimeHours,
+        );
+      } else if (target
+          is PlayerState) {
+        target.encounteredNpc =
+            bandit;
+        target.ignoredNpcs.add(
+          bandit,
+        );
+      }
 
       bandit.followTarget = null;
 

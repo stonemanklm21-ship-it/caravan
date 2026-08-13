@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
-import '../core/combat/combat_encounter.dart';
-import '../core/combat/combat_round_result.dart';
+import '../core/combat/combat_result.dart';
+import '../core/combat/combat_session.dart';
 import '../core/combat/combat_service.dart';
+import '../core/combat/combat_round_result.dart';
 import '../core/combat/combat_strength_service.dart';
+import '../screens/combat_result_screen.dart';
 
 class CombatScreen extends StatefulWidget {
-  final CombatEncounter encounter;
+  final CombatSession session;
 
   const CombatScreen({
     super.key,
-    required this.encounter,
+    required this.session,
   });
 
   @override
@@ -24,14 +26,15 @@ class _CombatScreenState
 
   int roundNumber = 0;
   bool rewardsGranted = false;
+
   bool get playerDefeated =>
       CombatService.combatants(
-        widget.encounter.defenders,
+        widget.session.encounter.defenders,
       ).isEmpty;
 
   bool get enemyDefeated =>
       CombatService.combatants(
-        widget.encounter.attackers,
+        widget.session.encounter.attackers,
       ).isEmpty;
 
   bool get combatEnded =>
@@ -52,11 +55,11 @@ class _CombatScreenState
       CombatService.resolveRound(
         attackers:
             CombatService.combatants(
-          widget.encounter.defenders,
+          widget.session.encounter.defenders,
         ),
         defenders:
             CombatService.combatants(
-          widget.encounter.attackers,
+          widget.session.encounter.attackers,
         ),
       ),
     );
@@ -65,11 +68,11 @@ class _CombatScreenState
       CombatService.resolveRound(
         attackers:
             CombatService.combatants(
-          widget.encounter.attackers,
+          widget.session.encounter.attackers,
         ),
         defenders:
             CombatService.combatants(
-          widget.encounter.defenders,
+          widget.session.encounter.defenders,
         ),
       ),
     );
@@ -86,31 +89,9 @@ class _CombatScreenState
         );
       }
 
-if (enemyDefeated && !rewardsGranted) {
-  
-rewardsGranted = true;
-
-  final goldWon =
-      widget.encounter.attackers.gold;
-
-  widget.encounter.defenders.gold +=
-      goldWon;
-
-  widget.encounter.attackers.gold = 0;
-
-  log.add(
-    'Victory!',
-  );
-
-  log.add(
-    'Looted ${goldWon.toStringAsFixed(0)} gold.',
-  );
-}
-
-      if (playerDefeated) {
-        log.add(
-          'Defeat!',
-        );
+      if (enemyDefeated &&
+          !rewardsGranted) {
+        rewardsGranted = true;
       }
     });
   }
@@ -139,39 +120,40 @@ rewardsGranted = true;
               height: 8,
             ),
             ...combatants.map(
-              (character) =>
-Column(
-  crossAxisAlignment:
-      CrossAxisAlignment.start,
-  children: [
-    Text(
-      '${character.name}: '
-      '${character.hp.toStringAsFixed(0)} HP',
-    ),
-    Text(
-      '  Weapon: ${character.weapon?.name ?? "None"}',
-      style: const TextStyle(
-        fontSize: 12,
-        color: Colors.grey,
-      ),
-    ),
-    Text(
-      '  Armour: ${character.armour?.name ?? "None"}',
-      style: const TextStyle(
-        fontSize: 12,
-        color: Colors.grey,
-      ),
-    ),
-    Text(
-      '  Helmet: ${character.helmet?.name ?? "None"}',
-      style: const TextStyle(
-        fontSize: 12,
-        color: Colors.grey,
-      ),
-    ),
-    const SizedBox(height: 4),
-  ],
-),
+              (character) => Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${character.name}: '
+                    '${character.hp.toStringAsFixed(0)} HP',
+                  ),
+                  Text(
+                    '  Weapon: ${character.weapon?.name ?? "None"}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    '  Armour: ${character.armour?.name ?? "None"}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    '  Helmet: ${character.helmet?.name ?? "None"}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                ],
+              ),
             ),
             if (combatants.isEmpty)
               const Text(
@@ -189,30 +171,36 @@ Column(
   ) {
     final playerSide =
         CombatService.combatants(
-      widget.encounter.defenders,
+      widget.session.encounter
+          .defenders,
     );
 
     final enemySide =
         CombatService.combatants(
-      widget.encounter.attackers,
+      widget.session.encounter
+          .attackers,
     );
-final playerStrength =
-    CombatStrengthService
-        .caravanStrength(
-  widget.encounter.defenders,
-);
 
-final enemyStrength =
-    CombatStrengthService
-        .caravanStrength(
-  widget.encounter.attackers,
-);
+    final playerStrength =
+        CombatStrengthService
+            .caravanStrength(
+      widget.session.encounter
+          .defenders,
+    );
 
-final strengthRatio =
-    enemyStrength <= 0
-        ? 0
-        : playerStrength /
-            enemyStrength;
+    final enemyStrength =
+        CombatStrengthService
+            .caravanStrength(
+      widget.session.encounter
+          .attackers,
+    );
+
+    final strengthRatio =
+        enemyStrength <= 0
+            ? 0
+            : playerStrength /
+                enemyStrength;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -221,72 +209,40 @@ final strengthRatio =
       ),
       body: Column(
         children: [
-          if (enemyDefeated)
-            const Padding(
-              padding:
-                  EdgeInsets.all(8),
-              child: Text(
-                'VICTORY',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight:
-                      FontWeight.bold,
-                  color: Colors.green,
+          Padding(
+            padding:
+                const EdgeInsets.all(8),
+            child: Column(
+              children: [
+                Text(
+                  'Player Strength: '
+                  '${playerStrength.toStringAsFixed(1)}',
                 ),
-              ),
+                Text(
+                  'Enemy Strength: '
+                  '${enemyStrength.toStringAsFixed(1)}',
+                ),
+                Text(
+                  'Strength Ratio: '
+                  '${strengthRatio.toStringAsFixed(2)}',
+                ),
+              ],
             ),
+          ),
 
-          if (playerDefeated)
-            const Padding(
-              padding:
-                  EdgeInsets.all(8),
-              child: Text(
-                'DEFEAT',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight:
-                      FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-            ),
-Padding(
-  padding:
-      const EdgeInsets.all(8),
-  child: Column(
-    children: [
-      Text(
-        'Player Strength: '
-        '${playerStrength.toStringAsFixed(1)}',
-      ),
-      Text(
-        'Enemy Strength: '
-        '${enemyStrength.toStringAsFixed(1)}',
-      ),
-      Text(
-        'Strength Ratio: '
-        '${strengthRatio.toStringAsFixed(2)}',
-      ),
-    ],
-  ),
-),
           _buildSide(
             title: 'Player Caravan',
-            combatants:
-                playerSide,
+            combatants: playerSide,
           ),
 
           _buildSide(
             title: 'Enemy Caravan',
-            combatants:
-                enemySide,
+            combatants: enemySide,
           ),
 
           Padding(
             padding:
-                const EdgeInsets.all(
-              8,
-            ),
+                const EdgeInsets.all(8),
             child: ElevatedButton(
               onPressed:
                   combatEnded
@@ -301,20 +257,53 @@ Padding(
           if (combatEnded)
             Padding(
               padding:
-                  const EdgeInsets.all(
-                8,
-              ),
+                  const EdgeInsets.all(8),
               child: ElevatedButton(
-  onPressed: () {
-    Navigator.pop(
-      context,
-      enemyDefeated,
-    );
-  },
-  child: const Text(
-    'Continue',
-  ),
-),
+                onPressed: () async {
+                  final result =
+                      widget.session.buildResult(
+                    victory:
+                        enemyDefeated,
+                    defeatedCaravan:
+                        enemyDefeated
+                            ? widget
+                                  .session
+                                  .encounter
+                                  .attackers
+                            : widget
+                                  .session
+                                  .encounter
+                                  .defenders,
+                  );
+
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          CombatResultScreen(
+                        result: result,
+                        caravan: widget
+                            .session
+                            .encounter
+                            .defenders,
+                      ),
+                    ),
+                  );
+
+                  if (!context.mounted) {
+                    return;
+                  }
+
+                  Navigator.pop<
+                      CombatResult>(
+                    context,
+                    result,
+                  );
+                },
+                child: const Text(
+                  'Continue',
+                ),
+              ),
             ),
 
           const Divider(),

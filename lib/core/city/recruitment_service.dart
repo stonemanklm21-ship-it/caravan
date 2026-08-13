@@ -1,9 +1,9 @@
 import 'dart:math';
 
+import '../caravan/skill_service.dart';
 import '../models/character.dart';
 import '../models/city.dart';
 import '../models/recruit.dart';
-import '../caravan/skill_service.dart';
 
 enum RecruitmentMarketTier {
   basic,
@@ -91,6 +91,39 @@ class RecruitmentService {
         SkillService.xpForLevel(60),
     };
 
+    final maxSelf = switch (tier) {
+      RecruitmentMarketTier.basic => 12,
+      RecruitmentMarketTier.regional => 25,
+      RecruitmentMarketTier.major => 40,
+    };
+
+    final totalSelf =
+        _random.nextInt(maxSelf + 1);
+
+    int strength = 0;
+    int endurance = 0;
+    int life = 0;
+    int fortitude = 0;
+
+    for (int i = 0;
+        i < totalSelf;
+        i++) {
+      switch (_random.nextInt(4)) {
+        case 0:
+          strength++;
+          break;
+        case 1:
+          endurance++;
+          break;
+        case 2:
+          life++;
+          break;
+        case 3:
+          fortitude++;
+          break;
+      }
+    }
+
     final doctorXp =
         _randomSkillXp(maxXp);
 
@@ -139,20 +172,12 @@ class RecruitmentService {
       weightKg:
           55 +
           (_random.nextDouble() * 45),
-      cargoCapacityKg:
-          (8 +
-                  _random.nextInt(
-                13,
-              ))
-              .toDouble(),
-      caloriesPerDay: 2500,
-      waterPerDay: 3,
       wagePerDay: wage,
-      hp: 100,
-      maxHp: 100,
-      speed:
-          3 +
-          (_random.nextDouble() * 3),
+      strength: strength,
+      endurance: endurance,
+      life: life,
+      fortitude: fortitude,
+      hp: 50 + (5 * life),
       doctorXp: doctorXp,
       vetXp: vetXp,
       mechanicXp: mechanicXp,

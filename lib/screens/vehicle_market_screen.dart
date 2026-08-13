@@ -3,6 +3,13 @@ import 'package:flutter/material.dart';
 import '../../core/economy/vehicle_market_service.dart';
 import '../../core/models/player_state.dart';
 import '../../core/models/vehicle.dart';
+import '../../ui/theme/app_colors.dart';
+import '../../ui/theme/app_text_styles.dart';
+import '../../ui/widgets/app_button.dart';
+import '../../ui/widgets/app_card.dart';
+import '../../ui/widgets/game_scaffold.dart';
+import '../../ui/widgets/game_status_bar.dart';
+import '../../ui/widgets/status_item.dart';
 
 class VehicleMarketScreen
     extends StatefulWidget {
@@ -45,13 +52,23 @@ class _VehicleMarketScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Vehicle Dealer',
-        ),
+    final caravan =
+        widget.playerState.caravan;
+
+    return GameScaffold(
+      title: 'Vehicle Dealer',
+      statusBar: GameStatusBar(
+        children: [
+          StatusItem(
+            icon: '🪙',
+            value: caravan.gold
+                .toStringAsFixed(0),
+            color: AppColors.gold,
+          ),
+        ],
       ),
-      body: ListView.builder(
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
         itemCount: stock.length,
         itemBuilder:
             (context, index) {
@@ -64,78 +81,211 @@ class _VehicleMarketScreenState
             vehicle,
           );
 
-          return Card(
-            margin:
-                const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 6,
-            ),
-            child: ListTile(
-              title: Text(
-                vehicle.type.name,
-              ),
-              subtitle: Column(
+          final canBuy =
+              caravan.gold >=
+                  price;
+
+          return AppCard(
+            child: IntrinsicHeight(
+              child: Row(
                 crossAxisAlignment:
                     CrossAxisAlignment
-                        .start,
+                        .stretch,
                 children: [
-                  Text(
-                    'Condition: '
-                    '${vehicle.condition.toStringAsFixed(0)}'
-                    ' / '
-                    '${vehicle.type.maxCondition.toStringAsFixed(0)}',
+                  // Identity column
+                  Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration:
+                            BoxDecoration(
+                          border:
+                              Border.all(
+                            color:
+                                AppColors
+                                    .primary,
+                            width: 1,
+                          ),
+                          borderRadius:
+                              BorderRadius
+                                  .circular(
+                            6,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.local_shipping,
+                          size: 40,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 4,
+                      ),
+
+                      Text(
+                        vehicle.type.name,
+                        textAlign:
+                            TextAlign
+                                .center,
+                        style:
+                            AppTextStyles
+                                .section,
+                      ),
+                    ],
                   ),
-                  Text(
-                    'Pull Requirement: '
-                    '${vehicle.type.requiredPullingCapacityKg.toStringAsFixed(1)} kg',
+
+                  const SizedBox(
+                    width: 8,
                   ),
-                  Text(
-                    'Max Cargo: '
-                    '${vehicle.type.maxCargoKg.toStringAsFixed(1)} kg',
+
+                  VerticalDivider(
+                    width: 1,
+                    thickness: 1,
+                    color:
+                        AppColors.accent,
                   ),
-                  Text(
-                    'Multiplier: '
-                    '${vehicle.type.capacityMultiplier.toStringAsFixed(1)}x',
+
+                  const SizedBox(
+                    width: 8,
                   ),
-                  Text(
-                    'Price: '
-                    '${price.toStringAsFixed(0)}',
+
+                  // Stats column
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .center,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Cargo Capacity',
+                              style:
+                                  AppTextStyles
+                                      .caption,
+                            ),
+                            const Spacer(),
+                            Text(
+                              '${vehicle.type.maxCargoKg.toStringAsFixed(0)}kg',
+                              style:
+                                  AppTextStyles
+                                      .statValue,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(
+                          height: 2,
+                        ),
+
+                        Row(
+                          children: [
+                            Text(
+                              'Required Pull',
+                              style:
+                                  AppTextStyles
+                                      .caption,
+                            ),
+                            const Spacer(),
+                            Text(
+                              '${vehicle.type.requiredPullingCapacityKg.toStringAsFixed(0)}kg',
+                              style:
+                                  AppTextStyles
+                                      .statValue,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(
+                          height: 8,
+                        ),
+
+                        Row(
+                          children: [
+                            Text(
+                              'Condition',
+                              style:
+                                  AppTextStyles
+                                      .caption,
+                            ),
+                            const Spacer(),
+                            Text(
+                              '${vehicle.condition.toInt()}/${vehicle.type.maxCondition.toInt()}',
+                              style:
+                                  AppTextStyles
+                                      .statValue,
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(
+                          height: 2,
+                        ),
+
+                        Row(
+                          children: [
+                            Text(
+                              'Cargo Multiplier',
+                              style:
+                                  AppTextStyles
+                                      .caption,
+                            ),
+                            const Spacer(),
+                            Text(
+                              '${vehicle.type.capacityMultiplier.toStringAsFixed(1)}x',
+                              style:
+                                  AppTextStyles
+                                      .statValue,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(
+                    width: 8,
+                  ),
+
+                  // Action column
+                  SizedBox(
+                    width: 84,
+                    child: Opacity(
+                      opacity:
+                          canBuy
+                              ? 1.0
+                              : 0.5,
+                      child:
+                          AppButton(
+                        text:
+                            'Buy\n🪙\n${price.toStringAsFixed(0)}',
+                        onPressed:
+                            canBuy
+                                ? () {
+                                    setState(
+                                      () {
+                                        caravan.gold -=
+                                            price;
+
+                                        caravan
+                                            .vehicles
+                                            .add(
+                                              vehicle,
+                                            );
+
+                                        stock
+                                            .removeAt(
+                                          index,
+                                        );
+                                      },
+                                    );
+                                  }
+                                : null,
+                      ),
+                    ),
                   ),
                 ],
-              ),
-              trailing:
-                  ElevatedButton(
-                onPressed:
-                    widget
-                                .playerState
-                                .caravan
-                                .gold <
-                            price
-                        ? null
-                        : () {
-                            setState(() {
-                              widget
-                                      .playerState
-                                      .caravan
-                                      .gold -=
-                                  price;
-
-                              widget
-                                  .playerState
-                                  .caravan
-                                  .vehicles
-                                  .add(
-                                    vehicle,
-                                  );
-
-                              stock.removeAt(
-                                index,
-                              );
-                            });
-                          },
-                child: const Text(
-                  'Buy',
-                ),
               ),
             ),
           );

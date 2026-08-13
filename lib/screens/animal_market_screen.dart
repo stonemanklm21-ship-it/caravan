@@ -4,6 +4,15 @@ import '../../core/economy/animal_market_service.dart';
 import '../../core/models/animal.dart';
 import '../../core/models/player_state.dart';
 import '../../core/world/calendar_service.dart';
+import '../../core/caravan/animal_service.dart';
+import '../../ui/theme/app_colors.dart';
+import '../../ui/theme/app_text_styles.dart';
+import '../../ui/widgets/app_button.dart';
+import '../../ui/widgets/app_card.dart';
+import '../../ui/widgets/game_scaffold.dart';
+import '../../ui/widgets/game_status_bar.dart';
+import '../../ui/widgets/status_item.dart';
+
 
 class AnimalMarketScreen
     extends StatefulWidget {
@@ -46,13 +55,23 @@ class _AnimalMarketScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Animal Market',
-        ),
+    final caravan =
+        widget.playerState.caravan;
+
+    return GameScaffold(
+      title: 'Animal Market',
+      statusBar: GameStatusBar(
+        children: [
+          StatusItem(
+            icon: '🪙',
+            value: caravan.gold
+                .toStringAsFixed(0),
+            color: AppColors.gold,
+          ),
+        ],
       ),
-      body: ListView.builder(
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
         itemCount: stock.length,
         itemBuilder:
             (context, index) {
@@ -65,73 +84,208 @@ class _AnimalMarketScreenState
             animal,
           );
 
-          return Card(
-            margin:
-                const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 6,
-            ),
-            child: ListTile(
-              title: Text(
-                animal.type.name,
-              ),
-              subtitle: Column(
+          final canBuy =
+              caravan.gold >=
+                  price;
+
+          return AppCard(
+            child: IntrinsicHeight(
+              child: Row(
                 crossAxisAlignment:
                     CrossAxisAlignment
-                        .start,
+                        .stretch,
                 children: [
-                  Text(
-                    'Gender: ${animal.gender.name}',
+                  // Identity column
+                  Column(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration:
+                            BoxDecoration(
+                          border:
+                              Border.all(
+                            color:
+                                AppColors
+                                    .primary,
+                            width: 1,
+                          ),
+                          borderRadius:
+                              BorderRadius
+                                  .circular(
+                            6,
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.pets,
+                          size: 40,
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 4,
+                      ),
+
+                      Text(
+                        animal.type.name,
+                        textAlign:
+                            TextAlign
+                                .center,
+                        style:
+                            AppTextStyles
+                                .section,
+                      ),
+                    ],
                   ),
-                  Text(
-                    'Age: ${CalendarService.formatAge(animal.ageYears)}',
+
+                  const SizedBox(
+                    width: 8,
                   ),
-                  Text(
-                    'Weight: ${animal.adultWeightKg.toStringAsFixed(1)} kg (adult)',
+
+                  VerticalDivider(
+                    width: 1,
+                    thickness: 1,
+                    color:
+                        AppColors.accent,
                   ),
-                  Text(
-                    'HP: ${animal.hp.toStringAsFixed(0)}'
-                    ' / '
-                    '${animal.type.maxHp.toStringAsFixed(0)}',
+
+                  const SizedBox(
+                    width: 8,
                   ),
-                  Text(
-                    'Price: ${price.toStringAsFixed(0)}',
+
+                  // Stats column
+ // Stats column
+Expanded(
+  child: Column(
+    mainAxisAlignment:
+        MainAxisAlignment.center,
+    children: [
+      Row(
+        children: [
+          Text(
+            'Gender',
+            style:
+                AppTextStyles.caption,
+          ),
+          const Spacer(),
+          Text(
+            animal.gender.name ==
+                    'male'
+                ? 'Male'
+                : 'Female',
+            style:
+                AppTextStyles.statValue,
+          ),
+        ],
+      ),
+
+      const SizedBox(
+        height: 2,
+      ),
+
+      Row(
+        children: [
+          Text(
+            'Age',
+            style:
+                AppTextStyles.caption,
+          ),
+          const Spacer(),
+          Text(
+            CalendarService
+                .formatAge(
+              animal.ageYears,
+            ),
+            style:
+                AppTextStyles.statValue,
+          ),
+        ],
+      ),
+
+      const SizedBox(
+        height: 8,
+      ),
+
+      Row(
+        children: [
+          Text(
+            'Cargo Capacity',
+            style:
+                AppTextStyles.caption,
+          ),
+          const Spacer(),
+Text(
+  '${AnimalService.cargoCapacityKg(animal).toStringAsFixed(0)}kg',
+  style:
+      AppTextStyles.statValue,
+),
+        ],
+      ),
+
+      const SizedBox(
+        height: 2,
+      ),
+
+      Row(
+        children: [
+          Text(
+            'Health',
+            style:
+                AppTextStyles.caption,
+          ),
+          const Spacer(),
+          Text(
+            '${animal.hp.toInt()}/${animal.type.maxHp.toInt()}',
+            style:
+                AppTextStyles.statValue,
+          ),
+        ],
+      ),
+    ],
+  ),
+),
+                  const SizedBox(
+                    width: 8,
+                  ),
+
+                  // Action column
+                  SizedBox(
+                    width: 84,
+                    child: Opacity(
+                      opacity:
+                          canBuy
+                              ? 1.0
+                              : 0.5,
+                      child:
+                          AppButton(
+                        text:
+                            'Buy\n🪙\n${price.toStringAsFixed(0)}',
+                        onPressed:
+                            canBuy
+                                ? () {
+                                    setState(
+                                      () {
+                                        caravan.gold -=
+                                            price;
+
+                                        caravan
+                                            .animals
+                                            .add(
+                                              animal,
+                                            );
+
+                                        stock
+                                            .removeAt(
+                                          index,
+                                        );
+                                      },
+                                    );
+                                  }
+                                : null,
+                      ),
+                    ),
                   ),
                 ],
-              ),
-              trailing:
-                  ElevatedButton(
-                onPressed:
-                    widget
-                                .playerState
-                                .caravan
-                                .gold <
-                            price
-                        ? null
-                        : () {
-                            setState(() {
-                              widget
-                                  .playerState
-                                  .caravan
-                                  .gold -=
-                                  price;
-
-                              widget
-                                  .playerState
-                                  .caravan
-                                  .animals
-                                  .add(
-                                    animal,
-                                  );
-
-                              stock.removeAt(
-                                index,
-                              );
-                            });
-                          },
-                child: const Text(
-                  'Buy',
-                ),
               ),
             ),
           );

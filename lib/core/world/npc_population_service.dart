@@ -4,6 +4,7 @@ import '../models/caravan_faction.dart';
 import '../models/world.dart';
 import '../bandits/bandit_caravan_generator.dart';
 import '../npc/npc_caravan_generator.dart';
+import '../../data/game_balance.dart';
 
 class NpcPopulationService {
   static int targetMerchantCount(
@@ -15,7 +16,8 @@ class NpcPopulationService {
           sum +
           max(
             1,
-            city.population ~/ 1000,
+            city.population ~/
+    GameBalance.peoplePerMerchant
           ),
     );
   }

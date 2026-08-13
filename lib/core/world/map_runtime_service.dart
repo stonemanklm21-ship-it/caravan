@@ -6,6 +6,7 @@ import '../travel/player_follow_service.dart';
 import '../travel/travel_service.dart';
 import '../world/location_service.dart';
 import '../world/visibility_service.dart';
+import '../models/caravan_faction.dart';
 
 enum MapEventType {
   merchantEncounter,
@@ -38,11 +39,19 @@ class MapRuntimeService {
         player.currentCity == null) {
       for (final npc
           in world.npcCaravans) {
-        if (player.ignoredNpcs
-            .contains(npc)) {
-          continue;
-        }
+if (player.ignoredNpcs
+    .contains(npc)) {
 
+  continue;
+}
+
+if (npc.faction ==
+        CaravanFaction.bandit &&
+    player.banditProtectionHours >
+        0) {
+
+  continue;
+}
         if (npc.activeJourney ==
             null) {
           continue;

@@ -15,23 +15,17 @@ class GameBalance {
 
   // Economy
 
-static const int supportedPopulationPerIndustrySize =
-    2000;
+  static const int supportedPopulationPerIndustrySize =    2000;
 
-static double outputForDemand(
-  double demandPerPersonPerDay,
-) {
-  return supportedPopulationPerIndustrySize *
-      demandPerPersonPerDay;
-}
+  static double outputForDemand(  double demandPerPersonPerDay,) {
+    return supportedPopulationPerIndustrySize *      demandPerPersonPerDay;}
 
-static const double breadDemandPerPersonPerDay =    0.1;
-static const double turnipDemandPerPersonPerDay =    0.1;
-static const double waterDemandPerPersonPerDay =    0.01;
-static const double toolsDemandPerPersonPerDay =    0.01;
-static const double woodDemandPerPersonPerDay =    0.02;
-static const double chairDemandPerPersonPerDay =    0.01;
-
+  static const double breadDemandPerPersonPerDay =    0.1;
+  static const double turnipDemandPerPersonPerDay =    0.1;
+  static const double waterDemandPerPersonPerDay =    0.01;
+  static const double toolsDemandPerPersonPerDay =    0.01;
+  static const double woodDemandPerPersonPerDay =    0.02;
+  static const double chairDemandPerPersonPerDay =    0.01;
 
   // Visibility service
 
@@ -63,4 +57,10 @@ static const double chairDemandPerPersonPerDay =    0.01;
 
   static const double surrenderRatio = 2.0;
 
+  // Skills
+
+  static const double scoutXpPerTravelHour = 3.0;
+  static const double mechanicPerTravelHour = 3.0;
+  static const double doctorPerTravelHour = 10.0;
+  static const double vetPerTravelHour = 10.0;
 }

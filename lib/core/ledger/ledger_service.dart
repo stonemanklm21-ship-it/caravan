@@ -8,10 +8,20 @@ class LedgerService {
     required String goodId,
     required double price,
   }) {
-    playerState.ledger.observations.removeWhere(
+    final alreadyRecorded =
+        playerState.ledger.observations.any(
       (observation) =>
           observation.cityId == cityId &&
-          observation.goodId == goodId,
+          observation.goodId == goodId &&
+          observation.day == playerState.day,
+    );
+
+    if (alreadyRecorded) {
+      return;
+    }
+
+    print(
+      'Recording $goodId in $cityId on day ${playerState.day} at $price',
     );
 
     playerState.ledger.observations.add(
@@ -31,11 +41,19 @@ class LedgerService {
     required String goodId,
   }) {
     try {
-      return playerState.ledger.observations.firstWhere(
-        (observation) =>
-            observation.cityId == cityId &&
-            observation.goodId == goodId,
-      );
+      return playerState.ledger.observations
+          .where(
+            (observation) =>
+                observation.cityId == cityId &&
+                observation.goodId == goodId,
+          )
+          .reduce(
+            (a, b) {
+              final aTime = a.day * 24 + a.hour;
+              final bTime = b.day * 24 + b.hour;
+              return aTime > bTime ? a : b;
+            },
+          );
     } catch (_) {
       return null;
     }
@@ -49,10 +67,10 @@ class LedgerService {
         playerState.ledger.observations
             .where(
               (observation) =>
-                  observation.cityId ==
-                  cityId,
+                  observation.cityId == cityId,
             )
             .toList();
+
 
     observations.sort(
       (a, b) => a.goodId.compareTo(
@@ -71,16 +89,43 @@ class LedgerService {
         playerState.ledger.observations
             .where(
               (observation) =>
-                  observation.goodId ==
-                  goodId,
+                  observation.goodId == goodId,
             )
             .toList();
 
-    observations.sort(
-      (a, b) => a.price.compareTo(
-        b.price,
-      ),
-    );
+    observations.sort((a, b) {
+      if (a.day != b.day) {
+        return a.day.compareTo(b.day);
+      }
+
+      return a.hour.compareTo(b.hour);
+    });
+
+    return observations;
+  }
+
+  static List<MarketObservation>
+      observationsForCityAndGood({
+    required PlayerState playerState,
+    required String cityId,
+    required String goodId,
+  }) {
+    final observations =
+        playerState.ledger.observations
+            .where(
+              (observation) =>
+                  observation.cityId == cityId &&
+                  observation.goodId == goodId,
+            )
+            .toList();
+
+    observations.sort((a, b) {
+      if (a.day != b.day) {
+        return a.day.compareTo(b.day);
+      }
+
+      return a.hour.compareTo(b.hour);
+    });
 
     return observations;
   }

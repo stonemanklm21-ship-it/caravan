@@ -38,7 +38,7 @@ final farmingVillage = City(
 
     Industry(
       type: gatheringCamp,
-      size: 1,
+      size: 3,
       inputDaysTarget: 5,
       cash: 25000,
       inventory: [],
@@ -151,7 +151,7 @@ final miningTown = City(
 
     Industry(
       type: gatheringCamp,
-      size: 1,
+      size: 3,
       inputDaysTarget: 5,
       cash: 25000,
       inventory: [],
@@ -272,7 +272,7 @@ final forestCamp = City(
 
     Industry(
       type: gatheringCamp,
-      size: 1,
+      size: 3,
       inputDaysTarget: 5,
       cash: 25000,
       inventory: [],
@@ -280,7 +280,7 @@ final forestCamp = City(
 
     Industry(
       type: well,
-      size: 1,
+      size: 2,
       inputDaysTarget: 0,
       cash: 25000,
       inventory: [],

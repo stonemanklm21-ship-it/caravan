@@ -49,6 +49,9 @@ class PlayerState
 
   final Set<NpcCaravan> ignoredNpcs = {};
 
+  /// Hours of protection from bandit encounters.
+  double banditProtectionHours;
+
   PlayerState({
     required this.worldTimeHours,
     required this.worldX,
@@ -57,6 +60,7 @@ class PlayerState
     required this.discoveredCities,
     required this.caravan,
     required this.ledger,
+    required this.banditProtectionHours,
     this.activeJourney,
     this.encounteredNpc,
     this.followTarget,
@@ -114,6 +118,8 @@ class PlayerState
       'ledger': ledger.toJson(),
       'activeJourney':
           activeJourney?.toJson(),
+      'banditProtectionHours':
+          banditProtectionHours,
     };
   }
 
@@ -189,6 +195,11 @@ class PlayerState
                           dynamic>,
                   world,
                 ),
+      banditProtectionHours:
+          (json['banditProtectionHours']
+                  as num? ??
+              0)
+              .toDouble(),
     );
   }
 }

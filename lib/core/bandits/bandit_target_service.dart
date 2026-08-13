@@ -114,8 +114,11 @@ class BanditTargetService {
       }
     }
 
-    // Player
-    if (!playerState.isInSafeZone) {
+  // Player
+if (!playerState.isInSafeZone &&
+    playerState.banditProtectionHours <=
+        0) {
+
       final playerDistance =
           VisibilityService.distance(
         x1: banditX,

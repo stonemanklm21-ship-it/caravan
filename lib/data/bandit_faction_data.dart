@@ -15,7 +15,7 @@ const marauders = BanditFaction(
   id: 'marauders',
   name: 'Marauders',
   preferredWeapon: club,
-  maxCombatLevel: 40,
+  maxCombatLevel: 10, //re-balance later
   minCompanions: 2,
   maxCompanions: 3,
 );

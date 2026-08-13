@@ -1,5 +1,6 @@
 import '../caravan/animal_service.dart';
 import '../caravan/vehicle_service.dart';
+import '../caravan/death_service.dart';
 import '../economy/economy_service.dart';
 import '../models/player_state.dart';
 import '../models/world.dart';
@@ -12,6 +13,8 @@ import '../world/location_service.dart';
 import '../world/npc_population_service.dart';
 import '../../data/game_balance.dart';
 import '../models/caravan_faction.dart';
+import '../caravan/skill_service.dart';
+import '../models/skill.dart';
 
 class TimeService {
   static void advanceTime({
@@ -25,10 +28,31 @@ class TimeService {
       hours: hours,
     );
 
-    playerState.worldTimeHours +=
-        hours;
+playerState.worldTimeHours += hours;
 
-    NpcCaravanService.advanceAll(
+if (playerState.banditProtectionHours >
+    0) {
+  playerState.banditProtectionHours -=
+      hours;
+
+  if (playerState.banditProtectionHours <
+      0) {
+    playerState.banditProtectionHours =
+        0;
+  }
+}
+if (playerState.activeJourney != null) {
+  SkillService.addSharedXp(
+    characters: [
+      playerState.caravan.leader,
+      ...playerState.caravan.companions,
+    ],
+    skill: Skill.scout,
+    amount: hours * GameBalance.scoutXpPerTravelHour,
+  );
+}
+
+NpcCaravanService.advanceAll(
       world: world,
       hours: hours,
       playerState: playerState,
@@ -190,6 +214,15 @@ class TimeService {
       world.lastPopulationMaintenanceHour =
           currentHour;
     }
+
+DeathService.processPlayer(
+  playerState: playerState,
+);
+
+DeathService.processWorld(
+  world: world,
+);
+
 
     DiscoveryService
         .discoverNearbyCities(

@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
+import '../core/caravan/skill_service.dart';
 import '../core/city/recruitment_service.dart';
 import '../core/models/character_portrait.dart';
 import '../core/models/player_state.dart';
 import '../core/models/recruit.dart';
 import '../core/models/skill.dart';
-import '../core/caravan/skill_service.dart';
+import '../ui/theme/app_colors.dart';
+import '../ui/theme/app_text_styles.dart';
+import '../ui/widgets/app_button.dart';
+import '../ui/widgets/app_card.dart';
+import '../ui/widgets/game_scaffold.dart';
+import '../ui/widgets/game_status_bar.dart';
+import '../ui/widgets/status_item.dart';
 
 class RecruitmentScreen extends StatefulWidget {
   final PlayerState playerState;
@@ -42,15 +49,28 @@ class _RecruitmentScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title:
-            const Text('Recruitment Hall'),
+    return GameScaffold(
+      title: 'Recruitment Hall',
+      statusBar: GameStatusBar(
+        children: [
+          StatusItem(
+            icon: '🪙',
+            value: widget
+                .playerState
+                .caravan
+                .gold
+                .toStringAsFixed(0),
+            color: AppColors.gold,
+          ),
+        ],
       ),
-      body: ListView.builder(
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
         itemCount: recruits.length,
         itemBuilder: (context, index) {
-          final recruit = recruits[index];
+          final recruit =
+              recruits[index];
+
           final character =
               recruit.character;
 
@@ -60,127 +80,245 @@ class _RecruitmentScreenState
                   .gold >=
               recruit.hiringCost;
 
-          return Card(
-            margin:
-                const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 6,
-            ),
-            child: Padding(
-              padding:
-                  const EdgeInsets.all(12),
+          return AppCard(
+            child: IntrinsicHeight(
               child: Row(
                 crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    CrossAxisAlignment
+                        .stretch,
                 children: [
-                 CharacterPortrait(
-  seed: character.id.hashCode,
-  dna: character.portrait,
-  size: 96,
-),
+                  // Identity column
+                  Column(
+                    children: [
+                      Container(
+                        decoration:
+                            BoxDecoration(
+                          border:
+                              Border.all(
+                            color:
+                                AppColors
+                                    .primary,
+                            width: 1,
+                          ),
+                          borderRadius:
+                              BorderRadius
+                                  .circular(
+                            6,
+                          ),
+                        ),
+                        child:
+                            CharacterPortrait(
+                          seed: character
+                              .id.hashCode,
+                          dna: character
+                              .portrait,
+                          size: 80,
+                        ),
+                      ),
 
-                  const SizedBox(
-                    width: 12,
+                      const SizedBox(
+                        height: 4,
+                      ),
+
+                      Text(
+                        '${character.name} (${character.ageYears})',
+                        textAlign:
+                            TextAlign
+                                .center,
+                        style:
+                            AppTextStyles
+                                .section,
+                      ),
+
+                      Text(
+                        '🪙${character.wagePerDay.toInt()}/day',
+                        textAlign:
+                            TextAlign
+                                .center,
+                        style:
+                            AppTextStyles
+                                .caption,
+                      ),
+                    ],
                   ),
 
+                  const SizedBox(
+                    width: 8,
+                  ),
+
+                  VerticalDivider(
+                    width: 1,
+                    thickness: 1,
+                    color:
+                        AppColors.accent,
+                  ),
+
+                  const SizedBox(
+                    width: 8,
+                  ),
+
+                  // Stats column
                   Expanded(
                     child: Column(
                       crossAxisAlignment:
                           CrossAxisAlignment
                               .start,
+                      mainAxisAlignment:
+                          MainAxisAlignment
+                              .center,
                       children: [
                         Text(
-                          '${character.name} (${character.ageYears})',
-                          style:
-                              Theme.of(context)
-                                  .textTheme
-                                  .titleMedium,
+                          'Stats',
+                          style: AppTextStyles
+                              .body
+                              .copyWith(
+                            color:
+                                AppColors
+                                    .primary,
+                            fontWeight:
+                                FontWeight
+                                    .w600,
+                          ),
                         ),
 
                         const SizedBox(
-                          height: 4,
+                          height: 2,
                         ),
 
-Text(
-  '🩺${SkillService.getLevel(character, Skill.doctor)}  '
-  '🐴${SkillService.getLevel(character, Skill.vet)}  '
-  '🔧${SkillService.getLevel(character, Skill.mechanic)}  '
-  '👁️${SkillService.getLevel(character, Skill.scout)}  '
-  '⚔️${SkillService.getLevel(character, Skill.combat)}',
-),
+                        Row(
+                          children: [
+                            StatText(
+                              icon: '❤️',
+                              value:
+                                  '${character.maxHp.toInt()}',
+                            ),
+                            StatText(
+                              icon: '🏃',
+                              value: character
+                                  .speed
+                                  .toStringAsFixed(
+                                    1,
+                                  ),
+                            ),
+                            StatText(
+                              icon: '🎒',
+                              value: character
+                                  .cargoCapacityKg
+                                  .toStringAsFixed(
+                                    0,
+                                  ),
+                            ),
+                            StatText(
+                              icon: '🍖',
+                              value:
+                                  '${(character.caloriesPerDay / 1000).toStringAsFixed(1)}k',
+                            ),
+                            StatText(
+                              icon: '💧',
+                              value: character
+                                  .waterPerDay
+                                  .toStringAsFixed(
+                                    1,
+                                  ),
+                            ),
+                          ],
+                        ),
 
-                        Text(
-                          '🏃 ${character.speed.toStringAsFixed(1)} km/h',
+                        const SizedBox(
+                          height: 8,
                         ),
 
                         Text(
-                          'HP: '
-                          '${character.hp.toStringAsFixed(0)}'
-                          ' / '
-                          '${character.maxHp.toStringAsFixed(0)}',
+                          'Skills',
+                          style: AppTextStyles
+                              .body
+                              .copyWith(
+                            color:
+                                AppColors
+                                    .primary,
+                            fontWeight:
+                                FontWeight
+                                    .w600,
+                          ),
                         ),
 
-                        Text(
-                          '📦 '
-                          '${character.cargoCapacityKg.toStringAsFixed(1)} kg',
+                        const SizedBox(
+                          height: 2,
                         ),
 
-                        Text(
-                          '🍖 '
-                          '${character.caloriesPerDay.toStringAsFixed(0)} / day',
-                        ),
-
-                        Text(
-                          '💧 '
-                          '${character.waterPerDay.toStringAsFixed(1)} / day',
-                        ),
-
-                        Text(
-                          '💰 Wage: '
-                          '${character.wagePerDay.toStringAsFixed(0)} / day',
-                        ),
-
-                        Text(
-                          '🏷️ Hire: '
-                          '${recruit.hiringCost.toStringAsFixed(0)}',
+                        Row(
+                          children: [
+                            StatText(
+                              icon: '🩺',
+                              value:
+                                  '${SkillService.getLevel(character, Skill.doctor)}',
+                            ),
+                            StatText(
+                              icon: '🐴',
+                              value:
+                                  '${SkillService.getLevel(character, Skill.vet)}',
+                            ),
+                            StatText(
+                              icon: '🔧',
+                              value:
+                                  '${SkillService.getLevel(character, Skill.mechanic)}',
+                            ),
+                            StatText(
+                              icon: '👁',
+                              value:
+                                  '${SkillService.getLevel(character, Skill.scout)}',
+                            ),
+                            StatText(
+                              icon: '⚔',
+                              value:
+                                  '${SkillService.getLevel(character, Skill.combat)}',
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
 
                   const SizedBox(
-                    width: 12,
+                    width: 8,
                   ),
 
-                  ElevatedButton(
-                    onPressed: canHire
-                        ? () {
-                            setState(() {
-                              widget
-                                  .playerState
-                                  .caravan
-                                  .gold -=
-                                  recruit
-                                      .hiringCost;
+                  // Full-height action column
+                  SizedBox(
+                    width: 84,
+                    child: AppButton(
+                      text:
+                          'Hire\n🪙\n${recruit.hiringCost.toStringAsFixed(0)}',
+                      onPressed:
+                          canHire
+                              ? () {
+                                  setState(
+                                    () {
+                                      widget
+                                              .playerState
+                                              .caravan
+                                              .gold -=
+                                          recruit.hiringCost;
 
-                              RecruitmentService
-                                  .recruit(
-                                recruit:
-                                    character,
-                                companions: widget
-                                    .playerState
-                                    .caravan
-                                    .companions,
-                              );
+                                      RecruitmentService
+                                          .recruit(
+                                        recruit:
+                                            character,
+                                        companions: widget
+                                            .playerState
+                                            .caravan
+                                            .companions,
+                                      );
 
-                              recruits.removeAt(
-                                index,
-                              );
-                            });
-                          }
-                        : null,
-                    child:
-                        const Text('Hire'),
+                                      recruits
+                                          .removeAt(
+                                        index,
+                                      );
+                                    },
+                                  );
+                                }
+                              : null,
+                    ),
                   ),
                 ],
               ),

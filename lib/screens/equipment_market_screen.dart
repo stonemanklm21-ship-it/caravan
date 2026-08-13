@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+
 import '../../core/economy/equipment_market_service.dart';
 import '../../core/models/player_state.dart';
-import '../../core/models/weapon.dart';
-import '../../core/models/armour.dart';
-import '../../core/models/helmet.dart';
+import '../../ui/theme/app_colors.dart';
+import '../../ui/widgets/app_tab_view.dart';
+import '../../ui/widgets/game_scaffold.dart';
+import '../../ui/widgets/game_status_bar.dart';
+import '../../ui/widgets/status_item.dart';
+import '../../ui/widgets/weapon_card.dart';
+import '../../ui/widgets/armour_card.dart';
+import '../../ui/widgets/helmet_card.dart';
 
 class EquipmentMarketScreen
     extends StatefulWidget {
@@ -23,8 +29,7 @@ class EquipmentMarketScreen
 class _EquipmentMarketScreenState
     extends State<
         EquipmentMarketScreen> {
-
-          @override
+  @override
   void initState() {
     super.initState();
 
@@ -38,6 +43,7 @@ class _EquipmentMarketScreenState
               .floor(),
     );
   }
+
   @override
   Widget build(
     BuildContext context,
@@ -45,277 +51,119 @@ class _EquipmentMarketScreenState
     final city =
         widget.playerState.currentCity!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Equipment Market',
-        ),
-      ),
-      body: ListView(
-        padding:
-            const EdgeInsets.all(12),
+    final caravan =
+        widget.playerState.caravan;
+
+    return GameScaffold(
+      title: 'Equipment Market',
+      statusBar: GameStatusBar(
         children: [
-          const Text(
-            'Weapons',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight:
-                  FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(
-            height: 8,
-          ),
-
-          ...city.weaponMarketStock.map(
-            (weapon) =>
-                _WeaponTile(
-              weapon: weapon,
-              gold: widget
-                  .playerState
-                  .caravan
-                  .gold,
-              onBuy: () {
-                setState(() {
-                  widget
-                      .playerState
-                      .caravan
-                      .gold -=
-                      weapon.basePrice;
-
-                  widget
-                      .playerState
-                      .caravan
-                      .weapons
-                      .add(weapon);
-
-                  city.weaponMarketStock
-                      .remove(
-                    weapon,
-                  );
-                });
-              },
-            ),
-          ),
-
-          const SizedBox(
-            height: 24,
-          ),
-
-          const Text(
-            'Armour',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight:
-                  FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(
-            height: 8,
-          ),
-
-          ...city.armourMarketStock.map(
-            (armour) =>
-                _ArmourTile(
-              armour: armour,
-              gold: widget
-                  .playerState
-                  .caravan
-                  .gold,
-              onBuy: () {
-                setState(() {
-                  widget
-                      .playerState
-                      .caravan
-                      .gold -=
-                      armour.basePrice;
-
-                  widget
-                      .playerState
-                      .caravan
-                      .armours
-                      .add(armour);
-
-                  city.armourMarketStock
-                      .remove(
-                    armour,
-                  );
-                });
-              },
-            ),
-          ),
-
-          const SizedBox(
-            height: 24,
-          ),
-
-          const Text(
-            'Helmets',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight:
-                  FontWeight.bold,
-            ),
-          ),
-
-          const SizedBox(
-            height: 8,
-          ),
-
-          ...city.helmetMarketStock.map(
-            (helmet) =>
-                _HelmetTile(
-              helmet: helmet,
-              gold: widget
-                  .playerState
-                  .caravan
-                  .gold,
-              onBuy: () {
-                setState(() {
-                  widget
-                      .playerState
-                      .caravan
-                      .gold -=
-                      helmet.basePrice;
-
-                  widget
-                      .playerState
-                      .caravan
-                      .helmets
-                      .add(helmet);
-
-                  city.helmetMarketStock
-                      .remove(
-                    helmet,
-                  );
-                });
-              },
-            ),
+          StatusItem(
+            icon: '🪙',
+            value: caravan.gold
+                .toStringAsFixed(0),
+            color: AppColors.gold,
           ),
         ],
       ),
-    );
-  }
-}
+      child: AppTabView(
+        tabs: const [
+          'Weapons',
+          'Armour',
+          'Helmets',
+        ],
+        children: [
+          ListView(
+            padding: EdgeInsets.zero,
+            children: city
+                .weaponMarketStock
+                .map(
+                  (weapon) =>
+                      WeaponMarketCard(
+                    weapon: weapon,
+                    gold: caravan.gold,
+                    onBuy: () {
+                      setState(() {
+                        caravan.gold -=
+                            weapon.basePrice;
 
-class _WeaponTile
-    extends StatelessWidget {
-  final Weapon weapon;
-  final double gold;
-  final VoidCallback onBuy;
+                        caravan.weapons
+                            .add(
+                          weapon,
+                        );
 
-  const _WeaponTile({
-    required this.weapon,
-    required this.gold,
-    required this.onBuy,
-  });
-
-  @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          weapon.name,
-        ),
-        subtitle: Text(
-          'Accuracy +${weapon.accuracy} • '
-          'd${weapon.damageDie} • '
-          '${weapon.weightKg}kg • '
-          '${weapon.basePrice.toStringAsFixed(0)} gold',
-        ),
-        trailing: ElevatedButton(
-          onPressed:
-              gold < weapon.basePrice
-                  ? null
-                  : onBuy,
-          child: const Text(
-            'Buy',
+                        city
+                            .weaponMarketStock
+                            .remove(
+                          weapon,
+                        );
+                      });
+                    },
+                  ),
+                )
+                .toList(),
           ),
-        ),
-      ),
-    );
-  }
-}
+          ListView(
+            padding: EdgeInsets.zero,
+            children: city
+                .armourMarketStock
+                .map(
+                  (armour) =>
+                      ArmourMarketCard(
+                    armour: armour,
+                    gold: caravan.gold,
+                    onBuy: () {
+                      setState(() {
+                        caravan.gold -=
+                            armour.basePrice;
 
-class _ArmourTile
-    extends StatelessWidget {
-  final Armour armour;
-  final double gold;
-  final VoidCallback onBuy;
+                        caravan.armours
+                            .add(
+                          armour,
+                        );
 
-  const _ArmourTile({
-    required this.armour,
-    required this.gold,
-    required this.onBuy,
-  });
-
-  @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          armour.name,
-        ),
-        subtitle: Text(
-          'Protection +${armour.protection} • '
-          '${armour.weightKg}kg • '
-          '${armour.basePrice.toStringAsFixed(0)} gold',
-        ),
-        trailing: ElevatedButton(
-          onPressed:
-              gold < armour.basePrice
-                  ? null
-                  : onBuy,
-          child: const Text(
-            'Buy',
+                        city
+                            .armourMarketStock
+                            .remove(
+                          armour,
+                        );
+                      });
+                    },
+                  ),
+                )
+                .toList(),
           ),
-        ),
-      ),
-    );
-  }
-}
+          ListView(
+            padding: EdgeInsets.zero,
+            children: city
+                .helmetMarketStock
+                .map(
+                  (helmet) =>
+                      HelmetMarketCard(
+                    helmet: helmet,
+                    gold: caravan.gold,
+                    onBuy: () {
+                      setState(() {
+                        caravan.gold -=
+                            helmet.basePrice;
 
-class _HelmetTile
-    extends StatelessWidget {
-  final Helmet helmet;
-  final double gold;
-  final VoidCallback onBuy;
+                        caravan.helmets
+                            .add(
+                          helmet,
+                        );
 
-  const _HelmetTile({
-    required this.helmet,
-    required this.gold,
-    required this.onBuy,
-  });
-
-  @override
-  Widget build(
-    BuildContext context,
-  ) {
-    return Card(
-      child: ListTile(
-        title: Text(
-          helmet.name,
-        ),
-        subtitle: Text(
-          'Protection +${helmet.protection} • '
-          '${helmet.weightKg}kg • '
-          '${helmet.basePrice.toStringAsFixed(0)} gold',
-        ),
-        trailing: ElevatedButton(
-          onPressed:
-              gold < helmet.basePrice
-                  ? null
-                  : onBuy,
-          child: const Text(
-            'Buy',
+                        city
+                            .helmetMarketStock
+                            .remove(
+                          helmet,
+                        );
+                      });
+                    },
+                  ),
+                )
+                .toList(),
           ),
-        ),
+        ],
       ),
     );
   }

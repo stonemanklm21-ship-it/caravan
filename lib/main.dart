@@ -1,3 +1,5 @@
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -11,7 +13,11 @@ void main() {
   );
 
   runApp(
-    const MerchantCaravanApp(),
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) =>
+          const MerchantCaravanApp(),
+    ),
   );
 }
 
@@ -23,10 +29,16 @@ class MerchantCaravanApp
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner:
           false,
-      home: MainMenuScreen(),
+      useInheritedMediaQuery: true,
+      locale: DevicePreview.locale(
+        context,
+      ),
+      builder:
+          DevicePreview.appBuilder,
+      home: const MainMenuScreen(),
     );
   }
 }

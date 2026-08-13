@@ -20,15 +20,16 @@ class Character {
   PortraitDna? portrait;
 
   int ageYears;
+
   final double weightKg;
-  final double cargoCapacityKg;
-  final double caloriesPerDay;
-  final double waterPerDay;
   final double wagePerDay;
 
-  double hp;
-  final double maxHp;
-  final double speed;
+  int strength;
+  int endurance;
+  int life;
+  int fortitude;
+
+  int hp;
 
   Animal? mountedAnimal;
   Vehicle? mountedVehicle;
@@ -50,13 +51,12 @@ class Character {
     this.portrait,
     required this.ageYears,
     required this.weightKg,
-    required this.cargoCapacityKg,
-    required this.caloriesPerDay,
-    required this.waterPerDay,
     required this.wagePerDay,
+    required this.strength,
+    required this.endurance,
+    required this.life,
+    required this.fortitude,
     required this.hp,
-    required this.maxHp,
-    required this.speed,
     this.mountedAnimal,
     this.mountedVehicle,
     this.weapon,
@@ -70,6 +70,21 @@ class Character {
   });
 
   bool get alive => hp > 0;
+
+  int get cargoCapacityKg =>
+      10 + (2 * strength);
+
+  double get speed =>
+      3.5 + (0.1 * endurance);
+
+  int get maxHp =>
+      50 + (5 * life);
+
+  double get waterPerDay =>
+      3.0 - (0.1 * fortitude);
+
+  int get caloriesPerDay =>
+      3000 - (100 * fortitude);
 
   double get equipmentWeightKg {
     return (weapon?.weightKg ?? 0) +
@@ -108,7 +123,12 @@ class Character {
       }
     }
 
-    return speed;
+    final hpRatio = hp / maxHp;
+
+    final speedModifier =
+        0.8 + (hpRatio * 0.2);
+
+    return speed * speedModifier;
   }
 
   bool get mounted =>
@@ -122,13 +142,12 @@ class Character {
       'cityId': cityId,
       'ageYears': ageYears,
       'weightKg': weightKg,
-      'cargoCapacityKg': cargoCapacityKg,
-      'caloriesPerDay': caloriesPerDay,
-      'waterPerDay': waterPerDay,
       'wagePerDay': wagePerDay,
+      'strength': strength,
+      'endurance': endurance,
+      'life': life,
+      'fortitude': fortitude,
       'hp': hp,
-      'maxHp': maxHp,
-      'speed': speed,
       'mountedAnimal':
           mountedAnimal?.toJson(),
       'mountedVehicle':
@@ -136,12 +155,11 @@ class Character {
       'weapon': weapon?.id,
       'armour': armour?.id,
       'helmet': helmet?.id,
-  'doctorXp': doctorXp,
-  'vetXp': vetXp,
-  'mechanicXp': mechanicXp,
-  'scoutXp': scoutXp,
-  'combatXp': combatXp,
-
+      'doctorXp': doctorXp,
+      'vetXp': vetXp,
+      'mechanicXp': mechanicXp,
+      'scoutXp': scoutXp,
+      'combatXp': combatXp,
       'portrait': portrait == null
           ? null
           : {
@@ -168,17 +186,16 @@ class Character {
     required Animal Function(
       Map<String, dynamic> json,
     )
-    animalFromJson,
+        animalFromJson,
     required Vehicle Function(
       Map<String, dynamic> json,
     )
-    vehicleFromJson,
+        vehicleFromJson,
   }) {
     return Character(
       id: json['id'] as String,
       name: json['name'] as String,
       cityId: json['cityId'] as String?,
-
       portrait: json['portrait'] == null
           ? null
           : PortraitDna(
@@ -207,45 +224,23 @@ class Character {
                     as int,
               ),
             ),
-
       ageYears: json['ageYears'] as int,
-
       weightKg:
           (json['weightKg'] as num)
               .toDouble(),
-
-      cargoCapacityKg:
-          (json['cargoCapacityKg']
-                  as num)
-              .toDouble(),
-
-      caloriesPerDay:
-          (json['caloriesPerDay']
-                  as num)
-              .toDouble(),
-
-      waterPerDay:
-          (json['waterPerDay']
-                  as num)
-              .toDouble(),
-
       wagePerDay:
-          (json['wagePerDay']
-                  as num)
+          (json['wagePerDay'] as num)
               .toDouble(),
-
+      strength:
+          json['strength'] as int,
+      endurance:
+          json['endurance'] as int,
+      life:
+          json['life'] as int,
+      fortitude:
+          json['fortitude'] as int,
       hp:
-          (json['hp'] as num)
-              .toDouble(),
-
-      maxHp:
-          (json['maxHp'] as num)
-              .toDouble(),
-
-      speed:
-          (json['speed'] as num)
-              .toDouble(),
-
+          json['hp'] as int,
       mountedAnimal:
           json['mountedAnimal'] == null
               ? null
@@ -253,7 +248,6 @@ class Character {
                   json['mountedAnimal']
                       as Map<String, dynamic>,
                 ),
-
       mountedVehicle:
           json['mountedVehicle'] == null
               ? null
@@ -261,49 +255,41 @@ class Character {
                   json['mountedVehicle']
                       as Map<String, dynamic>,
                 ),
-
       weapon: json['weapon'] == null
           ? null
           : weaponForId(
               json['weapon'] as String,
             ),
-
       armour: json['armour'] == null
           ? null
           : armourForId(
               json['armour'] as String,
             ),
-
       helmet: json['helmet'] == null
           ? null
           : helmetForId(
               json['helmet'] as String,
             ),
-
-doctorXp:
-    (json['doctorXp'] as num?)
-            ?.toDouble() ??
-        0,
-
-vetXp:
-    (json['vetXp'] as num?)
-            ?.toDouble() ??
-        0,
-
-mechanicXp:
-    (json['mechanicXp'] as num?)
-            ?.toDouble() ??
-        0,
-
-scoutXp:
-    (json['scoutXp'] as num?)
-            ?.toDouble() ??
-        0,
-
-combatXp:
-    (json['combatXp'] as num?)
-            ?.toDouble() ??
-        0,
+      doctorXp:
+          (json['doctorXp'] as num?)
+                  ?.toDouble() ??
+              0,
+      vetXp:
+          (json['vetXp'] as num?)
+                  ?.toDouble() ??
+              0,
+      mechanicXp:
+          (json['mechanicXp'] as num?)
+                  ?.toDouble() ??
+              0,
+      scoutXp:
+          (json['scoutXp'] as num?)
+                  ?.toDouble() ??
+              0,
+      combatXp:
+          (json['combatXp'] as num?)
+                  ?.toDouble() ??
+              0,
     );
   }
 }

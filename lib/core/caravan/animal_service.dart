@@ -78,11 +78,21 @@ class AnimalService {
                 )));
   }
 
-  static double cargoCapacityKg(
-    Animal animal,
-  ) {
-    return weightKg(animal) * 0.25;
-  }
+static double cargoCapacityKg(
+  Animal animal,
+) {
+  double capacity =
+      weightKg(animal) * 0.25;
+
+final hpRatio =
+    animal.hp /
+    animal.type.maxHp;
+
+final capacityModifier =
+    0.5 + (hpRatio * 0.5);
+
+return capacity * capacityModifier;
+}
 
   static bool canCarryRider({
     required Animal animal,

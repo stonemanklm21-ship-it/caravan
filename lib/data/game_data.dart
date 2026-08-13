@@ -35,5 +35,6 @@ final game = Game(
       vehicles: [],
       manifest: [],
     ),
+    banditProtectionHours: 0,
   ),
 );

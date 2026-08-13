@@ -12,6 +12,8 @@ import '../../data/armour_data.dart';
 import '../../data/helmet_data.dart';
 import 'skill.dart';
 import '../caravan/skill_service.dart';
+import '../caravan/animal_service.dart';
+
 
 class Caravan {
   Character leader;
@@ -84,15 +86,37 @@ double get speed {
   for (final animal
       in animals) {
     if (animal.alive &&
-        animal.type.speed <
+        AnimalService.speed(
+              animal,
+            ) <
             slowest) {
       slowest =
-          animal.type.speed;
+          AnimalService.speed(
+            animal,
+          );
     }
   }
 
-  return slowest;
+  double finalSpeed =
+      slowest;
+
+  if (cargoCapacityKg > 0) {
+    final utilisation =
+        cargoWeightKg /
+        cargoCapacityKg;
+
+    if (utilisation > 1.25) {
+      return 0;
+    }
+
+    if (utilisation > 1.0) {
+      finalSpeed *= 0.8;
+    }
+  }
+
+  return finalSpeed;
 }
+
 
 int get doctorSkill {
   int total = SkillService.getLevel(
@@ -174,18 +198,15 @@ int get combatSkill {
   return total;
 }
 
-  double get calorieRequirementPerDay {
-    double total =
-        leader.caloriesPerDay;
+int get calorieRequirementPerDay {
+  int total = leader.caloriesPerDay;
 
-    for (final companion
-        in companions) {
-      total +=
-          companion.caloriesPerDay;
-    }
-
-    return total;
+  for (final companion in companions) {
+    total += companion.caloriesPerDay;
   }
+
+  return total;
+}
 
   double get wagesPerDay {
     return companions.fold<double>(

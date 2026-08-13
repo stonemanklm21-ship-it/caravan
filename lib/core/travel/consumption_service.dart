@@ -1,13 +1,22 @@
+import 'package:merchantcaravan/data/game_balance.dart';
+
 import '../../data/goods_data.dart';
+import '../caravan/skill_service.dart';
 import '../models/caravan.dart';
 import '../models/skill.dart';
-import '../caravan/skill_service.dart';
 
 class ConsumptionService {
   static void consume({
     required Caravan caravan,
     required double days,
   }) {
+    // Pay wages
+    caravan.gold -= caravan.wagesPerDay * days;
+
+    if (caravan.gold < 0) {
+      caravan.gold = 0;
+    }
+
     final caloriesRequired =
         caravan.calorieRequirementPerDay *
         days;
@@ -197,24 +206,28 @@ class ConsumptionService {
         ...caravan.companions,
       ],
       skill: Skill.doctor,
-      amount: preventedDamage * 500,
+      amount:
+          preventedDamage *
+          GameBalance.doctorPerTravelHour,
     );
 
-    caravan.leader.hp =
-        (caravan.leader.hp - damage)
-            .clamp(
-      0,
-      caravan.leader.maxHp,
-    );
+caravan.leader.hp =
+    (caravan.leader.hp - damage)
+        .round()
+        .clamp(
+          0,
+          caravan.leader.maxHp,
+        );
 
     for (final companion
         in caravan.companions) {
-      companion.hp =
-          (companion.hp - damage)
-              .clamp(
-        0,
-        companion.maxHp,
-      );
+companion.hp =
+    (companion.hp - damage)
+        .round()
+        .clamp(
+          0,
+          companion.maxHp,
+        );
     }
   }
 
@@ -262,7 +275,9 @@ class ConsumptionService {
         ...caravan.companions,
       ],
       skill: Skill.vet,
-      amount: preventedDamage * 500,
+      amount:
+          preventedDamage *
+          GameBalance.vetPerTravelHour,
     );
 
     for (final animal

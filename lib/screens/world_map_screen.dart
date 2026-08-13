@@ -16,16 +16,13 @@ import '../world_map/world_map_selection_strip.dart';
 import '../world_map/world_map_status_bar.dart';
 import '../world_map/world_map_travel_service.dart';
 import '../world_map/world_map_navigation.dart';
-import '../screens/npc_trade_screen.dart';
-import '../core/models/caravan_faction.dart';
-import '../core/combat/combat_encounter.dart';
-import '../screens/combat_screen.dart';
 import '../core/world/map_runtime_service.dart';
 import '../core/world/map_interaction_service.dart';
-import '../core/world/map_encounter_interaction_service.dart';
-import '../core/world/map_combat_interaction_service.dart';
 import '../core/world/map_snapshot_service.dart';
 import '../core/world/map_snapshot.dart';
+import '../world_map/world_map_caravan_status_bar.dart';
+import '../core/caravan/caravan_encounter.dart';
+import '../core/caravan/caravan_encounter_handler.dart';
 
 
 class WorldMapScreen extends StatefulWidget {
@@ -118,150 +115,21 @@ if (game.player.encounteredNpc != null
     final npc =
         game.player.encounteredNpc!;
 
-if (npc.faction ==
-    CaravanFaction.bandit) {
-  Future.microtask(() {
-    if (!mounted) {
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text(
-            'Bandit Encounter',
-          ),
-          content: const Text(
-            'A bandit caravan blocks your path.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                MapEncounterInteractionService
-    .dismissEncounter(
-  player: game.player,
-);
-
-                _encounterActive = false;
-
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'Continue',
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                MapEncounterInteractionService.prepareCombat(player: game.player,);
-
-                _encounterActive = false;
-
-                Navigator.pop(context);
-
-Navigator.push<bool>(
-  this.context,
-  MaterialPageRoute(
-    builder: (_) => CombatScreen(
-      encounter: CombatEncounter(
-        attackers: npc.caravan,
-        defenders: game.player.caravan,
-        attackerFaction: npc.faction,
-        defenderFaction:
-            CaravanFaction.merchant,
-      ),
-    ),
-  ),
-).then(
-  (playerWon) {
-    if (playerWon == true) {
-setState(() {
-  MapCombatInteractionService
-      .removeDefeatedNpc(
-    world: game.world,
-    npc: npc,
-  );
-});
-    }
-  },
-);
-              },
-              child: const Text(
-                'Fight',
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  });
-
-  return;
-}
-
-    Future.microtask(() {
-      if (!mounted) {
-        return;
-      }
-
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text(
-              'Caravan Encounter',
-            ),
-            content: const Text(
-              'You have encountered a merchant caravan.',
-            ),  
-            actions: [
-              TextButton(
-onPressed: () {
-MapEncounterInteractionService
-    .ignoreEncounter(
-  player: game.player,
-  npc: npc,
-);
-
-  _encounterActive = false;
-
-  Navigator.pop(context);
-},
-                child: const Text(
-                  'Ignore',
-                ),
-              ),
-              TextButton(
-onPressed: () {
-MapEncounterInteractionService
-    .dismissEncounter(
-  player: game.player,
-);
-
-  _encounterActive = false;
-
-  Navigator.pop(context);
-
-  Navigator.push(
-    this.context,
-    MaterialPageRoute(
-      builder: (_) => NpcTradeScreen(
+     final encounter = CaravanEncounter(
         npc: npc,
-      ),
-    ),
-  );
-},
-                child: const Text(
-                  'Trade',
-                ),
-              ),
-            ],
-          );
-        },
-      );
-    });
-
+);
+Future.microtask(() async {
+  if (!mounted) {
     return;
+  }
+
+  await CaravanEncounterHandler.handle(
+    context,
+    encounter,
+  );
+
+  _encounterActive = false;
+});    return;
   }
 
 final snapshot =  _currentSnapshot();
@@ -644,7 +512,9 @@ MapInteractionService
                         setState(() {});
                       },
                     ),
-
+WorldMapCaravanStatusBar(
+  playerState: game.player,
+),
                     WorldMapControlBar(
                       timeController:
                           _timeController,

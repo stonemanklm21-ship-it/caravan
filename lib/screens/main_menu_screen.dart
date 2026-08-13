@@ -5,6 +5,8 @@ import '../core/save/save_service.dart';
 import '../core/world/time_service.dart';
 import '../core/combat/combat_encounter.dart';
 import '../core/models/caravan_faction.dart';
+import '../core/combat/combat_session.dart';
+import '../ui/theme/app_colors.dart';
 
 import 'equipment_market_screen.dart';
 import 'animal_market_screen.dart';
@@ -99,6 +101,12 @@ class _MainMenuScreenState
               runSpacing: 8,
               children: [
                 ElevatedButton(
+                                                                                                        style: ElevatedButton.styleFrom(
+    side: const BorderSide(
+      color: AppColors.gold,
+      width: 2,
+    ),
+  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -185,6 +193,12 @@ class _MainMenuScreenState
                 ),
 
                 ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+    side: const BorderSide(
+      color: AppColors.gold,
+      width: 2,
+    ),
+  ),
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -225,6 +239,12 @@ if (city != null)
                 if (city?.animalMarketTier !=
                     null)
                   ElevatedButton(
+                                                              style: ElevatedButton.styleFrom(
+    side: const BorderSide(
+      color: AppColors.gold,
+      width: 2,
+    ),
+  ),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -250,6 +270,12 @@ if (city != null)
                 if (city?.vehicleMarketTier !=
                     null)
                   ElevatedButton(
+                                                                                  style: ElevatedButton.styleFrom(
+    side: const BorderSide(
+      color: AppColors.gold,
+      width: 2,
+    ),
+  ),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -275,6 +301,12 @@ if (city != null)
 if (city?.equipmentMarketTier !=
     null)
   ElevatedButton(
+                                                                                      style: ElevatedButton.styleFrom(
+    side: const BorderSide(
+      color: AppColors.gold,
+      width: 2,
+    ),
+  ),
     onPressed: () {
       Navigator.push(
         context,
@@ -296,6 +328,12 @@ if (city?.equipmentMarketTier !=
 
                 if (city?.hasVet ?? false)
                   ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+    side: const BorderSide(
+      color: AppColors.gold,
+      width: 2,
+    ),
+  ),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -319,6 +357,12 @@ if (city?.equipmentMarketTier !=
                 if (city?.hasCartwright ??
                     false)
                   ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+    side: const BorderSide(
+      color: AppColors.gold,
+      width: 2,
+    ),
+  ),
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -341,23 +385,28 @@ if (city?.equipmentMarketTier !=
 
                 if (city?.hasDoctor ??
                     false)
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) =>
-                              const DoctorScreen(),
-                        ),
-                      ).then(
-                        (_) =>
-                            setState(() {}),
-                      );
-                    },
-                    child: const Text(
-                      'Doctor',
-                    ),
-                  ),
+ElevatedButton(
+  style: ElevatedButton.styleFrom(
+    side: const BorderSide(
+      color: AppColors.gold,
+      width: 2,
+    ),
+  ),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            const DoctorScreen(),
+      ),
+    ).then(
+      (_) => setState(() {}),
+    );
+  },
+  child: const Text(
+    'Doctor',
+  ),
+),
 
                 ElevatedButton(
                   onPressed: () {
@@ -381,7 +430,8 @@ ElevatedButton(
       context,
 MaterialPageRoute(
   builder: (_) => CombatScreen(
-    encounter: CombatEncounter(
+  session: CombatSession.fromEncounter(
+    CombatEncounter(
       attackers:
           game.world
               .npcCaravans
@@ -398,6 +448,7 @@ MaterialPageRoute(
           CaravanFaction.merchant,
     ),
   ),
+),
 ),
     );
   },

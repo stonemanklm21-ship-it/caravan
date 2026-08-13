@@ -7,6 +7,11 @@ void main() {
     'lib/data/industry_types.csv',
   );
 
+  final rowsByOutputGood = {
+    for (final row in rows)
+      row['outputGood'].toString(): row,
+  };
+
   final buffer = StringBuffer();
 
   buffer.writeln(
@@ -49,44 +54,17 @@ void main() {
     final outputGood =
         row['outputGood'].toString();
 
-    final consumers = rows.where(
-      (other) =>
-          other['inputGood1']
-                  .toString()
-                  .trim() ==
-              outputGood ||
-          other['inputGood2']
-                  .toString()
-                  .trim() ==
-              outputGood,
-    );
-
-    final outputExpression =
-        consumers.map((consumer) {
-      final consumerOutputGood =
-          consumer['outputGood'];
-
-      final outputExpr =
-          'GameBalance.outputForDemand($consumerOutputGood.populationDemandPerPersonPerDay)';
-
-      if (consumer['inputGood1']
-              .toString()
-              .trim() ==
-          outputGood) {
-        return '($outputExpr * ${consumer['inputRatio1']})';
-      }
-
-      return '($outputExpr * ${consumer['inputRatio2']})';
-    }).join(' + ');
-
     writeIndustry(
       buffer: buffer,
       row: row,
       demandDriven: false,
       outputExpression:
-          outputExpression.isEmpty
-              ? '0'
-              : outputExpression,
+          requiredOutputForGood(
+        good: outputGood,
+        rowsByOutputGood:
+            rowsByOutputGood,
+        rows: rows,
+      ),
     );
   }
 
@@ -116,7 +94,7 @@ IndustryType industryTypeForId(
 ''');
 
   File(
-    'lib/data/industry_data_test.dart',
+    'lib/data/industry_data.dart',
   ).writeAsStringSync(
     buffer.toString(),
   );
@@ -124,6 +102,85 @@ IndustryType industryTypeForId(
   print(
     'Generated ${rows.length} industry types.',
   );
+}
+
+String requiredOutputForGood({
+  required String good,
+  required Map<String, Map<String, dynamic>>
+      rowsByOutputGood,
+  required List<Map<String, dynamic>> rows,
+  Set<String>? visiting,
+}) {
+  visiting ??= {};
+
+  if (!visiting.add(good)) {
+    throw Exception(
+      'Circular dependency detected for $good',
+    );
+  }
+
+  final producerRow =
+      rowsByOutputGood[good]!;
+
+  final demandDriven =
+      producerRow['derivedFromDemand']
+              .toString()
+              .toLowerCase() ==
+          'true';
+
+  if (demandDriven) {
+    return '''
+GameBalance.outputForDemand(
+  $good.populationDemandPerPersonPerDay,
+)
+''';
+  }
+
+  final consumers = rows.where(
+    (row) =>
+        row['inputGood1']
+                .toString()
+                .trim() ==
+            good ||
+        row['inputGood2']
+                .toString()
+                .trim() ==
+            good,
+  );
+
+  return consumers.map((consumer) {
+    final consumerOutputGood =
+        consumer['outputGood']
+            .toString();
+
+    final requiredOutput =
+        requiredOutputForGood(
+      good: consumerOutputGood,
+      rowsByOutputGood:
+          rowsByOutputGood,
+      rows: rows,
+      visiting: {
+        ...visiting!,
+      },
+    );
+
+    if (consumer['inputGood1']
+            .toString()
+            .trim() ==
+        good) {
+      return '''
+(
+  $requiredOutput
+) * ${consumer['inputRatio1']}
+''';
+    }
+
+    return '''
+(
+  $requiredOutput
+) * ${consumer['inputRatio2']}
+''';
+  }).join(' + ');
 }
 
 void writeIndustry({
